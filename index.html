@@ -222,7 +222,15 @@ details summary{cursor:pointer;font-weight:600;padding:.3rem 0}
 const APP_KEY = 'trenerG463.data.v1';
 const LOCAL_KEY = 'trenerG463.local.v1';      // per-zařízení: aktivní směna
 /* Firebase RTDB (europe-west1) – doplň konfiguraci projektu, jinak aplikace běží lokálně v prohlížeči */
-const FIREBASE_CONFIG = null; /* volitelně natvrdo: { apiKey:'…', authDomain:'…', databaseURL:'https://xxx-default-rtdb.europe-west1.firebasedatabase.app', projectId:'…', appId:'…' } */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAz7_9ijMC38SL9dVbYdjwvBHHNyuV97VU",
+  authDomain: "g463-prefix---trainers-system.firebaseapp.com",
+  databaseURL: "https://g463-prefix---trainers-system-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "g463-prefix---trainers-system",
+  storageBucket: "g463-prefix---trainers-system.firebasestorage.app",
+  messagingSenderId: "906392970022",
+  appId: "1:906392970022:web:cd403e27e375d83675d7e7"
+}; /* formát: { apiKey:'…', authDomain:'…', databaseURL:'https://xxx-default-rtdb.europe-west1.firebasedatabase.app', projectId:'…', appId:'…' } */
 const FB_CFG_KEY = 'trenerG463.firebase.v1';
 function readFbCfg(){ if (FIREBASE_CONFIG) return FIREBASE_CONFIG; try{ return JSON.parse(localStorage.getItem(FB_CFG_KEY) || 'null'); }catch(e){ return null; } }
 /* Přijme celý snippet z Firebase konzole (const firebaseConfig = {...}) nebo JSON */
