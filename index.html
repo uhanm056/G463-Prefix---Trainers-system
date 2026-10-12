@@ -537,21 +537,52 @@ function renderSmena(){
      auto: [sug.open.length ? `${sug.open.length} otevřených eskalací na ${sh.line}` : '', sug.prevKrit.length ? `Kritické v posledních směnách: ${sug.prevKrit.join(', ')}` : '', sug.rep.length ? `Opakovaná korekce: ${sug.rep.map(r => esc(r.op) + ' – ' + PROC_BY[r.proc]?.n).join(', ')}` : '', sug.eolT ? `EOL ${sug.eolT.wn}: ${sug.eolT.list.filter(x => x.R.cls === 'crit' || (x.avg8 && x.rate > x.avg8 * 1.2)).map(x => esc(x.n) + (x.R.cls === 'crit' ? ' roste ' + pctTxt(x.R.pct) : ' nad normálem 8 týdnů')).join(', ') || 'TOP vady nerostou a jsou v normálu'}` : ''].filter(Boolean).join(' · ') || 'Žádná otevřená eskalace ani opakovaná chyba v datech.'},
     {k:'stab', t:'Je tým stabilní a bez odchylek?', h:'všichni OP zkušení, výkon v normě, žádná otevřená eskalace', auto:''},
   ];
-  let decided = null, stop = false;
+  // 1) urči rozhodnutí (první ANO, nebo 3× NE = smíšený tým)
+  let decided = null;
+  for (const q of qs){ const a = answers[q.k]; if (a === 'ano'){ decided = q.k; break; } if (a == null) break; }
+  if (!decided && answers.new === 'ne' && answers.prob === 'ne' && answers.stab === 'ne') decided = 'mix';
+  const F = decided ? FOCUS[decided] : null;
+  // 2) předvyplnění z dat (jen když trenér ještě nic nezapsal)
+  const sameType = f.type === decided;
+  let dOp = sameType ? f.op : '', dProc = sameType ? f.proc : '', dWhy = sameType ? f.why : '';
+  if (!dOp && decided === 'new' && sug.newOps.length === 1) dOp = sug.newOps[0].name;
+  if (!dOp && decided === 'prob' && sug.rep.length) dOp = sug.rep[0].op;
+  if (!dOp && decided === 'stab') dOp = 'Všichni OP – rotace';
+  if (!dProc && decided === 'prob'){
+    const hot = sug.eolT ? sug.eolT.list.find(x => x.proc && (x.R.cls === 'crit' || (x.avg8 && x.rate > x.avg8 * 1.2))) : null;
+    dProc = sug.rep[0]?.proc || hot?.proc || '';
+  }
+  const focusCard = F ? `<div class="focus-card ${F.cls}" id="focusCard" style="margin:.2rem 0 .7rem">
+      <div class="ft">${F.ico} ${F.n}</div>
+      <p style="margin:.4rem 0 .6rem">${F.strat}</p>
+      <div class="small"><b>Bloky:</b> ${F.blocks.join(', ')}</div>
+      <label class="f">Hlavní OP fokus <span class="req">*</span></label>
+      ${opSelect('fOp', dOp, sh.line, decided === 'stab')}
+      <label class="f">${decided === 'prob' ? 'Krok procesu s problémem' : 'Proces / krok procesu'}${decided === 'prob' ? ' <span class="req">*</span>' : ''}</label>
+      <select id="fProc"><option value="">– celá linka –</option>${PROC.map(p => `<option value="${p.k}" ${dProc===p.k?'selected':''}>${p.n}</option>`).join('')}</select>
+      <label class="f">Důvod výběru <span class="req">*</span></label>
+      <textarea id="fWhy" placeholder="${decided === 'new' ? 'Např. 3. den na Prefixu, zatím bez samostatné kvalifikace' : decided === 'prob' ? 'Např. EOL: vrásky nad normálem, včera 4 NOK na Laminaci' : decided === 'stab' ? 'Např. všichni kvalifikovaní, žádná otevřená eskalace' : 'Např. 2 zkušení + 1 OP po návratu z absence'}">${esc(dWhy || '')}</textarea>
+      <div class="row" style="margin-top:.75rem">
+        <button class="btn" id="btnFocus">${f.setAt ? 'Změnit fokus' : 'Zapsat fokus směny'}</button>
+        ${f.setAt ? `<span class="small muted">zapsáno ${hhmm(f.setAt)}${(f.hist||[]).length ? ` · změněno ${f.hist.length}×` : ''}</span>` : ''}
+      </div>
+    </div>` : '';
+  // 3) otázky; karta fokusu hned pod tou, kde padlo rozhodnutí
+  let stop = false;
   const qHtml = qs.map((q, i) => {
     const dim = stop;
     const a = answers[q.k];
-    if (!stop && a === 'ano'){ decided = q.k; stop = true; }
-    if (!stop && a == null) stop = true;
+    let after = '';
+    if (!stop && a === 'ano'){ stop = true; after = focusCard; }
+    else if (!stop && a == null) stop = true;
+    else if (q.k === 'stab' && decided === 'mix') after = focusCard;
     return `<div class="q ${dim?'dim':''}"><div class="qh"><div class="qn">${i+1}</div><div style="flex:1">
       <div class="qt">${q.t}</div><div class="hint">${q.h}</div>
       ${q.auto ? `<div class="auto">💡 ${q.auto}</div>` : ''}
       <div class="ans"><button class="chip ${a==='ano'?'active':''}" data-q="${q.k}" data-a="ano" ${dim?'disabled':''}>ANO</button>
       <button class="chip ${a==='ne'?'active':''}" data-q="${q.k}" data-a="ne" ${dim?'disabled':''}>NE</button></div>
-    </div></div></div>`;
+    </div></div></div>${after}`;
   }).join('');
-  if (!decided && answers.new==='ne' && answers.prob==='ne' && answers.stab==='ne') decided = 'mix';
-  const F = decided ? FOCUS[decided] : null;
   const ops = opsOf(sh.line);
   const pre = sh.pre || {};
   const tlLate = f.setAt && f.tlAt && (new Date(f.tlAt) - new Date(sh.startAt)) / 6e4 > RULES.tlConfirmMin;
@@ -574,21 +605,11 @@ function renderSmena(){
         </div>
       </div>
       <div>
-        ${F ? `<div class="focus-card ${F.cls}">
-            <div class="ft">${F.ico} ${F.n}</div>
-            <p style="margin:.4rem 0 .6rem">${F.strat}</p>
-            <div class="small"><b>Bloky:</b> ${F.blocks.join(', ')}</div>
-            <label class="f">Hlavní OP fokus <span class="req">*</span></label>
-            ${opSelect('fOp', f.op, sh.line, decided === 'stab')}
-            <label class="f">Proces / krok procesu</label>
-            <select id="fProc"><option value="">– celá linka –</option>${PROC.map(p => `<option value="${p.k}" ${f.proc===p.k?'selected':''}>${p.n}</option>`).join('')}</select>
-            <label class="f">Důvod výběru <span class="req">*</span></label>
-            <textarea id="fWhy" placeholder="Např. 3. den na Prefixu, včera 4 NOK – vrásky na hraně">${esc(f.why || '')}</textarea>
-            <div class="row" style="margin-top:.75rem">
-              <button class="btn" id="btnFocus">${f.setAt ? 'Změnit fokus' : 'Zapsat fokus směny'}</button>
-              ${f.setAt ? `<span class="small muted">zapsáno ${hhmm(f.setAt)}${(f.hist||[]).length ? ` · změněno ${f.hist.length}×` : ''}</span>` : ''}
-            </div>
-          </div>` : `<div class="card empty"><div class="big">🧭</div>Odpověz na otázky vlevo – aplikace určí fokus a strategii.</div>`}
+        ${f.setAt ? `<div class="focus-card ${FOCUS[f.type]?.cls || ''}" style="padding:.75rem 1rem">
+            <div class="small muted">Zapsaný fokus směny · ${hhmm(f.setAt)}</div>
+            <div class="ft" style="font-size:1rem">${FOCUS[f.type]?.ico || ''} ${FOCUS[f.type]?.n || ''}</div>
+            <div class="small" style="margin-top:.2rem"><b>${esc(f.op)}</b>${f.proc ? ' · ' + PROC_BY[f.proc].n : ''}<br>${esc(f.why)}</div>
+          </div>` : `<div class="card empty" style="padding:1.5rem 1rem"><div class="big">🧭</div>${F ? 'Doplň detail fokusu pod otázkou a zapiš ho.' : 'Odpověz na otázky rozhodovacího diagramu.'}</div>`}
 
         ${f.setAt ? `<div class="card">
             <h2>Potvrzení TL / supervisor</h2>
@@ -625,10 +646,17 @@ function renderSmena(){
     order.slice(i+1).forEach(k => delete sh.focus.ans[k]);
     sh.focus.ans[b.dataset.q] = b.dataset.a;
     await store.put('shifts', sh.id, sh); renderSmena();
+    const card = $('focusCard');
+    if (card){
+      card.scrollIntoView({ behavior:'smooth', block:'start' });
+      const first = [$('fOp'), $('fWhy')].find(x => x && !x.value);
+      if (first) setTimeout(() => first.focus({ preventScroll:true }), 350);
+    }
   });
   if ($('btnFocus')) $('btnFocus').onclick = async () => {
     const op = $('fOp').value, why = $('fWhy').value.trim();
     if (!op || !why){ toast('Vyplň hlavního OP a důvod výběru'); return; }
+    if (decided === 'prob' && !$('fProc').value){ toast('U aktivního problému vyber krok procesu'); return; }
     const prev = sh.focus.setAt ? {type:sh.focus.type, op:sh.focus.op, why:sh.focus.why, at:sh.focus.setAt} : null;
     Object.assign(sh.focus, { type: decided, op, proc: $('fProc').value, why, setAt: nowIso() });
     if (prev){ sh.focus.hist = [...(sh.focus.hist || []), prev]; }
