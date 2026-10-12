@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trenér G463 – Planá</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#003B7A; --navy-2:#0B5BA8; --navy-soft:#E6EEF7;
+  --bg:#F5F7FA; --surface:#FFFFFF; --text:#1B2430; --muted:#5C6B7A; --line:#D9E0E8;
+  --good:#1A9963; --warn:#C07F00; --crit:#D24842; --info:#0F6FB5; --violet:#6B4FB8;
+  --good-soft:#E3F4EC; --warn-soft:#FBF1DC; --crit-soft:#FBE7E6; --violet-soft:#EEE9F8;
+  --rail:#0F2340; --rail-text:#C9D6E6;
+  --f-head:"Bricolage Grotesque",system-ui,"Segoe UI",Arial,sans-serif;
+  --f-text:"Figtree",system-ui,"Segoe UI",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0E141C;--surface:#161E29;--text:#E6ECF2;--muted:#93A1B1;--line:#263241;--navy-soft:#122A47;
+    --good-soft:#12301F;--warn-soft:#33270C;--crit-soft:#3A1715;--violet-soft:#241B3D}
+}
+:root[data-theme="dark"]{--bg:#0E141C;--surface:#161E29;--text:#E6ECF2;--muted:#93A1B1;--line:#263241;--navy-soft:#122A47;
+  --good-soft:#12301F;--warn-soft:#33270C;--crit-soft:#3A1715;--violet-soft:#241B3D}
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.45 var(--f-text);display:flex;min-height:100vh}
+h1,h2,h3{font-family:var(--f-head);margin:0 0 .5rem;line-height:1.2}
+h1{font-size:1.45rem} h2{font-size:1.1rem} h3{font-size:1rem}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:.82rem}
+
+.rail{width:210px;background:var(--rail);color:var(--rail-text);padding:1rem .75rem;display:flex;flex-direction:column;gap:.2rem;flex-shrink:0;position:sticky;top:0;height:100vh}
+.rail .brand{font-family:var(--f-head);color:#fff;font-size:1.05rem;padding:.25rem .5rem .1rem}
+.rail .brand-sub{font-size:.75rem;opacity:.7;padding:0 .5rem 1rem}
+.rail button{all:unset;cursor:pointer;padding:.55rem .75rem;border-radius:8px;min-height:44px;display:flex;align-items:center;gap:.6rem;position:relative}
+.rail button:hover{background:rgba(255,255,255,.06)}
+.rail button.active{background:var(--navy-2);color:#fff}
+.rail .ico{width:20px;text-align:center}
+.rail .badge{margin-left:auto;background:var(--crit);color:#fff;border-radius:999px;font-size:.7rem;padding:0 .45rem;font-weight:700}
+.rail .spacer{flex:1}
+.rail .meta{font-size:.75rem;opacity:.75;padding:.5rem .75rem}
+
+main{flex:1;padding:1.25rem;max-width:1200px;width:100%;min-width:0;margin:0 auto}
+section[data-view]{display:none} section[data-view].active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:.9rem}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.9rem}
+.grid-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:.9rem}
+.kpi{margin:0}
+.kpi .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.kpi .val{font-family:var(--f-mono);font-size:1.6rem;font-weight:500;margin:.15rem 0}
+.kpi .sub{font-size:.78rem;color:var(--muted)}
+.tag{display:inline-block;padding:.1rem .55rem;border-radius:999px;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.02em;white-space:nowrap}
+.tag.good{background:var(--good)} .tag.warn{background:var(--warn)} .tag.crit{background:var(--crit)} .tag.neutral{background:var(--muted)} .tag.info{background:var(--info)} .tag.violet{background:var(--violet)}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem .9rem;min-height:40px;cursor:pointer;font:inherit;color:inherit}
+.chip.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.s-ok.active{background:var(--good);border-color:var(--good)}
+.chip.s-po.active{background:var(--warn);border-color:var(--warn)}
+.chip.s-kr.active{background:var(--crit);border-color:var(--crit)}
+label.f{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:.75rem 0 .3rem;text-transform:uppercase;letter-spacing:.03em}
+label.f .req{color:var(--crit)}
+input[type=text],input[type=date],input[type=number],input[type=time],select,textarea{width:100%;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;min-height:44px}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--navy-2);outline-offset:0}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:.6rem 1rem;min-height:44px;font:inherit;font-weight:600;cursor:pointer}
+.btn.secondary{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+:root[data-theme="dark"] .btn.secondary{color:#9CC3F0;border-color:#9CC3F0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.secondary{color:#9CC3F0;border-color:#9CC3F0}}
+.btn.danger{background:var(--crit)} .btn.good{background:var(--good)}
+.btn.sm{min-height:36px;padding:.35rem .7rem;font-size:.85rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{padding:.5rem .7rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:var(--navy-soft);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--line) 25%,transparent)}
+td.num{font-family:var(--f-mono);text-align:right}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.empty .big{font-size:2.2rem;margin-bottom:.3rem}
+.toast{position:fixed;right:1rem;bottom:1rem;background:var(--text);color:var(--bg);padding:.7rem 1rem;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;max-width:90vw}
+.toast.show{opacity:1}
+.banner{border-radius:10px;padding:.75rem .9rem;margin-bottom:.9rem;border-left:5px solid}
+.banner.crit{background:var(--crit-soft);border-color:var(--crit)}
+.banner.warn{background:var(--warn-soft);border-color:var(--warn)}
+.banner.good{background:var(--good-soft);border-color:var(--good)}
+.banner.info{background:var(--navy-soft);border-color:var(--navy-2)}
+
+/* rozhodovací diagram */
+.q{border:1px solid var(--line);border-radius:12px;padding:.8rem;margin-bottom:.6rem;background:var(--surface)}
+.q.dim{opacity:.4}
+.q .qh{display:flex;gap:.6rem;align-items:flex-start}
+.q .qn{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.q .qt{font-weight:600}
+.q .hint{font-size:.8rem;color:var(--muted)}
+.q .auto{font-size:.8rem;margin-top:.35rem;padding:.35rem .55rem;border-radius:6px;background:var(--navy-soft)}
+.q .ans{margin-top:.55rem;display:flex;gap:.4rem}
+.focus-card{border-radius:12px;padding:1rem;border:2px solid;margin-bottom:.9rem}
+.focus-card.f-new{border-color:var(--warn);background:var(--warn-soft)}
+.focus-card.f-prob{border-color:var(--crit);background:var(--crit-soft)}
+.focus-card.f-stab{border-color:var(--good);background:var(--good-soft)}
+.focus-card.f-mix{border-color:var(--violet);background:var(--violet-soft)}
+.focus-card .ft{font-family:var(--f-head);font-size:1.15rem;font-weight:700}
+.checkl{list-style:none;padding:0;margin:0}
+.checkl li{display:flex;gap:.6rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--line);min-height:44px}
+.checkl li:last-child{border-bottom:0}
+.checkl input{width:22px;height:22px;flex-shrink:0}
+.checkl .t{margin-left:auto;font-size:.75rem;color:var(--muted)}
+
+/* mapa linky */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem;margin-bottom:.9rem}
+.ptile{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--line);border-radius:12px;padding:.8rem;display:flex;flex-direction:column;gap:.45rem}
+.ptile.ok{border-top-color:var(--good)} .ptile.po{border-top-color:var(--warn)} .ptile.kr{border-top-color:var(--crit)}
+.ptile .pn{font-family:var(--f-head);font-weight:700;font-size:1.02rem}
+.ptile .pst{font-size:.78rem;color:var(--muted)}
+.ptile .stbtns{display:flex;gap:.3rem}
+.ptile .stbtns .chip{flex:1;padding:.3rem .2rem;font-size:.78rem;min-height:40px;text-align:center}
+.ptile .nums{display:flex;gap:.8rem;font-size:.78rem;color:var(--muted)}
+.ptile .nums b{font-family:var(--f-mono);color:var(--text);font-weight:500}
+.arrow{display:none}
+
+/* záznamy */
+.rec{border:1px solid var(--line);border-radius:10px;padding:.65rem .8rem;margin-bottom:.5rem;background:var(--surface)}
+.rec .rh{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.rec .rb{font-size:.88rem;margin-top:.3rem}
+.blocks .chip{font-size:.82rem}
+.bar{display:flex;align-items:center;gap:.6rem;margin:.3rem 0}
+.bar .bl{width:55%;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{flex:1;background:var(--navy-soft);border-radius:4px;height:16px;overflow:hidden}
+.bar .bf{height:100%;background:var(--navy-2)}
+.bar .bf.crit{background:var(--crit)}
+.bar .bv{width:48px;text-align:right;font-family:var(--f-mono);font-size:.85rem}
+.legend{font-size:.78rem;color:var(--muted);margin-top:.4rem}
+details summary{cursor:pointer;font-weight:600;padding:.3rem 0}
+.handover{white-space:pre-wrap;font-family:var(--f-mono);font-size:.82rem;background:var(--navy-soft);border-radius:8px;padding:.8rem;max-height:420px;overflow:auto}
+.sync{display:inline-flex;align-items:center;gap:.35rem}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync.on i{background:var(--good)}
+
+@media (max-width:760px){
+  body{flex-direction:column}
+  .rail{width:100%;height:auto;flex-direction:row;padding:.3rem;position:fixed;top:auto;bottom:0;left:0;right:0;z-index:40;overflow-x:auto;gap:.1rem}
+  .rail .brand,.rail .brand-sub,.rail .spacer,.rail .meta{display:none}
+  .rail button{flex:1 0 auto;flex-direction:column;justify-content:center;gap:.05rem;font-size:.68rem;padding:.3rem .45rem;min-height:52px}
+  .rail .ico{font-size:1.1rem}
+  .rail .badge{position:absolute;top:2px;right:2px;margin:0}
+  main{padding:.75rem .75rem 5.5rem}
+  body{font-size:16px}
+  .bar .bl{width:55%}
+  .toast{bottom:4.5rem;left:.75rem;right:.75rem}
+}
+@media print{.rail,.btn,.toast{display:none!important} body{display:block;background:#fff} .card{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<aside class="rail" id="rail">
+  <div class="brand">Trenér G463</div>
+  <div class="brand-sub">Prefix · Planá</div>
+  <button data-go="smena" class="active"><span class="ico">🎯</span><span>Směna</span></button>
+  <button data-go="linka"><span class="ico">🏭</span><span>Linka</span></button>
+  <button data-go="zaznam"><span class="ico">✍️</span><span>Záznam</span></button>
+  <button data-go="eskalace"><span class="ico">🚨</span><span>Eskalace</span><span class="badge" id="escBadge" hidden></span></button>
+  <button data-go="zaver"><span class="ico">🔚</span><span>Závěr</span></button>
+  <button data-go="prehled"><span class="ico">📊</span><span>Přehled TL</span></button>
+  <button data-go="nastaveni"><span class="ico">⚙️</span><span>Nastavení</span></button>
+  <div class="spacer"></div>
+  <div class="meta" id="railMeta">Bez aktivní směny</div>
+  <div class="meta"><span class="sync" id="syncState"><i></i><span>lokálně</span></span></div>
+</aside>
+
+<main>
+  <!-- ===== SMĚNA ===== -->
+  <section data-view="smena" class="active"><div id="smenaBody"></div></section>
+
+  <!-- ===== LINKA ===== -->
+  <section data-view="linka">
+    <div class="row between"><h1>Linka – stav procesů</h1><span class="muted small" id="linkaMeta"></span></div>
+    <p class="muted small" style="margin-top:0">OK = vše v pořádku · Pozornost = drobný problém, řeším sám · Kritické = závažná odchylka, potřebuji podporu (automaticky založí eskalaci).</p>
+    <div id="linkaBody"></div>
+  </section>
+
+  <!-- ===== ZÁZNAM ===== -->
+  <section data-view="zaznam">
+    <h1>Záznam pozorování / korekce</h1>
+    <div id="zaznamBody"></div>
+  </section>
+
+  <!-- ===== ESKALACE ===== -->
+  <section data-view="eskalace">
+    <div class="row between"><h1>Eskalace a otevřené body</h1><button class="btn sm" id="btnNewEsc">+ Nová eskalace</button></div>
+    <div class="chips" id="escFilter" style="margin-bottom:.8rem"></div>
+    <div id="escForm"></div>
+    <div id="escList"></div>
+  </section>
+
+  <!-- ===== ZÁVĚR ===== -->
+  <section data-view="zaver"><h1>Závěr směny a předávka</h1><div id="zaverBody"></div></section>
+
+  <!-- ===== PŘEHLED ===== -->
+  <section data-view="prehled">
+    <h1>Přehled pro TL / supervisora</h1>
+    <div class="row" style="margin-bottom:.8rem;gap:1rem">
+      <div class="chips" id="pvLine"></div>
+      <div class="chips" id="pvPeriod"></div>
+    </div>
+    <div id="prehledBody"></div>
+  </section>
+
+  <!-- ===== NASTAVENÍ ===== -->
+  <section data-view="nastaveni"><h1>Nastavení</h1><div id="nastaveniBody"></div></section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== 1. Konstanty ===================== */
+const APP_KEY = 'trenerG463.data.v1';
+const LOCAL_KEY = 'trenerG463.local.v1';      // per-zařízení: aktivní směna
+/* Firebase RTDB (europe-west1) – doplň konfiguraci projektu, jinak aplikace běží lokálně v prohlížeči */
+const FIREBASE_CONFIG = null; /* volitelně natvrdo: { apiKey:'…', authDomain:'…', databaseURL:'https://xxx-default-rtdb.europe-west1.firebasedatabase.app', projectId:'…', appId:'…' } */
+const FB_CFG_KEY = 'trenerG463.firebase.v1';
+function readFbCfg(){ if (FIREBASE_CONFIG) return FIREBASE_CONFIG; try{ return JSON.parse(localStorage.getItem(FB_CFG_KEY) || 'null'); }catch(e){ return null; } }
+/* Přijme celý snippet z Firebase konzole (const firebaseConfig = {...}) nebo JSON */
+function parseFbSnippet(txt){
+  const o = {}; const re = /["']?(apiKey|authDomain|databaseURL|projectId|storageBucket|messagingSenderId|appId)["']?\s*:\s*["']([^"']+)["']/g; let m;
+  while ((m = re.exec(txt))) o[m[1]] = m[2];
+  if (!o.apiKey || !o.databaseURL) throw new Error('V textu chybí apiKey nebo databaseURL (Realtime Database musí být založená).');
+  return o;
+}
+const FB_CFG = readFbCfg();
+const FB_ROOT = 'trenerG463';
+
+const LINES = ['L1','L2'];
+const SHIFTS = [{k:'R',n:'Ranní'},{k:'O',n:'Odpolední'},{k:'N',n:'Noční'}];
+const DEFAULT_TRAINERS = ['Isidora Medič','Tetiana Flora','Sebastian Gabriel Molnar','Petra Fizel'];
+
+/* Procesy a volby přesně podle MS Forms „G463 Prefix – denní rutina Trenéra“ */
+const PROC = [
+  {k:'spacer', n:'Spacer',
+   what:['Přetlačený spacer','Trhací zkouška','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Špatně nastavená teplota horkovzdušné pistole','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'glue', n:'Glue spray',
+   what:['Znečištění lepidlem','Lepidlo pod kůží','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Stroj – špatná tryska','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'prefix', n:'Prefix',
+   what:['Dlouhý nástřih','Znečištění lepidlem','Vada kůže','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Materiál (kůže)','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'lam', n:'Laminace',
+   what:['Vrásky','Vzduch (bubliny)','Lepidlo pod kůží','NOK díly po Prefixu','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Stroj','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Tool – znečištění','NOK díl z předešlého procesu','Jiné']},
+  {k:'ew', n:'Edge Wrapping',
+   what:['Hrana > 1 mm','Zahranění – Map Pocket','Zahranění – ostatní','Znečištění lepidlem','NOK díly po Prefixu','NOK díly po Laminaci','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Laminace','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Znečištění','Jiné']},
+  {k:'rework', n:'Rework',
+   what:['Oprava nedokončena / vada zůstala','Nová vada po opravě','NOK díly','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','NOK díly z Prefixu','NOK díl z Laminace','Jiné']},
+];
+const PROC_BY = Object.fromEntries(PROC.map(p => [p.k, p]));
+
+/* „Chyba operátora“ není root cause – trenér musí říct, proč to systém umožnil */
+const WHY_SYSTEM = ['OP standard neznal (nebyl zaškolen)','OP standard znal, ale nedodržel','Standard / WI je nejasný nebo chybí','Chybí poka-yoke / kontrola chybu nezachytí','Tlak na tempo / přetížení','Rozptýlení / pracovní podmínky'];
+
+const STATUS = {ok:{n:'OK',cls:'good'}, po:{n:'Pozornost',cls:'warn'}, kr:{n:'Kritické',cls:'crit'}};
+const ACTION = [{k:'done',n:'Ano – korekce provedena'},{k:'prog',n:'Probíhá – řeším'},{k:'help',n:'Ne – potřebuji pomoc'}];
+
+const BLOCKS = [
+  {k:1,n:'Blok 1 · Aktivní pozorování',s:['Sleduj celý pracovní cyklus bez zásahu','Sleduj, zda OP chápe, co kontroluje','Zaznamenej odchylky od standardu']},
+  {k:2,n:'Blok 2 · Okamžitá korekce',s:['Zastavit OP a vysvětlit','Ukázat správný postup (ne jen říct)','Nechat OP zopakovat správně','Ujistit se, že pochopil důvod']},
+  {k:3,n:'Blok 3 · Prevence chyb',s:['Upozornit na kritický bod','Vysvětlit následky chyby','Ověřit, že OP ví, co dělat při NOK','Identifikovat slabé místo procesu']},
+  {k:4,n:'Blok 4 · Podpora výkonu',s:['Tempo vs. kvalita (nejen rychlost)','Ergonomie / pohyby','5S na pracovišti','Pomůcky a nástroje']},
+  {k:5,n:'Blok 5 · Zpětná vazba',s:['Co dělá dobře (konkrétně)','Co má zlepšit (konkrétně)','Na co se zaměří příště','Zapsat do tréninkového záznamu']},
+];
+
+/* Rozhodovací diagram trenéra – pořadí = priorita */
+const FOCUS = {
+  new: {n:'NOVÝ OPERÁTOR', ico:'🆕', cls:'f-new', blocks:[1,2,3,4,5],
+        strat:'Bloky 1–5 komplet u tohoto jednoho OP. Ostatní OP: vizuální scan na začátku a v polovině směny.'},
+  prob:{n:'AKTIVNÍ PROBLÉM / NOK TREND', ico:'🚨', cls:'f-prob', blocks:[1,2,3],
+        strat:'Bloky 1–3 zaměřené na konkrétní krok procesu + eskalace. Ostatní OP: self-check.'},
+  stab:{n:'STABILNÍ TÝM', ico:'✅', cls:'f-stab', blocks:[1,5],
+        strat:'Rotace: Blok 1 + 5 u každého OP. Bloky 2–4 jen při odchylce v Bloku 1.'},
+  mix: {n:'SMÍŠENÝ TÝM', ico:'🔀', cls:'f-mix', blocks:[1,2,3,4,5],
+        strat:'70 % času na slabším / méně zkušeném OP, 30 % kontrolní scan ostatních (Blok 1).'},
+};
+const PRESHIFT = ['Zkontroluj docházku operátorů na pracovišti','Ověř dostupnost dokumentace (WI, control plan)','Zkontroluj stav nástrojů, přípravků a materiálu','Projdi hlášení NOK a eskalace z předchozí směny','Briefing operátorům: plán, cíle směny a aktuální TOP vady'];
+const ENDSHIFT = ['Počet NOK a hlavní příčiny zapsány','Otevřené problémy předány nástupní směně','Čistota a 5S pracoviště zkontrolovány','Tréninkové záznamy operátorů vyplněny','Eskalace nahlášena, pokud nebyly splněny cíle'];
+
+/* Vady z kontrolních reportů (EOL CZ25170, 200% sklad CZ26027) → proces + položka „Co nefunguje“.
+   Přiřazení k procesu = NÁVRH, potvrdit s Quality / Engineering. proc:null = vzniká mimo linku (šití, materiál). */
+const DEFECTS = [
+  {src:'laminacia',            n:'Laminace – vrásky',       proc:'lam',    item:'Vrásky'},
+  {src:'vzduch',               n:'Vzduch (bubliny)',        proc:'lam',    item:'Vzduch (bubliny)'},
+  {src:'znecistenie',          n:'Znečištění lepidlem',     proc:'glue',   item:'Znečištění lepidlem'},
+  {src:'lepidlo pod',          n:'Lepidlo pod kůží',        proc:'glue',   item:'Lepidlo pod kůží'},
+  {src:'hrana',                n:'Hrana > 1 mm',            proc:'ew',     item:'Hrana > 1 mm'},
+  {src:'zahranenie map',       n:'Zahranění – Map Pocket',  proc:'ew',     item:'Zahranění – Map Pocket'},
+  {src:'zahranenie',           n:'Zahranění – ostatní',     proc:'ew',     item:'Zahranění – ostatní'},
+  {src:'pretlaceny',           n:'Přetlačený spacer',       proc:'spacer', item:'Přetlačený spacer'},
+  {src:'dlhy nastrih',         n:'Dlouhý nástřih',          proc:'prefix', item:'Dlouhý nástřih'},
+  {src:'vada koze',            n:'Vada kůže',               proc:'prefix', item:'Vada kůže'},
+  {src:'sitie',                n:'Šití',                    proc:null,     item:null},
+  {src:'mechanicke',           n:'Mechanické poškození',    proc:null,     item:null},
+];
+const EOL_SRC = { eol:'EOL Prefix (CZ25170)', sklad:'200% kontrola sklad (CZ26027)' };
+const RULES = { repeatN: 3, repeatDays: 7, newOpDays: 14, tlConfirmMin: 30 };
+
+/* ===================== 2. Perzistence – odstíněná ===================== */
+let DATA = { shifts:{}, obs:{}, esc:{}, ops:{}, cfg:{} };
+let LOCAL = { activeShift:null };
+let fb = null;
+
+const store = {
+  async load(){
+    try{
+      if (FB_CFG){
+        await fbInit();
+        const snap = await fb.ref(FB_ROOT).once('value'); const remote = snap.val();
+        if (!remote){   // první připojení: nahraj do Firebase to, co je zatím v tomto prohlížeči
+          const local = normalize(JSON.parse(localStorage.getItem(APP_KEY) || '{}'));
+          if (Object.values(local).some(x => Object.keys(x).length)){ await fb.ref(FB_ROOT).set(clean(local)); toast('Lokální data nahrána do Firebase'); return local; }
+        }
+        return remote || {};
+      }
+      return JSON.parse(localStorage.getItem(APP_KEY) || '{}');
+    }catch(e){ console.warn('load', e); toast('Data se nepodařilo načíst – pracuji lokálně'); try{ return JSON.parse(localStorage.getItem(APP_KEY) || '{}'); }catch(_){ return {}; } }
+  },
+  async put(entity, id, obj){
+    DATA[entity] ??= {};
+    if (obj == null) delete DATA[entity][id]; else DATA[entity][id] = obj;
+    try{
+      if (fb){ await fb.ref(`${FB_ROOT}/${entity}/${id}`).set(obj == null ? null : clean(obj)); }
+      localStorage.setItem(APP_KEY, JSON.stringify(DATA));
+    }catch(e){ console.warn('save', e); toast('Uložení selhalo – zkontroluj připojení'); }
+  },
+  saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL)); }catch(e){} },
+  loadLocal(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); }catch(e){ return {}; } }
+};
+
+function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Nenačteno: ' + src)); document.head.appendChild(s); }); }
+async function fbInit(){
+  if (fb) return;
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
+  firebase.initializeApp(FB_CFG);
+  await firebase.auth().signInAnonymously();
+  fb = firebase.database();
+  fb.ref('.info/connected').on('value', s => setSync(!!s.val()));
+  fb.ref(FB_ROOT).on('value', s => {
+    DATA = normalize(s.val() || {});
+    // nepřekreslovat formulář, do kterého trenér právě píše – jen menu
+    const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) renderRail(); else renderAll();
+  });
+}
+function setSync(on){ const el = document.getElementById('syncState'); el.classList.toggle('on', on); el.querySelector('span').textContent = fb ? (on ? 'online – sdíleno' : 'offline – změny se odešlou') : 'lokálně'; }
+const clean = o => JSON.parse(JSON.stringify(o));   // Firebase nepřijímá undefined
+function normalize(d){ return { shifts:d.shifts||{}, obs:d.obs||{}, esc:d.esc||{}, ops:d.ops||{}, cfg:d.cfg||{}, eol:d.eol||{} }; }
+
+/* ===================== 3b. Import kontrolních reportů EOL / 200% ===================== */
+const nrm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+const defectOf = raw => { const r = nrm(raw); return DEFECTS.find(d => r.startsWith(d.src) || r.includes(d.src)) || { src:r, n: String(raw).trim(), proc:null, item:null }; };
+function isoWeek(dt){ const d = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const day = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return d.getUTCFullYear() + '-W' + String(Math.ceil(((d - y0) / 864e5 + 1) / 7)).padStart(2,'0'); }
+let XLSXp;
+const getXLSX = () => XLSXp ??= new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload = () => res(window.XLSX); sc.onerror = () => { XLSXp = null; rej(new Error('Knihovnu pro Excel se nepodařilo načíst (internet?)')); }; document.head.appendChild(sc); });
+
+async function parseControlReport(file){
+  const XLSX = await getXLSX();
+  const wb = XLSX.read(await file.arrayBuffer(), { type:'array', cellDates:true });
+  const sheetName = wb.SheetNames.find(n => nrm(n) === 'report') || wb.SheetNames[0];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header:1, raw:true, defval:null });
+  // hlavička podle názvů sloupců, nikdy pevný index
+  let hi = -1, H = [];
+  for (let i = 0; i < Math.min(rows.length, 40); i++){ const c = rows[i].map(nrm); if (c.some(x => x.startsWith('chyba')) && c.some(x => x.includes('datum'))){ hi = i; H = c; break; } }
+  if (hi < 0) throw new Error('Nenalezena hlavička (sloupce „Dátum kontroly“ a „Chyba / Defect“).');
+  const col = (...k) => H.findIndex(c => k.every(x => c.includes(x)));
+  const C = { date: col('datum'), line: col('linka'), var: col('variant'),
+    chk: col('vykonanych') >= 0 ? col('vykonanych') : col('skontrolovanych'),
+    def: H.findIndex(c => c.startsWith('chyba')), cnt: col('detekovanych') >= 0 ? col('detekovanych') : col('zachytenych') };
+  if (C.def < 0 || C.cnt < 0 || C.chk < 0) throw new Error('Chybí sloupec kontrolovaných MC nebo počtu vad.');
+  const src = C.line >= 0 ? 'eol' : 'sklad';
+  const weeks = {}; let cur = {}, skipped = 0; const todayD = new Date(); todayD.setHours(23,59,59);
+  for (const r of rows.slice(hi + 1)){
+    let d = r[C.date]; if (typeof d === 'number') d = new Date(Math.round((d - 25569) * 864e5));
+    if (d instanceof Date && !isNaN(d)) cur.date = d;
+    if (C.line >= 0 && r[C.line] != null && r[C.line] !== '') cur.line = 'L' + String(r[C.line]).trim();
+    if (!cur.date) continue;
+    if (cur.date > todayD){ skipped++; continue; }           // překlep v datu (budoucnost) – nezapočítat
+    const wk = isoWeek(cur.date);
+    const W = weeks[wk] ??= {};
+    const keys = ['ALL']; if (src === 'eol' && cur.line) keys.push(cur.line);
+    const chk = +r[C.chk]; const raw = r[C.def]; const q = +r[C.cnt] || 0;
+    for (const k of keys){
+      const B = W[k] ??= { chk:0, d:{} };
+      if (chk > 0) B.chk += chk;
+      if (raw && q){ const n = defectOf(raw).n.replace(/[.#$\[\]\/]/g,' '); B.d[n] = (B.d[n] || 0) + q; }
+    }
+  }
+  return { src, weeks, file: file.name, importedAt: nowIso(), skipped };
+}
+
+/* TOP vady: poslední týden v datech (W_n) vs. předchozí (W_n−1), na 100 kontrolovaných MC */
+function eolTop(src, line, n = 5){
+  const E = DATA.eol[src]; if (!E) return null;
+  const wks = Object.keys(E.weeks).sort(); if (!wks.length) return null;
+  const k = src === 'eol' ? (line || 'ALL') : 'ALL';
+  const wn = wks.at(-1), wp = wks.at(-2);
+  const B = { chk:0, ...(E.weeks[wn][k] || {}) }, P = wp ? { chk:0, ...(E.weeks[wp][k] || {}) } : null;
+  B.d = B.d || {}; if (P) P.d = P.d || {};
+  const total = Object.values(B.d).reduce((a,b) => a + b, 0);
+  const list = Object.entries(B.d).sort((a,b) => b[1] - a[1]).slice(0, n).map(([name, cnt]) => {
+    const def = DEFECTS.find(d => d.n === name) || { n:name, proc:null };
+    const rate = B.chk ? cnt / B.chk * 100 : null;
+    const prate = P && P.chk ? (P.d[name] || 0) / P.chk * 100 : null;
+    const prev8 = wks.slice(-9, -1).map(w => E.weeks[w][k]).filter(Boolean);
+    const c8 = prev8.reduce((s,x) => s + ((x.d || {})[name] || 0), 0), k8 = prev8.reduce((s,x) => s + (x.chk || 0), 0);
+    return { ...def, cnt, share: total ? cnt / total : 0, rate, prate, avg8: k8 ? c8 / k8 * 100 : null, R: rag(rate, prate) };
+  });
+  return { wn, wp, chk:B.chk, total, list, file:E.file, line:k };
+}
+function rag(cur, prev){
+  if (cur == null || prev == null || prev === 0) return { cls:'neutral', label:'–', pct:null };
+  const d = (cur - prev) / prev;
+  if (d >  0.05) return { cls:'crit', label:'ROSTE', pct:d };
+  if (d < -0.05) return { cls:'good', label:'KLESÁ', pct:d };
+  return { cls:'warn', label:'STABILNÍ', pct:d };
+}
+const pctTxt = p => p == null ? '' : (p > 0 ? '+' : '') + Math.round(p * 100) + ' %';
+
+/* ===================== 3. Pomocné ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+const hhmm = iso => iso ? new Date(iso).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}) : '–';
+const dfmt = s => s ? new Date(s + (s.length === 10 ? 'T00:00' : '')).toLocaleDateString('cs-CZ') : '–';
+const nowIso = () => new Date().toISOString();
+const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+const trainers = () => (DATA.cfg.trainers && DATA.cfg.trainers.length) ? DATA.cfg.trainers : DEFAULT_TRAINERS;
+const opsOf = line => Object.values(DATA.ops).filter(o => o.line === line && !o.off).sort((a,b) => a.name.localeCompare(b.name,'cs'));
+const shiftName = k => (SHIFTS.find(s => s.k === k) || {}).n || k;
+const curShift = () => LOCAL.activeShift ? DATA.shifts[LOCAL.activeShift] : null;
+const shiftObs = sh => Object.values(DATA.obs).filter(o => o.shift === sh.id).sort((a,b) => a.t < b.t ? 1 : -1);
+const openEsc = line => Object.values(DATA.esc).filter(e => e.st !== 'closed' && (!line || e.line === line));
+const isOverdue = e => e.st !== 'closed' && e.d0 && e.d0 < today();   // počítá se z PŮVODNÍHO termínu
+
+function isNewOp(o){
+  if (!o) return false;
+  if (o.absUntil && o.absUntil >= today()) return true;
+  if (!o.start) return false;
+  return (Date.now() - new Date(o.start + 'T00:00').getTime()) / 864e5 < RULES.newOpDays;
+}
+
+/* ===================== 4. Logika ===================== */
+/* Návrh odpovědí pro rozhodovací diagram z reálných dat */
+function focusSuggest(line){
+  const newOps = opsOf(line).filter(isNewOp);
+  const open = openEsc(line);
+  const prevKrit = Object.values(DATA.shifts)
+    .filter(s => s.line === line && s.id !== LOCAL.activeShift && new Date(s.date + 'T00:00') >= daysAgo(2))
+    .flatMap(s => Object.entries(s.proc || {}).filter(([,v]) => v.st === 'kr').map(([k]) => PROC_BY[k]?.n));
+  const rep = repeatOffenders(line);
+  const eolT = eolTop('eol', line, 3);
+  return { newOps, open, prevKrit:[...new Set(prevKrit)], rep, eolT };
+}
+
+/* Opakované korekce: stejný OP + proces + typ problému v posledních N dnech */
+function repeatGroups(line){
+  const since = daysAgo(RULES.repeatDays).toISOString();
+  const g = {};
+  Object.values(DATA.obs).filter(o => o.line === line && o.t >= since && o.op).forEach(o => {
+    (o.what || ['–']).forEach(w => { const k = o.op + '|' + o.proc + '|' + w; (g[k] ??= {op:o.op, proc:o.proc, what:w, list:[]}).list.push(o); });
+  });
+  return Object.values(g);
+}
+function repeatOffenders(line){ return repeatGroups(line).filter(x => x.list.length >= RULES.repeatN); }
+
+function shiftSummary(sh){
+  const obs = shiftObs(sh);
+  const nok = obs.reduce((a,o) => a + (+o.nok || 0), 0);
+  const sts = Object.values(sh.proc || {}).map(v => v.st);
+  const rating = sts.includes('kr') || obs.some(o => o.crit) ? 'kr' : (sts.includes('po') || obs.length ? 'po' : 'ok');
+  return { obs, nok, rating };
+}
+
+/* ===================== 5. Render – SMĚNA ===================== */
+let startDraft = { date: today(), shift: guessShift(), line: 'L1', trainer: '' };
+function guessShift(){ const h = new Date().getHours(); return h >= 6 && h < 14 ? 'R' : (h >= 14 && h < 22 ? 'O' : 'N'); }
+
+function renderSmena(){
+  const el = $('smenaBody');
+  const sh = curShift();
+  if (!sh){
+    el.innerHTML = `
+      <h1>Začátek směny</h1>
+      <div class="card">
+        <label class="f">Datum směny <span class="req">*</span></label>
+        <input type="date" id="stDate" value="${startDraft.date}">
+        <label class="f">Směna <span class="req">*</span></label>
+        <div class="chips" id="stShift">${SHIFTS.map(s => `<button class="chip ${startDraft.shift===s.k?'active':''}" data-v="${s.k}">${s.n}</button>`).join('')}</div>
+        <label class="f">Linka <span class="req">*</span></label>
+        <div class="chips" id="stLine">${LINES.map(l => `<button class="chip ${startDraft.line===l?'active':''}" data-v="${l}">G463 Prefix ${l}</button>`).join('')}</div>
+        <label class="f">Trenér <span class="req">*</span></label>
+        <div class="chips" id="stTrainer">${trainers().map(t => `<button class="chip ${startDraft.trainer===t?'active':''}" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+        <div style="margin-top:1rem"><button class="btn" id="btnStart" ${startDraft.trainer?'':'disabled'}>Zahájit směnu</button></div>
+      </div>
+      ${renderRecentShifts()}`;
+    $('stDate').onchange = e => startDraft.date = e.target.value;
+    bindChips('stShift', v => { startDraft.shift = v; renderSmena(); });
+    bindChips('stLine', v => { startDraft.line = v; renderSmena(); });
+    bindChips('stTrainer', v => { startDraft.trainer = v; renderSmena(); });
+    $('btnStart').onclick = startShift;
+    el.querySelectorAll('[data-resume]').forEach(b => b.onclick = () => { LOCAL.activeShift = b.dataset.resume; store.saveLocal(); renderAll(); });
+    return;
+  }
+
+  const sug = focusSuggest(sh.line);
+  const f = sh.focus || {};
+  const answers = f.ans || {};
+  // pořadí otázek – zastav se u první ANO
+  const qs = [
+    {k:'new', t:'Je na procesu nový OP?', h:'méně než 2 týdny na procesu nebo po delší absenci',
+     auto: sug.newOps.length ? `Podle evidence: ${sug.newOps.map(o => esc(o.name)).join(', ')}` : 'V evidenci operátorů linky není nikdo nový.'},
+    {k:'prob', t:'Je aktivní problém / NOK trend?', h:'opakující se chyba, eskalace z minulé směny, reklamace zákazníka',
+     auto: [sug.open.length ? `${sug.open.length} otevřených eskalací na ${sh.line}` : '', sug.prevKrit.length ? `Kritické v posledních směnách: ${sug.prevKrit.join(', ')}` : '', sug.rep.length ? `Opakovaná korekce: ${sug.rep.map(r => esc(r.op) + ' – ' + PROC_BY[r.proc]?.n).join(', ')}` : '', sug.eolT ? `EOL ${sug.eolT.wn}: ${sug.eolT.list.filter(x => x.R.cls === 'crit' || (x.avg8 && x.rate > x.avg8 * 1.2)).map(x => esc(x.n) + (x.R.cls === 'crit' ? ' roste ' + pctTxt(x.R.pct) : ' nad normálem 8 týdnů')).join(', ') || 'TOP vady nerostou a jsou v normálu'}` : ''].filter(Boolean).join(' · ') || 'Žádná otevřená eskalace ani opakovaná chyba v datech.'},
+    {k:'stab', t:'Je tým stabilní a bez odchylek?', h:'všichni OP zkušení, výkon v normě, žádná otevřená eskalace', auto:''},
+  ];
+  let decided = null, stop = false;
+  const qHtml = qs.map((q, i) => {
+    const dim = stop;
+    const a = answers[q.k];
+    if (!stop && a === 'ano'){ decided = q.k; stop = true; }
+    if (!stop && a == null) stop = true;
+    return `<div class="q ${dim?'dim':''}"><div class="qh"><div class="qn">${i+1}</div><div style="flex:1">
+      <div class="qt">${q.t}</div><div class="hint">${q.h}</div>
+      ${q.auto ? `<div class="auto">💡 ${q.auto}</div>` : ''}
+      <div class="ans"><button class="chip ${a==='ano'?'active':''}" data-q="${q.k}" data-a="ano" ${dim?'disabled':''}>ANO</button>
+      <button class="chip ${a==='ne'?'active':''}" data-q="${q.k}" data-a="ne" ${dim?'disabled':''}>NE</button></div>
+    </div></div></div>`;
+  }).join('');
+  if (!decided && answers.new==='ne' && answers.prob==='ne' && answers.stab==='ne') decided = 'mix';
+  const F = decided ? FOCUS[decided] : null;
+  const ops = opsOf(sh.line);
+  const pre = sh.pre || {};
+  const tlLate = f.setAt && f.tlAt && (new Date(f.tlAt) - new Date(sh.startAt)) / 6e4 > RULES.tlConfirmMin;
+
+  el.innerHTML = `
+    <div class="row between"><h1>Směna ${dfmt(sh.date)} · ${shiftName(sh.shift)} · G463 Prefix ${sh.line}</h1>
+      <span class="muted small">${esc(sh.trainer)} · zahájeno ${hhmm(sh.startAt)}</span></div>
+
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>📋 Předsměnový checklist</h2>
+          <ul class="checkl">${PRESHIFT.map((p,i) => `<li><input type="checkbox" data-pre="${i}" ${pre[i]?'checked':''} id="pre${i}"><label for="pre${i}">${p}</label><span class="t">${pre[i]?hhmm(pre[i]):''}</span></li>`).join('')}</ul>
+          ${briefingHtml(sh)}
+        </div>
+        <div class="card">
+          <h2>🎯 Fokus směny – rozhodovací diagram</h2>
+          <p class="muted small" style="margin-top:0">Projdi otázky shora dolů a zastav se u první, kde platí ANO. 💡 = návrh z dat aplikace, rozhoduješ ty.</p>
+          ${qHtml}
+        </div>
+      </div>
+      <div>
+        ${F ? `<div class="focus-card ${F.cls}">
+            <div class="ft">${F.ico} ${F.n}</div>
+            <p style="margin:.4rem 0 .6rem">${F.strat}</p>
+            <div class="small"><b>Bloky:</b> ${F.blocks.join(', ')}</div>
+            <label class="f">Hlavní OP fokus <span class="req">*</span></label>
+            ${opSelect('fOp', f.op, sh.line, decided === 'stab')}
+            <label class="f">Proces / krok procesu</label>
+            <select id="fProc"><option value="">– celá linka –</option>${PROC.map(p => `<option value="${p.k}" ${f.proc===p.k?'selected':''}>${p.n}</option>`).join('')}</select>
+            <label class="f">Důvod výběru <span class="req">*</span></label>
+            <textarea id="fWhy" placeholder="Např. 3. den na Prefixu, včera 4 NOK – vrásky na hraně">${esc(f.why || '')}</textarea>
+            <div class="row" style="margin-top:.75rem">
+              <button class="btn" id="btnFocus">${f.setAt ? 'Změnit fokus' : 'Zapsat fokus směny'}</button>
+              ${f.setAt ? `<span class="small muted">zapsáno ${hhmm(f.setAt)}${(f.hist||[]).length ? ` · změněno ${f.hist.length}×` : ''}</span>` : ''}
+            </div>
+          </div>` : `<div class="card empty"><div class="big">🧭</div>Odpověz na otázky vlevo – aplikace určí fokus a strategii.</div>`}
+
+        ${f.setAt ? `<div class="card">
+            <h2>Potvrzení TL / supervisor</h2>
+            <p class="small muted" style="margin-top:0">TL zkontroluje fokus nejpozději do ${RULES.tlConfirmMin} minut od začátku směny.</p>
+            ${f.tlAt ? `<div class="banner ${tlLate?'warn':'good'}" style="margin:0">Potvrdil(a) <b>${esc(f.tl)}</b> v ${hhmm(f.tlAt)}${tlLate?' – po limitu 30 min':''}${f.tlNote?`<br><span class="small">${esc(f.tlNote)}</span>`:''}</div>`
+              : `<input type="text" id="tlName" placeholder="Jméno TL"><input type="text" id="tlNote" placeholder="Poznámka / challenge (nepovinné)" style="margin-top:.4rem">
+                 <div style="margin-top:.5rem"><button class="btn secondary" id="btnTl">TL potvrzuje fokus</button></div>`}
+          </div>` : ''}
+
+        <div class="card">
+          <div class="row between"><h2 style="margin:0">Tato směna</h2><button class="btn secondary sm" id="btnSwitch">Přepnout / ukončit</button></div>
+          ${(() => { const s = shiftSummary(sh); return `<div class="grid-kpi" style="margin:.7rem 0 0">
+            <div class="kpi"><div class="lbl">Záznamy</div><div class="val">${s.obs.length}</div></div>
+            <div class="kpi"><div class="lbl">NOK ks</div><div class="val">${s.nok}</div></div>
+            <div class="kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${openEsc(sh.line).length}</div></div></div>`; })()}
+        </div>
+      </div>
+    </div>`;
+
+  el.querySelectorAll('[data-pre]').forEach(c => c.onchange = async () => {
+    sh.pre = sh.pre || {}; sh.pre[c.dataset.pre] = c.checked ? nowIso() : null;
+    if (c.dataset.pre === String(PRESHIFT.length - 1)){
+      if (c.checked){ const B = briefingData(sh); sh.brief = { at: nowIso(), items: B.items.map(x => x.n), src: B.srcLabel }; } else delete sh.brief;
+    }
+    await store.put('shifts', sh.id, sh); renderSmena();
+  });
+  el.querySelectorAll('[data-talk]').forEach(t => t.onchange = async () => {
+    DATA.cfg.talk = { ...(DATA.cfg.talk || {}), [t.dataset.talk]: t.value.trim() };
+    await store.put('cfg', 'talk', DATA.cfg.talk); toast('Sdělení uloženo – zobrazí se i dalším směnám');
+  });
+  el.querySelectorAll('[data-q]').forEach(b => b.onclick = async () => {
+    sh.focus = sh.focus || {}; sh.focus.ans = sh.focus.ans || {};
+    const order = ['new','prob','stab']; const i = order.indexOf(b.dataset.q);
+    order.slice(i+1).forEach(k => delete sh.focus.ans[k]);
+    sh.focus.ans[b.dataset.q] = b.dataset.a;
+    await store.put('shifts', sh.id, sh); renderSmena();
+  });
+  if ($('btnFocus')) $('btnFocus').onclick = async () => {
+    const op = $('fOp').value, why = $('fWhy').value.trim();
+    if (!op || !why){ toast('Vyplň hlavního OP a důvod výběru'); return; }
+    const prev = sh.focus.setAt ? {type:sh.focus.type, op:sh.focus.op, why:sh.focus.why, at:sh.focus.setAt} : null;
+    Object.assign(sh.focus, { type: decided, op, proc: $('fProc').value, why, setAt: nowIso() });
+    if (prev){ sh.focus.hist = [...(sh.focus.hist || []), prev]; }
+    await store.put('shifts', sh.id, sh); toast('Fokus směny zapsán'); renderAll();
+  };
+  if ($('btnTl')) $('btnTl').onclick = async () => {
+    const n = $('tlName').value.trim(); if (!n){ toast('Doplň jméno TL'); return; }
+    Object.assign(sh.focus, { tl:n, tlNote:$('tlNote').value.trim(), tlAt: nowIso() });
+    await store.put('shifts', sh.id, sh); renderSmena();
+  };
+  $('btnSwitch').onclick = () => { LOCAL.activeShift = null; store.saveLocal(); renderAll(); };
+}
+
+/* Briefing operátorům: TOP vady z EOL (linka), únik do skladu (200%), nálezy trenérů z minulé směny */
+function briefingData(sh){
+  const T = eolTop('eol', sh.line, 3);
+  const S = eolTop('sklad', null, 1);
+  const prevSh = Object.values(DATA.shifts).filter(s => s.line === sh.line && s.id !== sh.id && s.startAt < sh.startAt).sort((a,b) => a.startAt < b.startAt ? 1 : -1)[0];
+  const prevObs = prevSh ? Object.values(DATA.obs).filter(o => o.shift === prevSh.id) : [];
+  const cnt = {}; prevObs.forEach(o => (o.what || []).forEach(w => { if (!/working instruction|5s|tempo|jiné/i.test(w)) cnt[w] = (cnt[w] || 0) + (+o.nok || 1); }));
+  const prevTop = Object.entries(cnt).sort((a,b) => b[1] - a[1]).slice(0, 3);
+  const items = T ? T.list.map(x => ({ n:x.n, proc:x.proc, share:x.share, R:x.R, over: x.avg8 && x.rate > x.avg8 * 1.2 })) : [];
+  return { T, S, prevSh, prevTop, items, srcLabel: T ? `EOL ${T.wn}` : (prevTop.length ? 'minulá směna' : '') };
+}
+function briefingHtml(sh){
+  const B = briefingData(sh); const talk = DATA.cfg.talk || {};
+  const done = sh.brief;
+  const esc2 = esc;
+  if (!B.items.length && !B.prevTop.length) return `<div class="banner info" style="margin:.6rem 0 0"><b>🗣 Briefing TOP vad:</b> zatím nejsou data. Nahraj kontrolní report EOL v Nastavení – aplikace pak připraví TOP 3 vady pro operátory.</div>`;
+  return `<div class="q" style="margin:.7rem 0 0;border-color:${done ? 'var(--good)' : 'var(--navy-2)'}">
+    <div class="row between"><h3 style="margin:0">🗣 Co říct operátorům – TOP vady teď</h3>${done ? `<span class="tag good">PŘEDÁNO ${hhmm(done.at)}</span>` : '<span class="tag info">K PŘEDÁNÍ</span>'}</div>
+    ${B.T ? `<div class="small muted" style="margin:.2rem 0 .5rem">EOL Prefix ${sh.line} · ${B.T.wn} · podíl na všech vadách</div>
+      ${B.items.map((x,i) => `<div style="padding:.5rem 0;border-top:1px solid var(--line)">
+        <div class="row" style="gap:.4rem"><b>${i+1}. ${esc2(x.n)}</b><span class="muted small">· ${x.proc ? PROC_BY[x.proc].n : 'mimo linku'} · ${Math.round(x.share*100)} %</span>
+          <span class="tag ${x.R.cls}">${x.R.label}</span>${x.over ? '<span class="tag crit">NAD NORMÁLEM</span>' : ''}</div>
+        <input type="text" data-talk="${esc2(x.n)}" value="${esc2(talk[x.n] || '')}" placeholder="Na co upozornit (kontrolní bod, limitní vzorek, co dělat při vadě)" style="margin-top:.35rem;min-height:40px">
+      </div>`).join('')}` : ''}
+    ${B.S && B.S.list[0] ? `<div class="small" style="padding:.5rem 0;border-top:1px solid var(--line)">📦 <b>Ve 200% kontrole skladu nejčastěji:</b> ${esc2(B.S.list[0].n)} (${Math.round(B.S.list[0].share*100)} %) – vady, které prošly až za linku.</div>` : ''}
+    ${B.prevTop.length ? `<div class="small" style="padding:.5rem 0;border-top:1px solid var(--line)">🔁 <b>Minulá směna (${shiftName(B.prevSh.shift)} ${dfmt(B.prevSh.date)}) trenér zachytil:</b> ${B.prevTop.map(([w,c]) => esc2(w) + ' (' + c + ')').join(', ')}</div>` : ''}
+    <div class="small muted" style="margin-top:.3rem">Odškrtnutím posledního bodu checklistu se uloží, které vady byly operátorům předány. Sdělení u vady se pamatuje pro další směny – stačí ho napsat jednou (ideálně s Quality).</div>
+  </div>`;
+}
+
+function renderRecentShifts(){
+  const list = Object.values(DATA.shifts).sort((a,b) => a.startAt < b.startAt ? 1 : -1).slice(0, 8);
+  if (!list.length) return '';
+  return `<div class="card"><h2>Poslední směny</h2>${list.map(s => `<div class="row between" style="padding:.4rem 0;border-bottom:1px solid var(--line)">
+    <span>${dfmt(s.date)} · ${shiftName(s.shift)} · ${s.line} · ${esc(s.trainer)} ${s.closedAt?'<span class="tag neutral">uzavřeno</span>':'<span class="tag info">otevřeno</span>'}</span>
+    <button class="btn secondary sm" data-resume="${s.id}">Otevřít</button></div>`).join('')}</div>`;
+}
+
+function opSelect(id, val, line, allowAll){
+  const ops = opsOf(line);
+  return `<input type="text" id="${id}" list="${id}List" value="${esc(val || '')}" placeholder="${ops.length ? 'Vyber nebo napiš jméno OP' : 'Jméno OP (seznam doplň v Nastavení)'}">
+    <datalist id="${id}List">${allowAll ? '<option value="Všichni OP – rotace">' : ''}${ops.map(o => `<option value="${esc(o.name)}">${isNewOp(o)?'NOVÝ':''}</option>`).join('')}</datalist>`;
+}
+
+async function startShift(){
+  const d = startDraft;
+  const id = `${d.date}_${d.shift}_${d.line}_${d.trainer.replace(/\W+/g,'')}`;
+  if (!DATA.shifts[id]) await store.put('shifts', id, { id, date:d.date, shift:d.shift, line:d.line, trainer:d.trainer, startAt: nowIso(), proc:{}, pre:{}, focus:{} });
+  LOCAL.activeShift = id; store.saveLocal(); renderAll();
+}
+
+function bindChips(id, fn){ $(id).querySelectorAll('.chip').forEach(b => b.onclick = () => fn(b.dataset.v)); }
+
+/* ===================== 6. Render – LINKA ===================== */
+function needShift(el, what){
+  el.innerHTML = `<div class="card empty"><div class="big">🎯</div>Nejdřív zahaj směnu v sekci <b>Směna</b>${what ? ' – ' + what : ''}.<br><br><button class="btn" onclick="go('smena')">Zahájit směnu</button></div>`;
+}
+function renderLinka(){
+  const el = $('linkaBody'); const sh = curShift();
+  if (!sh){ $('linkaMeta').textContent = ''; return needShift(el); }
+  $('linkaMeta').textContent = `G463 Prefix ${sh.line} · ${shiftName(sh.shift)} ${dfmt(sh.date)}`;
+  const obs = shiftObs(sh);
+  const rep = repeatOffenders(sh.line);
+  const f = sh.focus || {};
+  const eolT = eolTop('eol', sh.line, 6);
+  el.innerHTML = `
+    ${f.setAt ? `<div class="banner info"><b>${FOCUS[f.type]?.ico || ''} Fokus:</b> ${esc(f.op)}${f.proc ? ' · ' + PROC_BY[f.proc].n : ''} — ${FOCUS[f.type]?.strat || ''}</div>`
+      : `<div class="banner warn"><b>Fokus směny není zapsán.</b> Bez fokusu trenér pracuje náhodně – vyplň ho v sekci Směna.</div>`}
+    ${rep.map(r => `<div class="banner crit"><b>${RULES.repeatN}× korekce bez zlepšení:</b> ${esc(r.op)} · ${PROC_BY[r.proc]?.n} · ${esc(r.what)} (${r.list.length}× za ${RULES.repeatDays} dní) → podle standardu eskaluj TL a zvaž přeškolení.</div>`).join('')}
+    <div class="flow">${PROC.map(p => {
+      const st = (sh.proc || {})[p.k] || {};
+      const po = obs.filter(o => o.proc === p.k);
+      const nok = po.reduce((a,o) => a + (+o.nok || 0), 0);
+      return `<div class="ptile ${st.st || ''}">
+        <div class="pn">${p.n}</div>
+        <div class="pst">${st.t ? `${STATUS[st.st].n} · ${hhmm(st.t)}` : 'Zatím nehodnoceno'}</div>
+        <div class="stbtns">${Object.entries(STATUS).map(([k,v]) => `<button class="chip s-${k} ${st.st===k?'active':''}" data-p="${p.k}" data-s="${k}">${v.n}</button>`).join('')}</div>
+        <div class="nums"><span>Záznamy <b>${po.length}</b></span><span>NOK <b>${nok}</b></span></div>
+        ${eolT ? eolT.list.filter(x => x.proc === p.k).slice(0,2).map(x => `<div class="small"><span class="tag ${x.R.cls}">${x.R.label}</span> EOL: ${esc(x.n)} <span class="mono">${Math.round(x.share*100)} %</span></div>`).join('') : ''}
+        <button class="btn secondary sm" data-rec="${p.k}">+ Záznam</button>
+      </div>`; }).join('')}</div>
+    <div class="legend">Pořadí dlaždic = tok materiálu: Spacer → Glue spray → Prefix → Laminace → Edge Wrapping → Rework.</div>`;
+  el.querySelectorAll('[data-s]').forEach(b => b.onclick = () => setProcStatus(b.dataset.p, b.dataset.s));
+  el.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => { recDraft = newRecDraft(b.dataset.rec); go('zaznam'); });
+}
+
+async function setProcStatus(pk, s){
+  const sh = curShift(); sh.proc = sh.proc || {};
+  sh.proc[pk] = { st:s, t: nowIso() };
+  await store.put('shifts', sh.id, sh);
+  if (s === 'kr'){
+    const id = uid();
+    await store.put('esc', id, { id, line:sh.line, shift:sh.id, proc:pk, src:'status', prio:'H', txt:`${PROC_BY[pk].n}: stav Kritické – závažná odchylka, trenér potřebuje podporu`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+    toast('Kritické → založena eskalace H. Doplň popis, ownera a termín.');
+    recDraft = newRecDraft(pk); go('zaznam'); return;
+  }
+  if (s !== 'ok'){ toast('Doplň záznam – co nefunguje a proč'); recDraft = newRecDraft(pk); go('zaznam'); return; }
+  renderLinka(); renderRail();
+}
+
+/* ===================== 7. Render – ZÁZNAM ===================== */
+let recDraft = null;
+function newRecDraft(pk){
+  const sh = curShift(); const f = sh?.focus || {};
+  return { proc: pk || f.proc || '', op: (f.op && f.op !== 'Všichni OP – rotace') ? f.op : '', what:[], cause:'', why:'', nok:'', act:'', crit:false, tempo:false,
+           blocks: f.type ? [...FOCUS[f.type].blocks] : [1], desc:'', und:null, more:null, train:null, okfb:'' };
+}
+function renderZaznam(){
+  const el = $('zaznamBody'); const sh = curShift();
+  if (!sh) return needShift(el);
+  recDraft ??= newRecDraft();
+  const r = recDraft; const P = PROC_BY[r.proc];
+  const obs = shiftObs(sh);
+  el.innerHTML = `
+    <div class="grid2">
+      <div class="card">
+        <label class="f">Proces <span class="req">*</span></label>
+        <div class="chips" id="rProc">${PROC.map(p => `<button class="chip ${r.proc===p.k?'active':''}" data-v="${p.k}">${p.n}</button>`).join('')}</div>
+        <label class="f">Operátor <span class="req">*</span></label>
+        ${opSelect('rOp', r.op, sh.line)}
+        ${P ? `
+        <label class="f">Co konkrétně nefunguje? <span class="req">*</span></label>
+        <div class="chips" id="rWhat">${P.what.map(w => `<button class="chip ${r.what.includes(w)?'active':''}" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+        <label class="f">Příčina problému <span class="req">*</span></label>
+        <div class="chips" id="rCause">${P.cause.map(c => `<button class="chip ${r.cause===c?'active':''}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+        ${r.cause === 'Chyba operátora' ? `
+          <div class="banner warn" style="margin:.7rem 0 0"><b>Proč systém chybu umožnil?</b> „Chyba operátora“ sama o sobě není příčina – vyber, co za ní stojí.
+          <div class="chips" id="rWhy" style="margin-top:.5rem">${WHY_SYSTEM.map(w => `<button class="chip ${r.why===w?'active':''}" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div></div>` : ''}
+        <div class="row" style="margin-top:.2rem">
+          <div style="flex:1;min-width:120px"><label class="f">Počet NOK dílů</label><input type="number" id="rNok" min="0" inputmode="numeric" value="${esc(r.nok)}"></div>
+          <div style="flex:2;min-width:200px"><label class="f">Kritická chyba?</label>
+            <div class="chips" id="rCrit"><button class="chip ${r.crit?'active':''}" data-v="1">ANO</button><button class="chip ${!r.crit?'active':''}" data-v="0">NE</button></div></div>
+        </div>
+        <label class="f">Okamžitá akce provedena? <span class="req">*</span></label>
+        <div class="chips" id="rAct">${ACTION.map(a => `<button class="chip ${r.act===a.k?'active':''}" data-v="${a.k}">${a.n}</button>`).join('')}</div>
+        <label class="f">Popis situace a akce <span class="req">*</span></label>
+        <textarea id="rDesc" placeholder="Co jsi viděl, co jsi ukázal, jak OP zopakoval">${esc(r.desc)}</textarea>
+        ` : '<p class="muted">Vyber proces – nabídnou se volby přesně pro daný proces.</p>'}
+      </div>
+
+      <div>
+        ${P ? `<div class="card blocks">
+          <h2>Tréninkové bloky</h2>
+          <p class="small muted" style="margin-top:0">Předvyplněno podle fokusu směny. Označ, co jsi s OP udělal.</p>
+          <div class="chips" id="rBlocks">${BLOCKS.map(b => `<button class="chip ${r.blocks.includes(b.k)?'active':''}" data-v="${b.k}" title="${esc(b.s.join(' · '))}">${b.n}</button>`).join('')}</div>
+          <details style="margin-top:.6rem"><summary class="small">Kroky jednotlivých bloků</summary>
+            ${BLOCKS.map(b => `<div class="small" style="margin:.35rem 0"><b>${b.n}</b><br>${b.s.map(s => '· ' + s).join('<br>')}</div>`).join('')}</details>
+          <label class="f">Tempo ohrožuje kvalitu?</label>
+          <div class="chips" id="rTempo"><button class="chip ${r.tempo?'active':''}" data-v="1">ANO</button><button class="chip ${!r.tempo?'active':''}" data-v="0">NE</button></div>
+          ${r.blocks.includes(5) ? `
+            <label class="f">Co dělá OP dobře (konkrétně)</label><input type="text" id="rOkfb" value="${esc(r.okfb)}">
+            ${yn('Operátor rozumí zpětné vazbě?','und',r.und)}
+            ${yn('Nutná další kontrola během směny?','more',r.more)}
+            ${yn('Potřeba delší trénink?','train',r.train)}` : ''}
+        </div>
+        <div class="row"><button class="btn" id="btnSaveRec">Uložit záznam</button><button class="btn secondary" id="btnClearRec">Vyčistit</button></div>` : ''}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:.9rem">
+      <h2>Záznamy této směny (${obs.length})</h2>
+      ${obs.length ? obs.map(recHtml).join('') : '<div class="empty" style="padding:1rem">Zatím žádný záznam.</div>'}
+    </div>`;
+
+  const sync = () => { if ($('rOp')) r.op = $('rOp').value; if ($('rNok')) r.nok = $('rNok').value; if ($('rDesc')) r.desc = $('rDesc').value; if ($('rOkfb')) r.okfb = $('rOkfb').value; };
+  ['rOp','rNok','rDesc','rOkfb'].forEach(i => $(i) && ($(i).oninput = sync));
+  bindChips('rProc', v => { sync(); if (r.proc !== v){ r.what = []; r.cause = ''; r.why = ''; } r.proc = v; renderZaznam(); });
+  if (P){
+    bindChips('rWhat', v => { sync(); r.what = r.what.includes(v) ? r.what.filter(x => x !== v) : [...r.what, v]; renderZaznam(); });
+    bindChips('rCause', v => { sync(); r.cause = v; if (v !== 'Chyba operátora') r.why = ''; renderZaznam(); });
+    $('rWhy') && bindChips('rWhy', v => { sync(); r.why = v; renderZaznam(); });
+    bindChips('rCrit', v => { sync(); r.crit = v === '1'; renderZaznam(); });
+    bindChips('rAct', v => { sync(); r.act = v; renderZaznam(); });
+    bindChips('rTempo', v => { sync(); r.tempo = v === '1'; renderZaznam(); });
+    bindChips('rBlocks', v => { sync(); v = +v; r.blocks = r.blocks.includes(v) ? r.blocks.filter(x => x !== v) : [...r.blocks, v].sort(); renderZaznam(); });
+    el.querySelectorAll('[data-yn]').forEach(b => b.onclick = () => { sync(); r[b.dataset.yn] = b.dataset.v === '1'; renderZaznam(); });
+    $('btnSaveRec').onclick = () => { sync(); saveRecord(); };
+    $('btnClearRec').onclick = () => { recDraft = newRecDraft(r.proc); renderZaznam(); };
+  }
+  el.querySelectorAll('[data-delrec]').forEach(b => b.onclick = async () => { if (!confirm('Smazat záznam?')) return; await store.put('obs', b.dataset.delrec, null); renderAll(); });
+}
+function yn(label, key, val){
+  return `<label class="f">${label}</label><div class="chips"><button class="chip ${val===true?'active':''}" data-yn="${key}" data-v="1">ANO</button><button class="chip ${val===false?'active':''}" data-yn="${key}" data-v="0">NE</button></div>`;
+}
+function recHtml(o){
+  const a = ACTION.find(x => x.k === o.act);
+  return `<div class="rec"><div class="rh">
+      <span class="mono small">${hhmm(o.t)}</span><b>${PROC_BY[o.proc]?.n}</b><span>· ${esc(o.op)}</span>
+      ${o.crit ? '<span class="tag crit">KRITICKÁ</span>' : ''}${o.nok ? `<span class="tag neutral">NOK ${o.nok}</span>` : ''}
+      ${o.act === 'help' ? '<span class="tag crit">POTŘEBUJE POMOC</span>' : o.act === 'prog' ? '<span class="tag warn">ŘEŠÍ SE</span>' : '<span class="tag good">KOREKCE OK</span>'}
+      ${o.train ? '<span class="tag violet">DELŠÍ TRÉNINK</span>' : ''}
+      <button class="btn secondary sm" style="margin-left:auto" data-delrec="${o.id}">Smazat</button></div>
+    <div class="rb"><b>${esc((o.what||[]).join(', '))}</b> → ${esc(o.cause)}${o.why ? ` <span class="muted">(${esc(o.why)})</span>` : ''}<br>${esc(o.desc)}</div></div>`;
+}
+
+async function saveRecord(){
+  const r = recDraft, sh = curShift();
+  const miss = [];
+  if (!r.proc) miss.push('proces'); if (!r.op.trim()) miss.push('operátor'); if (!r.what.length) miss.push('co nefunguje');
+  if (!r.cause) miss.push('příčina'); if (r.cause === 'Chyba operátora' && !r.why) miss.push('proč systém chybu umožnil');
+  if (!r.act) miss.push('okamžitá akce'); if (!r.desc.trim()) miss.push('popis');
+  if (miss.length){ toast('Chybí: ' + miss.join(', ')); return; }
+  const id = uid();
+  const rec = { id, shift: sh.id, line: sh.line, date: sh.date, sh: sh.shift, trainer: sh.trainer, t: nowIso(),
+    proc:r.proc, op:r.op.trim(), what:r.what, cause:r.cause, why:r.why, nok: r.nok === '' ? 0 : Math.max(0, +r.nok || 0),
+    act:r.act, crit:r.crit, tempo:r.tempo, blocks:r.blocks, desc:r.desc.trim(), okfb:r.okfb, und:r.und, more:r.more, train:r.train };
+  await store.put('obs', id, rec);
+  // eskalace: OP potřebuje pomoc nebo kritická chyba
+  if (r.act === 'help' || r.crit){
+    const eid = uid();
+    await store.put('esc', eid, { id:eid, line:sh.line, shift:sh.id, proc:r.proc, src:'obs', obs:id, prio: r.crit ? 'H' : 'M',
+      txt:`${PROC_BY[r.proc].n} · ${rec.op}: ${r.what.join(', ')} → ${r.cause}. ${rec.desc}`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+    toast('Záznam uložen + založena eskalace');
+  } else toast('Záznam uložen');
+  // 3× korekce bez zlepšení → TL
+  for (const g of repeatOffenders(sh.line)){
+    const key = g.op + '|' + g.proc + '|' + g.what;
+    const exists = Object.values(DATA.esc).some(e => e.repKey === key && e.st !== 'closed');
+    if (g.list.some(o => o.id === id) && !exists){
+      const eid = uid();
+      await store.put('esc', eid, { id:eid, line:sh.line, shift:sh.id, proc:g.proc, src:'repeat', repKey:key, prio:'H',
+        txt:`${g.op} · ${PROC_BY[g.proc].n} · ${g.what}: ${g.list.length}× korekce za ${RULES.repeatDays} dní bez zlepšení → eskalace TL, přeškolení / ověření standardu`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+      toast(`${RULES.repeatN}× korekce bez zlepšení → eskalace TL založena`);
+    }
+  }
+  recDraft = newRecDraft(r.proc);
+  renderAll();
+}
+
+/* ===================== 8. Render – ESKALACE ===================== */
+let escFilter = 'open', escEdit = null;
+function renderEskalace(){
+  const sh = curShift();
+  const all = Object.values(DATA.esc);
+  const counts = { open: all.filter(e => e.st !== 'closed').length, over: all.filter(isOverdue).length, noown: all.filter(e => e.st !== 'closed' && (!e.owner || !e.d0)).length, closed: all.filter(e => e.st === 'closed').length };
+  $('escFilter').innerHTML = [['open','Otevřené',counts.open],['noown','Bez ownera / termínu',counts.noown],['over','Po termínu',counts.over],['closed','Uzavřené',counts.closed]]
+    .map(([k,n,c]) => `<button class="chip ${escFilter===k?'active':''}" data-v="${k}">${n} <span class="mono">${c}</span></button>`).join('');
+  bindChips('escFilter', v => { escFilter = v; renderEskalace(); });
+
+  $('escForm').innerHTML = escEdit ? escFormHtml(escEdit) : '';
+  if (escEdit) bindEscForm();
+
+  const list = all.filter(e => escFilter === 'open' ? e.st !== 'closed' : escFilter === 'over' ? isOverdue(e) : escFilter === 'noown' ? (e.st !== 'closed' && (!e.owner || !e.d0)) : e.st === 'closed')
+    .sort((a,b) => ('HML'.indexOf(a.prio) - 'HML'.indexOf(b.prio)) || (a.created < b.created ? 1 : -1));
+  $('escList').innerHTML = list.length ? `<div class="tbl-wrap"><table><thead><tr><th>Pri</th><th>Linka</th><th>Problém / odchylka</th><th>Akce</th><th>Owner</th><th>Termín</th><th>Stav</th><th></th></tr></thead><tbody>
+    ${list.map(e => `<tr>
+      <td><span class="tag ${e.prio==='H'?'crit':e.prio==='M'?'warn':'neutral'}">${e.prio}</span></td>
+      <td>${e.line}<div class="small muted">${PROC_BY[e.proc]?.n || ''}</div></td>
+      <td style="min-width:240px">${esc(e.txt)}<div class="small muted">${dfmt(e.created?.slice(0,10))} · ${esc(e.by || '')}${e.src==='repeat'?' · automaticky (opakování)':e.src==='status'?' · automaticky (Kritické)':''}</div></td>
+      <td style="min-width:160px">${esc(e.act) || '<span class="muted">–</span>'}</td>
+      <td>${esc(e.owner) || '<span class="tag crit">chybí</span>'}</td>
+      <td class="mono">${e.d0 ? dfmt(e.d0) : '<span class="tag crit">chybí</span>'}${e.d && e.d !== e.d0 ? `<div class="small muted">posun: ${dfmt(e.d)}</div>` : ''}${isOverdue(e) ? '<div><span class="tag crit">PO TERMÍNU</span></div>' : ''}</td>
+      <td>${e.st==='closed' ? `<span class="tag good">UZAVŘENO</span><div class="small muted">${esc(e.verify||'')}</div>` : e.st==='prog' ? '<span class="tag warn">ŘEŠÍ SE</span>' : '<span class="tag info">OTEVŘENO</span>'}</td>
+      <td><button class="btn secondary sm" data-edit="${e.id}">Upravit</button></td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="legend">Termín se počítá z původního data – posun se zobrazuje zvlášť a „po termínu“ se tím neruší. Uzavřít lze až s ověřením účinnosti.</div>`
+    : `<div class="card empty"><div class="big">✅</div>Žádné položky v tomto filtru.</div>`;
+  $('escList').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { escEdit = {...DATA.esc[b.dataset.edit]}; renderEskalace(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnNewEsc').onclick = () => {
+    if (!sh){ toast('Nejdřív zahaj směnu'); return; }
+    escEdit = { id:null, line:sh.line, shift:sh.id, proc:'', src:'manual', prio:'M', txt:'', act:'', owner:'', d0:'', d:'', st:'open', by: sh.trainer }; renderEskalace();
+  };
+}
+function escFormHtml(e){
+  return `<div class="card">
+    <h2>${e.id ? 'Upravit eskalaci' : 'Nová eskalace'}</h2>
+    <div class="row">
+      <div style="flex:1;min-width:180px"><label class="f">Priorita</label><div class="chips" id="eP">${['H','M','L'].map(p => `<button class="chip ${e.prio===p?'active':''}" data-v="${p}">${p}</button>`).join('')}</div></div>
+      <div style="flex:1;min-width:180px"><label class="f">Proces</label><select id="eProc"><option value="">–</option>${PROC.map(p => `<option value="${p.k}" ${e.proc===p.k?'selected':''}>${p.n}</option>`).join('')}</select></div>
+    </div>
+    <label class="f">Problém / odchylka <span class="req">*</span></label><textarea id="eTxt">${esc(e.txt)}</textarea>
+    <label class="f">Akce – očekávaný výsledek, ne aktivita</label><input type="text" id="eAct" value="${esc(e.act)}" placeholder="Např. OP přeškolen na hranu R5, 0 NOK ve 3 po sobě jdoucích směnách">
+    <div class="row">
+      <div style="flex:2;min-width:200px"><label class="f">Owner (jméno, ne oddělení) <span class="req">*</span></label><input type="text" id="eOwn" value="${esc(e.owner)}"></div>
+      <div style="flex:1;min-width:150px"><label class="f">Termín <span class="req">*</span></label><input type="date" id="eD" value="${e.d || e.d0 || ''}"></div>
+    </div>
+    <label class="f">Stav</label>
+    <div class="chips" id="eSt">${[['open','Otevřeno'],['prog','Řeší se'],['closed','Uzavřeno']].map(([k,n]) => `<button class="chip ${e.st===k?'active':''}" data-v="${k}">${n}</button>`).join('')}</div>
+    ${e.st === 'closed' ? `<label class="f">Ověření účinnosti <span class="req">*</span></label><input type="text" id="eVer" value="${esc(e.verify || '')}" placeholder="KPI, období, výsledek – např. 0 NOK na EW za 5 směn">` : ''}
+    <div class="row" style="margin-top:.8rem"><button class="btn" id="eSave">Uložit</button><button class="btn secondary" id="eCancel">Zrušit</button></div>
+  </div>`;
+}
+function bindEscForm(){
+  const e = escEdit;
+  const sync = () => { e.txt = $('eTxt').value; e.act = $('eAct').value; e.owner = $('eOwn').value; e._d = $('eD').value; e.proc = $('eProc').value; if ($('eVer')) e.verify = $('eVer').value; };
+  bindChips('eP', v => { sync(); e.prio = v; $('escForm').innerHTML = escFormHtml(e); bindEscForm(); $('eD').value = e._d || ''; });
+  bindChips('eSt', v => { sync(); e.st = v; $('escForm').innerHTML = escFormHtml(e); bindEscForm(); $('eD').value = e._d || ''; });
+  $('eCancel').onclick = () => { escEdit = null; renderEskalace(); };
+  $('eSave').onclick = async () => {
+    sync();
+    if (!e.txt.trim() || !e.owner.trim() || !e._d){ toast('Vyplň problém, ownera a termín'); return; }
+    if (e.st === 'closed' && !(e.verify || '').trim()){ toast('Uzavření vyžaduje ověření účinnosti'); return; }
+    if (!e.d0) e.d0 = e._d;      // původní termín se nepřepisuje
+    e.d = e._d; delete e._d;
+    if (!e.id){ e.id = uid(); e.created = nowIso(); }
+    if (e.st === 'closed' && !e.closedAt) e.closedAt = nowIso();
+    await store.put('esc', e.id, e); escEdit = null; toast('Eskalace uložena'); renderAll();
+  };
+}
+
+/* ===================== 9. Render – ZÁVĚR ===================== */
+function renderZaver(){
+  const el = $('zaverBody'); const sh = curShift();
+  if (!sh) return needShift(el);
+  const s = shiftSummary(sh);
+  const open = openEsc(sh.line);
+  const end = sh.end || {};
+  const rating = sh.rating || s.rating;
+  const causes = {}; s.obs.forEach(o => { const k = PROC_BY[o.proc].n + ' – ' + o.cause; causes[k] = (causes[k] || 0) + (+o.nok || 1); });
+  const top = Object.entries(causes).sort((a,b) => b[1]-a[1]).slice(0,3);
+  const ho = handoverText(sh, s, open, top);
+  const unrated = PROC.filter(p => !(sh.proc || {})[p.k]);
+  el.innerHTML = `
+    ${unrated.length ? `<div class="banner warn">Nehodnocené procesy: <b>${unrated.map(p => p.n).join(', ')}</b>. Podpis potvrzuje, že jsi prošel všechny procesy.</div>` : ''}
+    ${!(sh.focus||{}).setAt ? `<div class="banner warn">Fokus směny nebyl zapsán.</div>` : ''}
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>Celkové hodnocení směny</h2>
+          <div class="chips" id="zRate">${[['ok','Bez problémů','s-ok'],['po','Drobné odchylky','s-po'],['kr','Závažné problémy','s-kr']].map(([k,n,c]) => `<button class="chip ${c} ${rating===k?'active':''}" data-v="${k}">${n}</button>`).join('')}</div>
+          <div class="small muted" style="margin-top:.4rem">Návrh z dat: ${({ok:'Bez problémů',po:'Drobné odchylky',kr:'Závažné problémy'})[s.rating]}</div>
+          <div class="grid-kpi" style="margin:.8rem 0 0">
+            <div class="kpi"><div class="lbl">Záznamy</div><div class="val">${s.obs.length}</div></div>
+            <div class="kpi"><div class="lbl">NOK ks</div><div class="val">${s.nok}</div></div>
+            <div class="kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${open.length}</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>🔚 Závěr směny – před předáním</h2>
+          <ul class="checkl">${ENDSHIFT.map((p,i) => `<li><input type="checkbox" data-end="${i}" id="end${i}" ${end[i]?'checked':''}><label for="end${i}">${p}</label></li>`).join('')}</ul>
+        </div>
+        <div class="card">
+          <h2>Podpis trenéra</h2>
+          ${sh.closedAt ? `<div class="banner good" style="margin:0">Směnu uzavřel(a) <b>${esc(sh.trainer)}</b> v ${hhmm(sh.closedAt)}.</div>`
+            : `<p class="small muted" style="margin-top:0">Podpisem potvrzuješ, že jsi prošel všechny procesy a zaznamenal aktuální stav linky.</p>
+               <button class="btn good" id="btnClose">Podepsat a uzavřít směnu (${esc(sh.trainer)})</button>`}
+        </div>
+      </div>
+      <div class="card">
+        <div class="row between"><h2 style="margin:0">Předávka nástupní směně</h2><button class="btn secondary sm" id="btnCopy">Kopírovat</button></div>
+        <p class="small muted">Text pro Teams / e-mail TL. Otevřené eskalace se nástupní směně automaticky zobrazí v otázce 2 rozhodovacího diagramu.</p>
+        <div class="handover" id="hoText">${esc(ho)}</div>
+        <div class="row" style="margin-top:.6rem"><button class="btn secondary sm" id="btnCsv">Export záznamů (CSV pro Power BI)</button></div>
+      </div>
+    </div>`;
+  bindChips('zRate', async v => { sh.rating = v; await store.put('shifts', sh.id, sh); renderZaver(); });
+  el.querySelectorAll('[data-end]').forEach(c => c.onchange = async () => { sh.end = sh.end || {}; sh.end[c.dataset.end] = c.checked ? nowIso() : null; await store.put('shifts', sh.id, sh); });
+  $('btnCopy').onclick = () => copyText(ho);
+  $('btnCsv').onclick = exportCsv;
+  if ($('btnClose')) $('btnClose').onclick = async () => {
+    if (!sh.rating) sh.rating = s.rating;
+    sh.closedAt = nowIso(); await store.put('shifts', sh.id, sh); toast('Směna uzavřena'); renderAll();
+  };
+}
+function handoverText(sh, s, open, top){
+  const f = sh.focus || {};
+  const L = [];
+  L.push(`PŘEDÁVKA – G463 Prefix ${sh.line} – ${shiftName(sh.shift)} ${dfmt(sh.date)}`);
+  L.push(`Trenér: ${sh.trainer}`);
+  L.push(`Hodnocení: ${({ok:'Bez problémů',po:'Drobné odchylky',kr:'Závažné problémy'})[sh.rating || s.rating]}`);
+  L.push(`Fokus: ${f.setAt ? `${FOCUS[f.type]?.n} – ${f.op}${f.why ? ' (' + f.why + ')' : ''}` : 'nezapsán'}`);
+  L.push(`Briefing TOP vad operátorům: ${sh.brief ? hhmm(sh.brief.at) + ' – ' + sh.brief.items.join(', ') + ' (' + sh.brief.src + ')' : 'NEPROVEDEN'}`);
+  L.push('');
+  L.push('STAV PROCESŮ');
+  PROC.forEach(p => { const st = (sh.proc || {})[p.k]; L.push(`  ${p.n.padEnd(14)} ${st ? STATUS[st.st].n : 'nehodnoceno'}`); });
+  L.push('');
+  L.push(`NOK celkem: ${s.nok} ks · záznamů: ${s.obs.length}`);
+  if (top.length){ L.push('TOP příčiny:'); top.forEach(([k,v]) => L.push(`  - ${k} (${v})`)); }
+  const tr = [...new Set(s.obs.filter(o => o.train || o.more).map(o => o.op + (o.train ? ' – delší trénink' : ' – další kontrola')))];
+  if (tr.length){ L.push(''); L.push('SLEDOVAT V NÁSLEDUJÍCÍ SMĚNĚ'); tr.forEach(t => L.push('  - ' + t)); }
+  L.push('');
+  L.push(`OTEVŘENÉ ESKALACE (${open.length})`);
+  open.forEach(e => L.push(`  [${e.prio}] ${e.txt.slice(0,140)} | owner: ${e.owner || 'CHYBÍ'} | termín: ${e.d0 ? dfmt(e.d0) : 'CHYBÍ'}`));
+  return L.join('\n');
+}
+function copyText(t){
+  try{ navigator.clipboard.writeText(t).then(() => toast('Zkopírováno'), () => fallbackCopy(t)); }catch(e){ fallbackCopy(t); }
+}
+function fallbackCopy(t){ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); toast('Zkopírováno'); }catch(e){ toast('Kopírování selhalo'); } a.remove(); }
+function exportCsv(){
+  const cols = ['date','sh','line','trainer','t','proc','op','what','cause','why','nok','act','crit','tempo','blocks','und','more','train','desc'];
+  const head = ['Datum','Směna','Linka','Trenér','Čas','Proces','Operátor','Co nefunguje','Příčina','Proč systém','NOK','Akce','Kritická','Tempo ohrožuje kvalitu','Bloky','Rozumí ZV','Další kontrola','Delší trénink','Popis'];
+  const val = (o,c) => c === 'proc' ? PROC_BY[o.proc]?.n : c === 'what' ? (o.what||[]).join(' / ') : c === 'blocks' ? (o.blocks||[]).join(',') : c === 't' ? hhmm(o.t) : c === 'act' ? (ACTION.find(a => a.k === o.act)||{}).n : typeof o[c] === 'boolean' ? (o[c] ? 'ANO' : 'NE') : o[c];
+  const rows = Object.values(DATA.obs).sort((a,b) => a.t < b.t ? -1 : 1).map(o => cols.map(c => '"' + String(val(o,c) ?? '').replace(/"/g,'""') + '"').join(';'));
+  const blob = new Blob(['﻿' + head.join(';') + '\n' + rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `trener_g463_zaznamy_${today()}.csv`; a.click();
+}
+
+/* ===================== 10. Render – PŘEHLED TL ===================== */
+let pv = { line:'L1', days:7 };
+function renderPrehled(){
+  $('pvLine').innerHTML = LINES.map(l => `<button class="chip ${pv.line===l?'active':''}" data-v="${l}">${l}</button>`).join('');
+  $('pvPeriod').innerHTML = [[1,'Dnes'],[7,'7 dní'],[30,'30 dní']].map(([d,n]) => `<button class="chip ${pv.days===d?'active':''}" data-v="${d}">${n}</button>`).join('');
+  bindChips('pvLine', v => { pv.line = v; renderPrehled(); });
+  bindChips('pvPeriod', v => { pv.days = +v; renderPrehled(); });
+  const el = $('prehledBody');
+  const since = pv.days === 1 ? today() : daysAgo(pv.days).toISOString().slice(0,10);
+  const shifts = Object.values(DATA.shifts).filter(s => s.line === pv.line && s.date >= since);
+  const obs = Object.values(DATA.obs).filter(o => o.line === pv.line && o.date >= since);
+  if (!shifts.length && !obs.length){ el.innerHTML = `<div class="card empty"><div class="big">📊</div>Za zvolené období nejsou na ${pv.line} žádné záznamy trenérů.</div>`; return; }
+  const withFocus = shifts.filter(s => s.focus?.setAt).length;
+  const tlOk = shifts.filter(s => s.focus?.tlAt && (new Date(s.focus.tlAt) - new Date(s.startAt)) / 6e4 <= RULES.tlConfirmMin).length;
+  const nok = obs.reduce((a,o) => a + (+o.nok || 0), 0);
+  const opErr = obs.filter(o => o.cause === 'Chyba operátora');
+  const open = openEsc(pv.line); const over = open.filter(isOverdue);
+  const pct = (a,b) => b ? Math.round(a / b * 100) + ' %' : '–';
+
+  const by = (arr, keyFn, valFn = () => 1) => { const m = {}; arr.forEach(o => [].concat(keyFn(o)).forEach(k => { m[k] = (m[k] || 0) + valFn(o); })); return Object.entries(m).sort((a,b) => b[1]-a[1]); };
+  const bars = (list, crit) => { const mx = Math.max(...list.map(x => x[1]), 1); return list.map(([k,v]) => `<div class="bar"><div class="bl" title="${esc(k)}">${esc(k)}</div><div class="bt"><div class="bf ${crit?'crit':''}" style="width:${v/mx*100}%"></div></div><div class="bv">${v}</div></div>`).join('') || '<div class="muted small">Bez dat</div>'; };
+
+  const procStatus = PROC.map(p => {
+    const sts = shifts.map(s => (s.proc || {})[p.k]?.st).filter(Boolean);
+    return [p.n, sts.filter(x => x === 'kr').length, sts.filter(x => x === 'po').length, sts.length];
+  });
+  const opsAgg = by(obs, o => o.op).slice(0, 10).map(([op, n]) => {
+    const l = obs.filter(o => o.op === op);
+    return { op, n, nok: l.reduce((a,o) => a + (+o.nok || 0), 0), train: l.some(o => o.train), procs: [...new Set(l.map(o => PROC_BY[o.proc]?.n))].join(', '), nw: isNewOp(Object.values(DATA.ops).find(x => x.name === op)) };
+  });
+  const rep = repeatOffenders(pv.line);
+
+  el.innerHTML = `
+    <div class="grid-kpi">
+      <div class="card kpi"><div class="lbl">Směny s trenérem</div><div class="val">${shifts.length}</div><div class="sub">${pv.line} · od ${dfmt(since)}</div></div>
+      <div class="card kpi"><div class="lbl">Fokus zapsán</div><div class="val">${pct(withFocus, shifts.length)}</div><div class="sub">${withFocus} z ${shifts.length} směn · cíl 100 %</div></div>
+      <div class="card kpi"><div class="lbl">TL potvrdil do 30 min</div><div class="val">${pct(tlOk, shifts.length)}</div><div class="sub">${tlOk} z ${shifts.length} směn</div></div>
+      <div class="card kpi"><div class="lbl">Záznamy / NOK ks</div><div class="val">${obs.length} / ${nok}</div><div class="sub">z pozorování trenérů</div></div>
+      <div class="card kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${open.length}</div><div class="sub">${over.length ? `<span class="tag crit">${over.length} PO TERMÍNU</span>` : 'nic po termínu'}</div></div>
+    </div>
+    ${rep.length ? `<div class="banner crit"><b>Opakované korekce (${RULES.repeatN}+ za ${RULES.repeatDays} dní):</b> ${rep.map(r => `${esc(r.op)} – ${PROC_BY[r.proc]?.n} – ${esc(r.what)} (${r.list.length}×)`).join(' · ')}</div>` : ''}
+    <div class="grid2">
+      <div class="card"><h2>Pareto příčin (NOK ks, jinak počet)</h2>${bars(by(obs, o => PROC_BY[o.proc]?.n + ' – ' + o.cause, o => +o.nok || 1).slice(0,8))}</div>
+      <div class="card"><h2>Co nefunguje</h2>${bars(by(obs, o => o.what || []).slice(0,8))}</div>
+      <div class="card"><h2>Stav procesů po směnách</h2>
+        <div class="tbl-wrap" style="border:0"><table style="min-width:0"><thead><tr><th>Proces</th><th>Krit.</th><th>Pozor.</th><th>Hodnoc.</th></tr></thead><tbody>
+        ${procStatus.map(([n,k,p,t]) => `<tr><td>${n}</td><td class="num">${k ? `<span class="tag crit">${k}</span>` : 0}</td><td class="num">${p}</td><td class="num">${t} / ${shifts.length}</td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="legend">„Hodnoceno“ = v kolika směnách trenér proces skutečně prošel.</div></div>
+      <div class="card"><h2>„Chyba operátora“ – co za ní stojí</h2>
+        <p class="small muted" style="margin-top:0">${opErr.length} z ${obs.length} záznamů (${pct(opErr.length, obs.length)}). Systémová příčina:</p>
+        ${bars(by(opErr, o => o.why || 'neuvedeno'), true)}</div>
+    </div>
+    ${eolCompareHtml(obs)}
+    <div class="card"><h2>Operátoři s nejvíce záznamy – vstup pro skill matrix a tréninkový plán</h2>
+      ${opsAgg.length ? `<div class="tbl-wrap"><table><thead><tr><th>Operátor</th><th>Záznamy</th><th>NOK ks</th><th>Procesy</th><th>Delší trénink</th></tr></thead><tbody>
+      ${opsAgg.map(o => `<tr><td>${esc(o.op)} ${o.nw ? '<span class="tag warn">NOVÝ</span>' : ''}</td><td class="num">${o.n}</td><td class="num">${o.nok}</td><td>${esc(o.procs)}</td><td>${o.train ? '<span class="tag violet">ANO</span>' : '–'}</td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="muted">Bez dat</div>'}
+      <div class="legend">Slouží k plánování tréninku, ne k hodnocení lidí. Disciplinární poznámky sem nepatří.</div></div>
+    <div class="card"><h2>Fokus trenérů po směnách</h2>
+      <div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Směna</th><th>Trenér</th><th>Fokus</th><th>Hlavní OP</th><th>Zapsáno</th><th>TL</th><th>Briefing vad</th><th>Hodnocení</th></tr></thead><tbody>
+      ${shifts.sort((a,b) => a.startAt < b.startAt ? 1 : -1).map(s => { const f = s.focus || {}; const late = f.tlAt && (new Date(f.tlAt) - new Date(s.startAt)) / 6e4 > RULES.tlConfirmMin; const r = s.rating || shiftSummary(s).rating; return `<tr>
+        <td>${dfmt(s.date)}</td><td>${shiftName(s.shift)}</td><td>${esc(s.trainer)}</td>
+        <td>${f.setAt ? FOCUS[f.type]?.ico + ' ' + FOCUS[f.type]?.n : '<span class="tag crit">NEZAPSÁN</span>'}</td>
+        <td>${esc(f.op || '')}</td><td class="mono">${hhmm(f.setAt)}</td>
+        <td>${f.tlAt ? `<span class="tag ${late?'warn':'good'}">${hhmm(f.tlAt)}</span>` : '<span class="muted">–</span>'}</td>
+        <td>${s.brief ? `<span class="tag good">${hhmm(s.brief.at)}</span>` : '<span class="tag crit">NE</span>'}</td>
+        <td><span class="tag ${STATUS[r].cls}">${({ok:'BEZ PROBLÉMŮ',po:'DROBNÉ',kr:'ZÁVAŽNÉ'})[r]}</span></td></tr>`; }).join('')}
+      </tbody></table></div></div>`;
+}
+
+function eolCompareHtml(obs){
+  const blocks = Object.keys(EOL_SRC).map(src => {
+    const T = eolTop(src, pv.line, 8); if (!T) return '';
+    return `<div class="card"><h2>TOP vady – ${EOL_SRC[src]}${src === 'eol' ? ' · ' + pv.line : ' · obě linky'}</h2>
+      <p class="small muted" style="margin-top:0">${T.wn} vs. ${T.wp || '–'} · ${Math.round(T.chk).toLocaleString('cs-CZ')} kontrolovaných MC · ${T.total.toLocaleString('cs-CZ')} vad · zdroj ${esc(T.file)}</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Vada</th><th>Proces (návrh)</th><th>Podíl</th><th>Vad / 100 MC</th><th>Trend W/W</th><th>Ø 8 týdnů před</th><th>Záznamy trenérů</th></tr></thead><tbody>
+      ${T.list.map(x => { const tr = x.item ? obs.filter(o => (o.what || []).includes(x.item)).length : null; return `<tr>
+        <td>${esc(x.n)}</td><td>${x.proc ? PROC_BY[x.proc].n : '<span class="muted">mimo linku</span>'}</td>
+        <td class="num">${Math.round(x.share*100)} %</td><td class="num">${x.rate == null ? '–' : x.rate.toFixed(1)}</td>
+        <td><span class="tag ${x.R.cls}">${x.R.label}</span> <span class="mono small">${pctTxt(x.R.pct)}</span></td>
+        <td class="num">${x.avg8 == null ? '–' : x.avg8.toFixed(1)}${x.avg8 && x.rate > x.avg8 * 1.2 ? ' <span class="tag crit">NAD</span>' : ''}</td>
+        <td class="num">${tr == null ? '–' : tr === 0 && x.share > .1 ? '<span class="tag crit">0</span>' : tr}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      <div class="legend">Trend = vad na 100 MC v ${T.wn} vs. ${T.wp || '–'}: ROSTE > +5 %, KLESÁ < −5 %, jinak STABILNÍ. „Ø 8 týdnů“ = kontext (je aktuální úroveň nad dlouhodobým normálem?), NAD = o více než 20 % výš. Červená 0 u záznamů = vada s podílem nad 10 %, kterou trenéři ve zvoleném období vůbec nezaznamenali.</div></div>`;
+  }).join('');
+  return blocks || `<div class="card"><h2>TOP vady z EOL / 200% kontroly</h2><div class="muted small">Nahraj kontrolní report v Nastavení → Kontrolní reporty – aplikace pak porovná TOP vady se záznamy trenérů.</div></div>`;
+}
+
+/* ===================== 11. Render – NASTAVENÍ ===================== */
+let setLine = 'L1';
+function renderNastaveni(){
+  const el = $('nastaveniBody');
+  const ops = Object.values(DATA.ops).filter(o => o.line === setLine).sort((a,b) => a.name.localeCompare(b.name,'cs'));
+  el.innerHTML = `
+    <div class="grid2">
+      <div class="card">
+        <h2>Operátoři linky</h2>
+        <div class="chips" id="sLine" style="margin-bottom:.6rem">${LINES.map(l => `<button class="chip ${setLine===l?'active':''}" data-v="${l}">${l}</button>`).join('')}</div>
+        <p class="small muted" style="margin-top:0">Datum nástupu na proces a návrat z absence řídí otázku 1 diagramu („nový OP“ = méně než ${RULES.newOpDays} dní).</p>
+        <div class="row"><input type="text" id="sOpName" placeholder="Příjmení Jméno" style="flex:2;min-width:160px"><input type="date" id="sOpStart" style="flex:1;min-width:140px" title="Nástup na proces"><button class="btn" id="sOpAdd">Přidat</button></div>
+        <div class="small muted" style="margin:.4rem 0">Nebo vlož více jmen najednou (jedno na řádek):</div>
+        <textarea id="sOpBulk" placeholder="Příjmení Jméno&#10;Příjmení Jméno"></textarea>
+        <button class="btn secondary sm" id="sOpBulkAdd" style="margin-top:.4rem">Přidat seznam</button>
+        <div style="margin-top:.8rem">${ops.length ? `<div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Operátor</th><th>Nástup</th><th>Absence do</th><th></th></tr></thead><tbody>
+          ${ops.map(o => `<tr><td>${esc(o.name)} ${isNewOp(o)?'<span class="tag warn">NOVÝ</span>':''}${o.off?'<span class="tag neutral">neaktivní</span>':''}</td>
+            <td><input type="date" data-opstart="${o.id}" value="${o.start||''}" style="min-height:36px;padding:.2rem .4rem"></td>
+            <td><input type="date" data-opabs="${o.id}" value="${o.absUntil||''}" style="min-height:36px;padding:.2rem .4rem" title="Po návratu z delší absence nastav datum, do kdy platí režim nového OP"></td>
+            <td><button class="btn secondary sm" data-opoff="${o.id}">${o.off?'Aktivovat':'Vyřadit'}</button></td></tr>`).join('')}
+          </tbody></table></div>` : '<div class="muted small">Zatím žádní operátoři pro ' + setLine + '.</div>'}</div>
+      </div>
+      <div>
+        <div class="card">
+          <h2>Trenéři</h2>
+          <p class="small muted" style="margin-top:0">Jeden na řádek. Výchozí seznam je převzatý z MS Forms.</p>
+          <textarea id="sTrainers">${esc(trainers().join('\n'))}</textarea>
+          <button class="btn secondary sm" id="sTrSave" style="margin-top:.4rem">Uložit trenéry</button>
+        </div>
+        <div class="card">
+          <h2>Kontrolní reporty (EOL / 200% sklad)</h2>
+          <p class="small muted" style="margin-top:0">Nahraj aktuální „Kontrolný report“ (.xlsm). Aplikace pozná EOL (má sloupec Linka) i 200% kontrolu ve skladu a vyhodnotí TOP vady po týdnech.</p>
+          <label class="btn secondary sm" style="display:inline-flex;align-items:center">Nahrát report<input type="file" id="sEol" accept=".xlsm,.xlsx,.xls" multiple hidden></label>
+          <div style="margin-top:.6rem">${Object.entries(DATA.eol).map(([k,v]) => { const w = Object.keys(v.weeks).sort(); return `<div class="small" style="padding:.3rem 0;border-bottom:1px solid var(--line)"><b>${EOL_SRC[k]}</b><br>${esc(v.file)} · ${w[0]} – ${w.at(-1)} · nahráno ${dfmt(v.importedAt.slice(0,10))}${v.skipped ? ` · <span style="color:var(--crit)">${v.skipped} řádků s datem v budoucnu nezapočteno</span>` : ''}</div>`; }).join('') || '<span class="small muted">Zatím nic nenahráno.</span>'}</div>
+        </div>
+        <div class="card">
+          <h2>Data a sdílení</h2>
+          <p class="small">Režim: <b>${fb ? 'Firebase RTDB – sdíleno mezi zařízeními' : 'lokálně v tomto prohlížeči'}</b></p>
+          ${FB_CFG ? `<p class="small">Projekt: <span class="mono">${esc(FB_CFG.projectId || '')}</span>${FIREBASE_CONFIG ? ' (nastaveno v souboru)' : ''}</p>
+              ${FIREBASE_CONFIG ? '' : '<button class="btn secondary sm" id="sFbOff">Odpojit Firebase v tomto prohlížeči</button>'}`
+            : `<p class="small muted" style="margin-bottom:.3rem">Připojení Firebase: vlož sem celý blok <span class="mono">const firebaseConfig = {…}</span> z Firebase konzole (Project settings → Your apps → Web app).</p>
+              <textarea id="sFbCfg" placeholder="const firebaseConfig = {&#10;  apiKey: &quot;…&quot;,&#10;  databaseURL: &quot;https://…europe-west1.firebasedatabase.app&quot;,&#10;  …&#10;};"></textarea>
+              <button class="btn sm" id="sFbOn" style="margin-top:.4rem">Uložit a připojit</button>
+              <p class="small muted">Konfigurace se uloží v tomto prohlížeči. Na dalším zařízení ji vlož znovu, nebo mi ji pošli a zapíšu ji natvrdo do souboru.</p>`}
+          <div class="row"><button class="btn secondary sm" id="sExp">Záloha JSON</button>
+          <label class="btn secondary sm" style="display:inline-flex;align-items:center">Obnovit ze zálohy<input type="file" id="sImp" accept=".json" hidden></label>
+          <button class="btn secondary sm" id="sCsv">Export CSV</button></div>
+          <div class="row" style="margin-top:.6rem"><button class="btn secondary sm" id="sTheme">Přepnout světlý / tmavý režim</button></div>
+        </div>
+        <div class="card">
+          <h2>Pravidla aplikace</h2>
+          <div class="small">
+            <p><b>Rozhodovací diagram</b> – pořadí = priorita: nový OP → aktivní problém → stabilní tým → smíšený tým. Zastav se u první odpovědi ANO.</p>
+            <p><b>Nový OP</b> – nástup na proces před méně než ${RULES.newOpDays} dny nebo nastavená „absence do“.</p>
+            <p><b>Opakovaná korekce</b> – stejný OP + proces + typ problému ${RULES.repeatN}× za ${RULES.repeatDays} dní → automatická eskalace H na TL.</p>
+            <p><b>Kritické</b> na procesu, „Ne – potřebuji pomoc“ nebo kritická chyba → automatická eskalace.</p>
+            <p><b>„Chyba operátora“</b> – povinně doplnit, proč systém chybu umožnil.</p>
+            <p><b>Eskalace</b> – owner jménem, konkrétní termín; „po termínu“ se počítá z původního data; uzavření jen s ověřením účinnosti.</p>
+            <p><b>L1 a L2</b> se vedou vždy zvlášť.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  bindChips('sLine', v => { setLine = v; renderNastaveni(); });
+  const addOp = async (name, start) => { name = name.trim(); if (!name) return; if (Object.values(DATA.ops).some(o => o.line === setLine && o.name === name)) return; const id = uid(); await store.put('ops', id, { id, line:setLine, name, start: start || '' }); };
+  $('sOpAdd').onclick = async () => { await addOp($('sOpName').value, $('sOpStart').value); renderAll(); };
+  $('sOpBulkAdd').onclick = async () => { for (const n of $('sOpBulk').value.split(/\r?\n/)) await addOp(n, ''); renderAll(); };
+  el.querySelectorAll('[data-opstart]').forEach(i => i.onchange = async () => { const o = DATA.ops[i.dataset.opstart]; o.start = i.value; await store.put('ops', o.id, o); renderNastaveni(); });
+  el.querySelectorAll('[data-opabs]').forEach(i => i.onchange = async () => { const o = DATA.ops[i.dataset.opabs]; o.absUntil = i.value; await store.put('ops', o.id, o); renderNastaveni(); });
+  el.querySelectorAll('[data-opoff]').forEach(b => b.onclick = async () => { const o = DATA.ops[b.dataset.opoff]; o.off = !o.off; await store.put('ops', o.id, o); renderNastaveni(); });
+  $('sTrSave').onclick = async () => { DATA.cfg.trainers = $('sTrainers').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean); await store.put('cfg', 'trainers', DATA.cfg.trainers); toast('Trenéři uloženi'); renderAll(); };
+  $('sExp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DATA, null, 1)], {type:'application/json'})); a.download = `trener_g463_zaloha_${today()}.json`; a.click(); };
+  $('sImp').onchange = async e => { const f = e.target.files[0]; if (!f) return; try{ const d = normalize(JSON.parse(await f.text())); if (!confirm('Nahradit aktuální data zálohou?')) return; for (const ent of ['shifts','obs','esc','ops','cfg','eol']) for (const [k,v] of Object.entries(d[ent])) await store.put(ent, k, v); toast('Záloha obnovena'); renderAll(); }catch(err){ toast('Neplatný soubor zálohy'); } };
+  $('sCsv').onclick = exportCsv;
+  if ($('sFbOn')) $('sFbOn').onclick = () => { try{ const c = parseFbSnippet($('sFbCfg').value); localStorage.setItem(FB_CFG_KEY, JSON.stringify(c)); toast('Připojuji…'); setTimeout(() => location.reload(), 600); }catch(err){ toast(err.message); } };
+  if ($('sFbOff')) $('sFbOff').onclick = () => { if (!confirm('Odpojit Firebase? Aplikace bude dál pracovat jen lokálně.')) return; try{ localStorage.removeItem(FB_CFG_KEY); }catch(e){} location.reload(); };
+  $('sEol').onchange = async e => {
+    for (const f of e.target.files){
+      try{ toast('Načítám ' + f.name + ' …'); const R = await parseControlReport(f); await store.put('eol', R.src, R);
+        toast(`${EOL_SRC[R.src]}: ${Object.keys(R.weeks).length} týdnů načteno${R.skipped ? ', ' + R.skipped + ' řádků s chybným datem vynecháno' : ''}`); }
+      catch(err){ console.warn(err); toast(f.name + ': ' + err.message); }
+    }
+    renderAll();
+  };
+  $('sTheme').onclick = () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; try{ localStorage.setItem('trenerG463.theme', r.dataset.theme); }catch(e){} };
+}
+
+/* ===================== 12. Navigace, rail, init ===================== */
+function go(view){
+  document.querySelectorAll('.rail button').forEach(x => x.classList.toggle('active', x.dataset.go === view));
+  document.querySelectorAll('section[data-view]').forEach(s => s.classList.toggle('active', s.dataset.view === view));
+  renderView(view); window.scrollTo(0,0);
+}
+function renderView(v){ ({smena:renderSmena, linka:renderLinka, zaznam:renderZaznam, eskalace:renderEskalace, zaver:renderZaver, prehled:renderPrehled, nastaveni:renderNastaveni})[v]?.(); }
+function renderRail(){
+  const sh = curShift();
+  $('railMeta').textContent = sh ? `${sh.line} · ${shiftName(sh.shift)} · ${sh.trainer.split(' ')[0]}` : 'Bez aktivní směny';
+  const n = Object.values(DATA.esc).filter(e => e.st !== 'closed' && (e.prio === 'H' || isOverdue(e) || !e.owner)).length;
+  const b = $('escBadge'); b.hidden = !n; b.textContent = n;
+}
+function renderAll(){
+  renderRail();
+  const active = document.querySelector('section[data-view].active')?.dataset.view || 'smena';
+  renderView(active);
+}
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200); }
+
+$('rail').addEventListener('click', e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); });
+
+(async () => {
+  try{ const th = localStorage.getItem('trenerG463.theme'); if (th) document.documentElement.dataset.theme = th; }catch(e){}
+  DATA = normalize(await store.load());
+  LOCAL = Object.assign({ activeShift:null }, store.loadLocal());
+  if (LOCAL.activeShift && !DATA.shifts[LOCAL.activeShift]) LOCAL.activeShift = null;
+  if (!fb) setSync(false);
+  renderAll();
+})();
+</script>
+</body>
+</html>
