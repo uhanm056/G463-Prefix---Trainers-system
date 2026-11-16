@@ -1,0 +1,27 @@
+# Tréninkové karty: nasazení na Firebase Hosting (projekt g463-prefix---trainers-system,
+# https://g463-prefix---trainers-system.web.app) po každé změně ve větvi main – stejně jako PMS.
+# Potřebuje secret FIREBASE_SA_G463 = JSON klíč servisního účtu projektu (Firebase konzole →
+# Nastavení projektu → Servisní účty → Vygenerovat nový soukromý klíč). Bez něj se nasazení přeskočí.
+name: Nasazení na Firebase Hosting
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kontrola klíče
+        id: k
+        env:
+          SA: ${{ secrets.FIREBASE_SA_G463 }}
+        run: |
+          if [ -n "$SA" ]; then echo "ok=1" >> "$GITHUB_OUTPUT"; else echo "::notice::Chybí secret FIREBASE_SA_G463 – nasazení na Firebase Hosting přeskočeno (GitHub Pages běží dál)."; fi
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: steps.k.outputs.ok == '1'
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SA_G463 }}
+          projectId: g463-prefix---trainers-system
+          channelId: live

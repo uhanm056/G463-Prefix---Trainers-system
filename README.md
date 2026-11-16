@@ -15,3 +15,7 @@ Samostatná aplikace pro trenéry a Team Leadery linky G463 Prefix (Yanfeng Plan
 Jeden soubor `index.html` bez buildu, fotky a logo v `assets/`. Data ve Firebase Realtime Database (projekt `g463-prefix---trainers-system`, europe-west1), kořen `trenerG463/karty`, anonymní přihlášení; bez připojení pracuje lokálně v prohlížeči. SheetJS se načte z cdnjs až při importu Excelu.
 
 GitHub Pages: Settings → Pages → Branch `main`, složka `/ (root)`. Staré adresy `karty.html` a `modules/karty/` přesměrují na úvod.
+
+## Sdílení a hosting
+- **GitHub Pages** (běží hned): https://uhanm056.github.io/G463-Prefix---Trainers-system/
+- **Firebase Hosting** (jako PMS): https://g463-prefix---trainers-system.web.app – nasazuje `.github/workflows/firebase-hosting.yml` po push do `main`, potřebuje secret `FIREBASE_SA_G463` (JSON klíč servisního účtu projektu `g463-prefix---trainers-system`). Bez secretu se krok přeskočí.
