@@ -1,17 +1,16 @@
-# G463 Prefix – Training system
+# Tréninkové karty – G463 Prefix
 
-Uživatel: Milan Hanus. Komunikace česky, stručně, výstupy hotové k použití. Architektura stejná jako repo `uhanm056/plant-management-system` (shell + moduly v rámu).
+Uživatel: Milan Hanus. Komunikace česky, stručně, výstupy hotové k použití. Vlastní samostatná aplikace (ne součást PMS), vzhledem podle bety Řízení závodu (repo `uhanm056/Plant-Management-System`, větev `nova-aplikace`, `app/src/styles.css`): navy hlavička s cestou, menu vlevo, záhlaví s fotkou (`assets/plant.jpg`, `interior.jpg`, `car.jpg`), dlaždice `.tk`, karty s navy `h3`.
 
 ## Architektura
-- `index.html` – shell, pole `GROUPS` = menu i dlaždice úvodu. Modul se načte do `<iframe>` podle `#hash`.
-- Modul Trenér G463 (`modules/trener/`) byl na přání uživatele 16. 11. 2026 odstraněn; jeho data ve Firebase (`trenerG463/shifts`, `obs`, `esc`, `ops`, `cfg`, `eol`) zůstala nesmazaná. Kód je v historii gitu (commit bf16958).
-- Jen jeden modul → shell (`body.single`) skryje menu a otevře ho rovnou.
-- `modules/karty/` – Tréninkové karty (single-file). Kořen `trenerG463/karty`: `ops/<id>` {name, tl, trainer, start, note, lv/<stepId> {l 0–4, d, by}}, `procs` (seznam procesů a kroků).
-- `shared/embed.js` na začátku `<head>` modulu → v rámu třída `pms-embed` + `shared/embed.css`.
+- `index.html` – celá aplikace (single-file, vanilla JS). Routy `#/prehled`, `#/operatori[/ok|tr|new|stale|bez-trenera]`, `#/op/<id>`, `#/matice`, `#/proces/<k>`, `#/aktivita`, `#/nastaveni/import|skilly|parametry`. Každá stránka = `vXxx(r)` vrací HTML + `binds.xxx(r)` události.
+- Data RTDB `trenerG463/karty`: `ops/<id>` {name, tl, trainer, start, plan (proces z rozpisu), note, lv/<stepId> {l 0–4, d, at, by}}, `procs` [{k, n, ico, col, steps:[{id, n}]}], `cfg` {thNew, thOk, stale}, `log/<pushId>` {op, s, l, p, at, by} (historie; čte se limitToLast 4000). Zápis vždy `update()` více cest (`write`), změna úrovně = `setLevel` (lv + log v jednom zápisu).
+- Trend zaškolení se počítá zpětně z dnešního stavu a `log`.
+- `karty.html`, `modules/karty/index.html` = přesměrování ze starých adres.
+- Modul Trenér G463 odstraněn 16. 11. 2026 (kód v historii gitu, commit bf16958); jeho data ve Firebase (`trenerG463/shifts`, `obs`, `esc`, `ops`, `cfg`, `eol`) zůstala.
 
 ## Pravidla
-- Nevymýšlet data; kroky procesů v kartách jsou návrh – upravuje je trenér v aplikaci.
+- Nevymýšlet data; kroky procesů jsou návrh – upravuje je trenér v aplikaci.
 - L1 a L2 vždy zvlášť.
 - Jména operátorů nepatří do repozitáře (je veřejný) – nahrávají se importem do Firebase.
-- Moduly zůstávají samostatně funkční; změny chování přidávat s komentářem.
-- Lokální test: `python3 -m http.server` v kořeni + Playwright.
+- Lokální test: `python3 -m http.server` v kořeni + Playwright; gstatic (Firebase) a cdnjs (SheetJS) v testu podstrčit / zablokovat.

@@ -1,19 +1,17 @@
-# G463 Prefix – Training system
+# Tréninkové karty – G463 Prefix
 
-Tréninkové karty operátorů linky G463 Prefix (Yanfeng Planá) pro trenéry a Team Leadery. Postavené stejně jako Plant Management System (shell + moduly).
+Samostatná aplikace pro trenéry a Team Leadery linky G463 Prefix (Yanfeng Planá): co kdo umí na procesech Spacer, Glue application, Prefix, Lamination, Edge Wrapping a Rework – po krocích, ve 4 úrovních, se součtem zaškolení. Vzhled podle aplikace Řízení závodu (PMS).
 
-| Modul | Složka | Co dělá | Data |
-|---|---|---|---|
-| Tréninkové karty | `modules/karty/` | karta operátora, skilly po procesech (4 úrovně), % za proces a celkem, import/export | Firebase RTDB `trenerG463/karty` |
+## Stránky
+- **Přehled zaškolení** – KPI, pokrytí procesů, Co řešit, vývoj zaškolení týmu, stav operátorů, největší pokrok, aktivita trenérů.
+- **Operátoři** – karty nebo tabulka, hledání, rejstřík A–Ž, filtry (TL, proces z rozpisu, stav).
+- **Karta operátora** – údaje, profil po procesech (radar), kroky se 4 úrovněmi, historie změn, listování ‹ ›, tisk.
+- **Skill matrix** – operátoři × procesy (%), nebo × kroky jednoho procesu s rychlým zadáváním.
+- **Procesy** – detail každého procesu: kdo umí, úrovně po krocích.
+- **Aktivita a historie** – všechny změny s datem a jménem.
+- **Nastavení** – import (xlsx / csv / vložení z Excelu), export do Excelu, procesy a kroky, parametry.
 
-## Struktura
-- `index.html` – shell: navy hlavička, menu vlevo (na mobilu ☰), úvod s dlaždicemi, modul v rámu podle `#hash` (`#karty`). Dokud je modul jen jeden, shell skryje menu a otevře ho rovnou.
-- `modules/<id>/index.html` – samostatná aplikace, běží i otevřená zvlášť.
-- `shared/embed.js` + `embed.css` – modul v rámu skryje vlastní hlavičku s logem (logo a název nese shell).
-- `assets/logo.png` – logo.
-- `karty.html` – přesměrování ze staré adresy na `#karty`.
+## Technika
+Jeden soubor `index.html` bez buildu, fotky a logo v `assets/`. Data ve Firebase Realtime Database (projekt `g463-prefix---trainers-system`, europe-west1), kořen `trenerG463/karty`, anonymní přihlášení; bez připojení pracuje lokálně v prohlížeči. SheetJS se načte z cdnjs až při importu Excelu.
 
-Nový modul = složka `modules/<id>/` + řádek v poli `GROUPS` v `index.html`.
-
-## Spuštění
-GitHub Pages: Settings → Pages → Branch `main`, složka `/ (root)`. Firebase (projekt `g463-prefix---trainers-system`, europe-west1) je nastavený přímo v modulech, přihlášení anonymní.
+GitHub Pages: Settings → Pages → Branch `main`, složka `/ (root)`. Staré adresy `karty.html` a `modules/karty/` přesměrují na úvod.
