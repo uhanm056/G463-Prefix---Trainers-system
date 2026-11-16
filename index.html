@@ -116,7 +116,7 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .tools input[type=search]{flex:1;min-width:200px}
 .az{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}
 .az button{border:0;cursor:pointer;min-width:26px;height:26px;padding:0 4px;border-radius:6px;font-size:12px;font-weight:700;color:var(--blue);background:var(--th)}
-.az button:hover{background:var(--blue);color:#fff}.az button:disabled{color:var(--muted);background:transparent;cursor:default;opacity:.45}
+.az button:hover,.az button.on{background:var(--blue);color:#fff}.az button:disabled{color:var(--muted);background:transparent;cursor:default;opacity:.45}
 .empty{text-align:center;padding:28px 16px;color:var(--muted)}.empty b{display:block;color:var(--navy);font-size:15px;margin-bottom:4px}
 
 /* avatar, prstenec, pruhy */
@@ -489,13 +489,14 @@ function vPrehled(){
 }
 
 /* ---- Operátoři: seznam vlevo + karta vpravo ---- */
-const UI = { q:'', tl:'', pl:'', st:'', pre:'' };
+const UI = { q:'', tl:'', pl:'', st:'', pre:'', az:'' };   // az = vybrané písmeno (filtr)
 const PRE = () => ({ ok:'Zaškolení', tr:'V tréninku', new:'Noví', stale:`Bez pokroku ${CFG().stale}+ dní`, 'bez-trenera':'Bez trenéra' });
-function filterOps(pre){
+function filterOps(pre, noLetter){
   const c = CFG(), q = norm(UI.q);
   return opsSorted().filter(o => {
     const s = status(totalPct(o)).k;
     if (q && !norm(o.name).includes(q)) return false;
+    if (UI.az && !noLetter && firstLetter(o.name) !== UI.az) return false;
     if (UI.tl && (UI.tl === '__none' ? o.tl : o.tl !== UI.tl)) return false;
     if (UI.pl && (UI.pl === '__none' ? planKeys(o).length : !planKeys(o).includes(UI.pl))) return false;
     if (UI.st && s !== UI.st) return false;
@@ -538,10 +539,10 @@ function vPeople(r){
 }
 let mdScroll = 0;
 function renderMdList(sel){
-  const list = filterOps(UI.pre), have = new Set(list.map(o => firstLetter(o.name))), az = [...AZ];
+  const list = filterOps(UI.pre), have = new Set(filterOps(UI.pre, true).map(o => firstLetter(o.name))), az = [...AZ];
   have.forEach(l => { if (!az.includes(l)) az.push(l); });
-  $('az').innerHTML = az.map(l => `<button data-az="${esc(l)}" ${have.has(l) ? '' : 'disabled'}>${esc(l)}</button>`).join('');
-  $('opCount').textContent = `${list.length} z ${opsSorted().length} operátorů · podle abecedy`;
+  $('az').innerHTML = az.map(l => `<button data-az="${esc(l)}" class="${l === UI.az ? 'on' : ''}" ${have.has(l) || l === UI.az ? '' : 'disabled'} title="${l === UI.az ? 'Zrušit filtr písmene' : 'Jen příjmení na ' + esc(l)}">${esc(l)}</button>`).join('') + (UI.az ? '<button data-az="" title="Zobrazit všechny">✕ vše</button>' : '');
+  $('opCount').textContent = `${list.length} z ${opsSorted().length} operátorů${UI.az ? ` · příjmení na ${UI.az}` : ' · podle abecedy'}`;
   $('mdList').innerHTML = list.map(o => { const t = totalPct(o), s = status(t);
     return `<a class="mi ${o.id === sel ? 'on' : ''}" href="#/op/${encodeURIComponent(o.id)}" data-id="${esc(o.id)}" data-letter="${esc(firstLetter(o.name))}">${avatar(o.name)}<span><b>${esc(o.name)}</b><small>${esc(o.plan || o.note || '')}</small></span><span class="st ${s.k}">${t} %</span></a>`; }).join('')
     || '<div class="empty" style="padding:18px 10px">Nikdo neodpovídá hledání nebo filtrům.</div>';
@@ -558,7 +559,7 @@ function bindPeople(r){
   $('fPl').onchange = e => { UI.pl = e.target.value; re(); };
   $('fSt').onchange = e => { UI.st = e.target.value; re(); };
   $('fQ').onkeydown = e => { if (e.key === 'Enter'){ const a = L.querySelector('.mi'); if (a) go('op', a.dataset.id); } };
-  $('az').onclick = e => { const b = e.target.closest('button[data-az]'); if (!b) return; const el = L.querySelector(`[data-letter="${CSS.escape(b.dataset.az)}"]`); if (el) L.scrollTo({top: el.offsetTop - L.offsetTop, behavior:'smooth'}); };
+  $('az').onclick = e => { const b = e.target.closest('button[data-az]'); if (!b) return; UI.az = b.dataset.az && b.dataset.az !== UI.az ? b.dataset.az : ''; mdScroll = 0; L.scrollTop = 0; re(); };
   if (sel && D.ops[sel]) bindDetail(D.ops[sel]);
 }
 /* ↑ ↓ = předchozí / další operátor v seznamu */
