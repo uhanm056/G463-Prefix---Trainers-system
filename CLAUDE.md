@@ -5,6 +5,7 @@ Uživatel: Milan Hanus. Komunikace česky, stručně, výstupy hotové k použit
 ## Architektura
 - `index.html` – celá aplikace (single-file, vanilla JS). Routy `#/prehled`, `#/operatori[/ok|tr|new|stale|bez-trenera]`, `#/op/<id>`, `#/matice`, `#/proces/<k>`, `#/aktivita`, `#/nastaveni/import|skilly|parametry`. Každá stránka = `vXxx(r)` vrací HTML + `binds.xxx(r)` události.
 - Data RTDB `trenerG463/karty`: `ops/<id>` {name, tl, trainer, start, plan (proces z rozpisu), note, lv/<stepId> {l 0–4, d, at, by}}, `procs` [{k, n, ico, col, steps:[{id, n}]}], `cfg` {thNew, thOk, stale}, `log/<pushId>` {op, s, l, p, at, by} (historie; čte se limitToLast 4000). Zápis vždy `update()` více cest (`write`), změna úrovně = `setLevel` (lv + log v jednom zápisu).
+- Operátoři: výchozí pohled „Podle rozpisu“ – směny z `plan` („Proces (směna); …“, `planEntries`) jako sloupce, uvnitř procesy (`PROC_ORDER`), pruh = proces z rozpisu (`procOfPlan`), Σ = celkem. Další pohledy Karty / Tabulka.
 - Trend zaškolení se počítá zpětně z dnešního stavu a `log`.
 - `karty.html`, `modules/karty/index.html` = přesměrování ze starých adres.
 - Modul Trenér G463 odstraněn 16. 11. 2026 (kód v historii gitu, commit bf16958); jeho data ve Firebase (`trenerG463/shifts`, `obs`, `esc`, `ops`, `cfg`, `eol`) zůstala.
