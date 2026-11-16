@@ -151,6 +151,7 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .sqs{display:flex;gap:4px}
 .sq{border:0;cursor:pointer;width:28px;height:28px;border-radius:7px;background:var(--sq);font-size:11px;font-weight:800;color:var(--muted);transition:transform .1s}
 .sq:hover{transform:scale(1.1);box-shadow:0 0 0 2px var(--blue)} .sq.on{color:#fff}
+.sgh{padding:6px 14px 4px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pc);background:color-mix(in srgb,var(--pc) 9%,var(--card));border-top:1px solid var(--line)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 12px}.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:13px;height:13px;border-radius:4px;display:inline-block}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hist td{white-space:normal}
@@ -237,15 +238,18 @@ const LEVELS = ['Nehodnoceno','Teorie / viděl','Pod vedením trenéra','Samosta
 const LV_COL = ['var(--sq)','#9DB4CC','#F2B544','#3B8FE0','#1E9E4A'];
 const PHOTO = { plant:'assets/plant.jpg', interior:'assets/interior.jpg', car:'assets/car.jpg' };
 const DEFAULT_CFG = { thNew:5, thOk:85, stale:30 };
+/* Kroky podle zadání linky (Milan 16. 11.); „FRT|…“ / „RR|…“ = část dílu. Rework zatím návrh – k doplnění. */
 const DEFAULT_PROCS = [
-  {k:'spacer', n:'Spacer', ico:'🧩', col:'#6B4FB8', steps:['Příprava pracoviště a materiálu','Kontrola spaceru před aplikací','Nastavení teploty horkovzdušné pistole','Aplikace spaceru dle WI','Trhací zkouška','Kontrola přetlačení spaceru','Vizuální kontrola a postup při NOK','5S a předání dílu']},
-  {k:'glue', n:'Glue application', ico:'🧴', col:'#D08600', steps:['Příprava pracoviště a lepidla','Kontrola a nastavení trysek','Nastavení parametrů stroje','Nanesení lepidla dle WI','Kontrola pokrytí lepidlem','Prevence znečištění lepidlem','Čištění trysek a stroje','Postup při NOK']},
-  {k:'prefix', n:'Prefix', ico:'📐', col:'#0A5FB4', steps:['Příprava kůže a dílů','Kontrola vad kůže','Založení kůže do přípravku','Nástřih dle WI (délka)','Fixace kůže','Kontrola kvality po Prefixu','Tempo / takt','Postup při NOK']},
-  {k:'lam', n:'Lamination', ico:'🔥', col:'#E03C31', steps:['Kontrola dílu z Prefixu','Založení do nástroje','Parametry (teplota, tlak, čas)','Spuštění cyklu a bezpečnost','Vyjmutí dílu','Kontrola vrásek a bublin','Čištění nástroje','Postup při NOK']},
-  {k:'ew', n:'Edge Wrapping', ico:'🎁', col:'#0F9488', steps:['Kontrola dílu z laminace','Příprava pracoviště a nástrojů','Zahranění rovných hran','Zahranění rohů a rádiusů','Zahranění Map Pocket','Kontrola hrany (max. 1 mm)','Kontrola znečištění','Postup při NOK']},
+  {k:'spacer', n:'Spacer', ico:'🧩', col:'#6B4FB8', steps:['FRT|Prefix spaceru A – přes plast (busbar)','FRT|Prefix spaceru A – přes plast (window switch)','FRT|Prefix spaceru A – správné usazení kabelu','FRT|Prefix spaceru armrest','FRT|Prefix repráku','RR|Prefix spaceru A – přes plast (window switch)','RR|Prefix armrest']},
+  {k:'glue', n:'Glue spray', ico:'🧴', col:'#D08600', steps:['Montáž konektoru + nalepení kabelu','Správné očištění lepidla / nástroje (toolu)','Vyhodnocení nánosu lepidla']},
+  {k:'prefix', n:'Prefix', ico:'📐', col:'#0A5FB4', steps:['FRT|Očištění MC od lepidla','FRT|Správný prefix kanálu','FRT|Správný prefix trojúhelníkové zóny','FRT|Prefix kanálů po obvodu','FRT|Kontrola po prefixu – lepidlo','FRT|Prefix rohu','RR|Očištění MC od lepidla','RR|Správný prefix kanálu','RR|Kontrola po prefixu – lepidlo','RR|Prefix kanálů po obvodu']},
+  {k:'lam', n:'Lamination', ico:'🔥', col:'#E03C31', steps:['Nástřih v oblasti A zóna','Příprava oblasti map pocket','Ostatní nástřihy','Kontrola správné prefixace dílů','Laminace map pocket']},
+  {k:'ew', n:'Edge Wrapping', ico:'🎁', col:'#0F9488', steps:['Zahranování rohů','Zahranování rádiusu','Laminace kanálu do 1 mm','Nástřihy WS','Zatřižení přebývající kůže']},
   {k:'rework', n:'Rework', ico:'🛠️', col:'#5B6B7C', steps:['Identifikace a třídění vad','Znalost limitních vzorků','Oprava vrásek a bublin','Oprava zahranění','Odstranění znečištění lepidlem','Výstupní kontrola po opravě','Evidence opravených dílů','Rozhodnutí OK / šrot']},
 ];
-const defaultProcs = () => DEFAULT_PROCS.map(p => ({k:p.k, n:p.n, ico:p.ico, col:p.col, steps:p.steps.map((s,i) => ({id:p.k+'_'+(i+1), n:s}))}));
+const defaultProcs = () => DEFAULT_PROCS.map(p => ({k:p.k, n:p.n, ico:p.ico, col:p.col, steps:p.steps.map((s,i) => { const [g, n] = s.includes('|') ? s.split('|') : ['', s]; return {id:p.k+'_v2_'+(i+1), n, ...(g ? {g} : {})}; })}));
+/* krok s částí dílu: „FRT · Prefix rohu“ */
+const sLabel = s => (s.g ? s.g + ' · ' : '') + s.n;
 
 /* ===================== 2. Pomocné ===================== */
 const $ = id => document.getElementById(id);
@@ -422,7 +426,7 @@ const emptyOps = () => `<div class="card"><div class="empty"><b>Zatím žádní 
 function vPrehled(){
   const ops = opsSorted(), c = CFG(), n = ops.length;
   const head = hero({ big:true, photo:PHOTO.plant, pos:'center 40%', kicker:'Yanfeng Planá · linka G463 Prefix', title:'Tréninkové karty',
-    sub:'Co kdo umí na Spacer, Glue application, Prefix, Lamination, Edge Wrapping a Rework – po krocích, ve 4 úrovních, se součtem zaškolení.',
+    sub:'Co kdo umí na Spacer, Glue spray, Prefix, Lamination, Edge Wrapping a Rework – po krocích, ve 4 úrovních, se součtem zaškolení.',
     right:`<a class="btn w" href="#/operatori">👥 Operátoři</a><a class="btn w" href="#/matice">🧩 Skill matrix</a>` });
   if (!n) return head + emptyOps();
   const pc = ops.map(totalPct), avg = Math.round(pc.reduce((a,b) => a + b, 0) / n), by = k => pc.filter(p => status(p).k === k).length;
@@ -566,12 +570,12 @@ function vOp(r){
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px" class="noprint"><button class="btn" id="cRename">✎ Přejmenovat</button><button class="btn danger" id="cReset">Vynulovat hodnocení</button><button class="btn danger" id="cDel">Smazat operátora</button></div>
       </div></div>
       <div class="card"><h3>Profil po procesech</h3><div class="chart">${radar(D.procs.map(p => ({l:p.n, ico:p.ico, v:procPct(o,p), c:p.col})))}</div></div>
-      <div class="card noprint"><h3>Historie změn <span>${hist.length ? 'posledních ' + hist.length : ''}</span></h3>${hist.length ? `<div class="tw" style="max-height:340px"><table class="hist"><thead><tr><th>Kdy</th><th>Krok</th><th>Úroveň</th><th>Kdo</th></tr></thead><tbody>${hist.map(x => { const sp = stepById(x.s); return `<tr><td>${dshort(x.at)}</td><td>${sp ? esc(sp.p.ico + ' ' + sp.s.n) : '<span class="muted">smazaný krok</span>'}</td><td><b>${+x.p || 0} → ${+x.l || 0}</b></td><td>${esc(x.by || '—')}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Zatím žádné změny.</div>'}</div>
+      <div class="card noprint"><h3>Historie změn <span>${hist.length ? 'posledních ' + hist.length : ''}</span></h3>${hist.length ? `<div class="tw" style="max-height:340px"><table class="hist"><thead><tr><th>Kdy</th><th>Krok</th><th>Úroveň</th><th>Kdo</th></tr></thead><tbody>${hist.map(x => { const sp = stepById(x.s); return `<tr><td>${dshort(x.at)}</td><td>${sp ? esc(sp.p.ico + ' ' + sLabel(sp.s)) : '<span class="muted">smazaný krok</span>'}</td><td><b>${+x.p || 0} → ${+x.l || 0}</b></td><td>${esc(x.by || '—')}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Zatím žádné změny.</div>'}</div>
     </div>
     <div>
       <div class="legend">${LEVELS.slice(1).map((l,i) => `<span><i style="background:${LV_COL[i+1]}"></i>${i+1} = ${l}</span>`).join('')}<span>· klik na stejný čtvereček úroveň sníží</span></div>
       <div class="procs">${D.procs.map(p => { const v = procPct(o,p); return `<div class="proc" style="--pc:${p.col}"><div class="pt"><span class="ic">${esc(p.ico)}</span><b>${esc(p.n)}</b><span class="pc">${v}%</span></div><div class="pbar"><i style="width:${v}%"></i></div>
-        ${p.steps.map(st => { const e = o.lv?.[st.id], l = +(e?.l || 0); return `<div class="step"><div class="sn"><div>${esc(st.n)}</div><small>${l ? `${LEVELS[l]}${e.d ? ' · ' + dfmt(e.d) : ''}${e.by ? ' · ' + esc(e.by) : ''}` : 'Nehodnoceno'}</small></div>
+        ${p.steps.map((st, si) => { const e = o.lv?.[st.id], l = +(e?.l || 0); return (st.g && st.g !== p.steps[si-1]?.g ? `<div class="sgh">${esc(st.g)}</div>` : '') + `<div class="step"><div class="sn"><div>${esc(st.n)}</div><small>${l ? `${LEVELS[l]}${e.d ? ' · ' + dfmt(e.d) : ''}${e.by ? ' · ' + esc(e.by) : ''}` : 'Nehodnoceno'}</small></div>
           <div class="sqs">${[1,2,3,4].map(nn => `<button class="sq ${nn <= l ? 'on' : ''}" style="${nn <= l ? 'background:' + LV_COL[l] : ''}" data-step="${esc(st.id)}" data-l="${nn}" title="${nn} – ${LEVELS[nn]}">${nn}</button>`).join('')}</div></div>`; }).join('') || '<div class="step muted small">Žádné kroky – doplňte v Nastavení › Procesy a kroky.</div>'}</div>`; }).join('')}</div>
     </div>
   </div>`;
@@ -622,8 +626,8 @@ function renderMx(){
       </tbody><tfoot><tr><td class="op">Zaškoleno (≥ ${c.thOk} %)</td>${D.procs.map(p => `<td>${ops.filter(o => procPct(o,p) >= c.thOk).length}</td>`).join('')}<td>${ops.filter(o => totalPct(o) >= c.thOk).length}</td></tr></tfoot></table>`;
   } else {
     const p = D.procs.find(x => x.k === MX.proc) || D.procs[0];
-    $('mxWrap').innerHTML = `<table class="mx"><thead><tr><th class="op">Operátor</th>${p.steps.map(s => `<th class="vs"><span>${esc(s.n)}</span></th>`).join('')}<th>${esc(p.ico)} %</th></tr></thead><tbody>
-      ${ops.map(o => `<tr>${opCell(o)}${p.steps.map(s => { const l = lvOf(o, s.id); return `<td class="c k" data-op="${esc(o.id)}" data-s="${esc(s.id)}" title="${esc(s.n)}: ${LEVELS[l]}" style="background:${l ? LV_COL[l] : 'var(--soft)'};color:${l ? '#fff' : '#b3bdc7'}">${l || '·'}</td>`; }).join('')}<td class="c" style="${bg(procPct(o,p))}">${procPct(o,p)}</td></tr>`).join('')}
+    $('mxWrap').innerHTML = `<table class="mx"><thead><tr><th class="op">Operátor</th>${p.steps.map(s => `<th class="vs"><span>${esc(sLabel(s))}</span></th>`).join('')}<th>${esc(p.ico)} %</th></tr></thead><tbody>
+      ${ops.map(o => `<tr>${opCell(o)}${p.steps.map(s => { const l = lvOf(o, s.id); return `<td class="c k" data-op="${esc(o.id)}" data-s="${esc(s.id)}" title="${esc(sLabel(s))}: ${LEVELS[l]}" style="background:${l ? LV_COL[l] : 'var(--soft)'};color:${l ? '#fff' : '#b3bdc7'}">${l || '·'}</td>`; }).join('')}<td class="c" style="${bg(procPct(o,p))}">${procPct(o,p)}</td></tr>`).join('')}
       </tbody><tfoot><tr><td class="op">Schváleno (4)</td>${p.steps.map(s => `<td>${ops.filter(o => lvOf(o, s.id) === 4).length}</td>`).join('')}<td></td></tr></tfoot></table>`;
   }
 }
@@ -649,7 +653,7 @@ function vProces(r){
     <div class="tk"><span class="l">Bez hodnocení</span><span class="vv"><b>${v.filter(x => x === 0).length}</b></span><span class="s">0 %</span></div>
     <div class="tk b"><span class="l">Ø zaškolení</span><span class="vv"><b>${avg}</b><span>%</span></span><span class="s">všichni operátoři</span></div></div>`;
   const steps = `<div class="hbars">${p.steps.map(s => { const cnt = [0,1,2,3,4].map(l => ops.filter(o => lvOf(o, s.id) === l).length);
-    return `<div class="hr"><span class="hl"><b>${esc(s.n)}</b><small>${cnt[4]} schváleno · ${cnt[3]} samostatně</small></span>${stack([{v:cnt[4],c:LV_COL[4],t:LEVELS[4]},{v:cnt[3],c:LV_COL[3],t:LEVELS[3]},{v:cnt[2],c:LV_COL[2],t:LEVELS[2]},{v:cnt[1],c:LV_COL[1],t:LEVELS[1]},{v:cnt[0],c:'#d5dbe1',t:LEVELS[0]}])}<span class="hn">${cnt[4]}/${n}</span></div>`; }).join('')}</div>
+    return `<div class="hr"><span class="hl"><b>${esc(sLabel(s))}</b><small>${cnt[4]} schváleno · ${cnt[3]} samostatně</small></span>${stack([{v:cnt[4],c:LV_COL[4],t:LEVELS[4]},{v:cnt[3],c:LV_COL[3],t:LEVELS[3]},{v:cnt[2],c:LV_COL[2],t:LEVELS[2]},{v:cnt[1],c:LV_COL[1],t:LEVELS[1]},{v:cnt[0],c:'#d5dbe1',t:LEVELS[0]}])}<span class="hn">${cnt[4]}/${n}</span></div>`; }).join('')}</div>
     <div class="legend" style="padding:0 14px 10px">${[4,3,2,1].map(l => `<span><i style="background:${LV_COL[l]}"></i>${LEVELS[l]}</span>`).join('')}<span><i style="background:#d5dbe1"></i>nehodnoceno</span></div>`;
   const rk = ops.map(o => ({o, v:procPct(o,p)})).filter(x => x.v > 0).sort((a,b) => b.v - a.v || a.o.name.localeCompare(b.o.name,'cs'));
   return head + tiles + `<div class="grid g12">
@@ -675,7 +679,7 @@ function renderAk(){
   const q = norm(AK.q), list = logList().filter(x => D.ops[x.op] && (!AK.by || x.by === AK.by) && (!q || norm(D.ops[x.op].name).includes(q))).slice(0, 300);
   let day = '';
   $('akList').innerHTML = list.length ? `<div class="tw" style="max-height:62vh"><table class="hist"><thead><tr><th>Čas</th><th>Operátor</th><th>Proces › krok</th><th>Úroveň</th><th>Zapsal</th></tr></thead><tbody>${list.map(x => { const sp = stepById(x.s), d = x.at.slice(0,10), sep = d !== day, up = (+x.l||0) > (+x.p||0); day = d;
-    return (sep ? `<tr><td colspan="5" style="background:var(--soft);font-weight:800;color:var(--navy)">${dfmt(d)}</td></tr>` : '') + `<tr class="click" data-id="${esc(x.op)}"><td>${new Date(x.at).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'})}</td><td><b>${esc(D.ops[x.op].name)}</b></td><td>${sp ? esc(sp.p.ico + ' ' + sp.p.n + ' › ' + sp.s.n) : '<span class="muted">smazaný krok</span>'}</td><td><span class="pill ${up ? 'g' : 'r'}">${+x.p||0} → ${+x.l||0}</span></td><td>${esc(x.by || '—')}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Nic neodpovídá filtru.</div>';
+    return (sep ? `<tr><td colspan="5" style="background:var(--soft);font-weight:800;color:var(--navy)">${dfmt(d)}</td></tr>` : '') + `<tr class="click" data-id="${esc(x.op)}"><td>${new Date(x.at).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'})}</td><td><b>${esc(D.ops[x.op].name)}</b></td><td>${sp ? esc(sp.p.ico + ' ' + sp.p.n + ' › ' + sLabel(sp.s)) : '<span class="muted">smazaný krok</span>'}</td><td><span class="pill ${up ? 'g' : 'r'}">${+x.p||0} → ${+x.l||0}</span></td><td>${esc(x.by || '—')}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Nic neodpovídá filtru.</div>';
 }
 binds.aktivita = () => { if (!$('akList')) return; renderAk();
   $('akBy').onchange = e => { AK.by = e.target.value; renderAk(); }; $('akQ').oninput = e => { AK.q = e.target.value; renderAk(); };
@@ -691,9 +695,9 @@ function vNastaveni(r){
     return head + sub + `<div class="card"><h3>Procesy a kroky <span>společné pro všechny operátory</span></h3><div class="in">
       <div class="subt">${D.procs.map((x,i) => `<button data-sk="${i}" class="${x === p ? 'on' : ''}">${esc(x.ico)} ${esc(x.n)} (${x.steps.length})</button>`).join('')}</div>
       <div class="fields" style="grid-template-columns:2fr 1fr 1fr;margin-bottom:12px"><label class="f">Název procesu<input type="text" id="pN" value="${esc(p.n)}"></label><label class="f">Ikona<input type="text" id="pI" value="${esc(p.ico)}" maxlength="4"></label><label class="f">Barva<input type="color" id="pC" value="${esc(p.col)}" style="min-height:36px;width:100%"></label></div>
-      ${p.steps.map((s,i) => `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center"><span class="pill b" style="min-width:30px;text-align:center">${i+1}</span><input type="text" value="${esc(s.n)}" data-ren="${i}" style="flex:1"><button class="btn" data-up="${i}" ${i ? '' : 'disabled'} title="Posunout nahoru">↑</button><button class="btn danger" data-del="${i}">Smazat</button></div>`).join('') || '<p class="muted">Žádné kroky.</p>'}
-      <form id="skAdd" style="display:flex;gap:6px;margin-top:10px"><input type="text" id="skNew" placeholder="Nový krok…" style="flex:1"><button class="btn f" type="submit">+ Přidat krok</button></form>
-      <p class="small muted" style="margin-top:12px">Smazaný krok se přestane započítávat do procent. Hodnocení ostatních kroků zůstává.</p>
+      ${p.steps.map((s,i) => `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center"><span class="pill b" style="min-width:30px;text-align:center">${i+1}</span><input type="text" value="${esc(s.g || '')}" data-grp="${i}" placeholder="část" title="Část dílu, např. FRT / RR (nepovinné)" style="width:70px"><input type="text" value="${esc(s.n)}" data-ren="${i}" style="flex:1"><button class="btn" data-up="${i}" ${i ? '' : 'disabled'} title="Posunout nahoru">↑</button><button class="btn danger" data-del="${i}">Smazat</button></div>`).join('') || '<p class="muted">Žádné kroky.</p>'}
+      <form id="skAdd" style="display:flex;gap:6px;margin-top:10px"><input type="text" id="skGrp" placeholder="část" value="${esc(p.steps.at(-1)?.g || '')}" style="width:70px"><input type="text" id="skNew" placeholder="Nový krok…" style="flex:1"><button class="btn f" type="submit">+ Přidat krok</button></form>
+      <p class="small muted" style="margin-top:12px">Část (např. FRT / RR) je nepovinná – na kartě operátora kroky rozdělí pod nadpisy. Smazaný krok se přestane započítávat do procent, hodnocení ostatních kroků zůstává.</p>
       <button class="btn danger" id="skReset">Obnovit výchozí kroky všech procesů</button></div></div>`; }
   if (tab === 'parametry'){ const c = CFG();
     return head + sub + `<div class="card"><h3>Parametry</h3><div class="in"><div class="fields" style="grid-template-columns:repeat(3,1fr)">
@@ -761,11 +765,11 @@ binds.nastaveni = r => {
     $('impFile').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; try{ showPreview(await readFile(f)); }catch(err){ console.warn(err); toast('Soubor se nepodařilo přečíst'); } };
     $('impGo').onclick = doImport;
     $('impTpl').onclick = () => download([['Operátor','Team Leader','Trenér','Nástup','Proces','Poznámka']], 'sablona-import-operatoru.csv');
-    $('exD').onclick = () => { const rows = [['Operátor','Nástup','Team Leader','Trenér','Proces (rozpis)','Proces','Krok','Úroveň (0–4)','Stav kroku','Datum změny','Zapsal','% procesu','% celkem']];
-      for (const o of opsSorted()){ const t = totalPct(o); for (const p of D.procs){ const pp = procPct(o,p); for (const s of p.steps){ const e = o.lv?.[s.id] || {}, l = +(e.l || 0); rows.push([o.name, o.start ? dfmt(o.start) : '', o.tl, o.trainer, o.plan, p.n, s.n, l, LEVELS[l], e.d ? dfmt(e.d) : '', e.by, pp, t]); } } }
+    $('exD').onclick = () => { const rows = [['Operátor','Nástup','Team Leader','Trenér','Proces (rozpis)','Proces','Část','Krok','Úroveň (0–4)','Stav kroku','Datum změny','Zapsal','% procesu','% celkem']];
+      for (const o of opsSorted()){ const t = totalPct(o); for (const p of D.procs){ const pp = procPct(o,p); for (const s of p.steps){ const e = o.lv?.[s.id] || {}, l = +(e.l || 0); rows.push([o.name, o.start ? dfmt(o.start) : '', o.tl, o.trainer, o.plan, p.n, s.g || '', s.n, l, LEVELS[l], e.d ? dfmt(e.d) : '', e.by, pp, t]); } } }
       download(rows, `treninkove-karty-podrobne-${today()}.csv`); };
     $('exM').onclick = () => download([['Operátor','Team Leader','Trenér','Proces (rozpis)', ...D.procs.map(p => p.n + ' %'), 'Celkem %', 'Stav'], ...opsSorted().map(o => [o.name, o.tl, o.trainer, o.plan, ...D.procs.map(p => procPct(o,p)), totalPct(o), status(totalPct(o)).n])], `skill-matrix-${today()}.csv`);
-    $('exL').onclick = () => download([['Datum','Čas','Operátor','Proces','Krok','Z','Na','Zapsal'], ...logList().filter(x => D.ops[x.op]).map(x => { const sp = stepById(x.s); return [dfmt(x.at), new Date(x.at).toLocaleTimeString('cs-CZ'), D.ops[x.op].name, sp?.p.n || '', sp?.s.n || '(smazaný krok)', +x.p || 0, +x.l || 0, x.by]; })], `historie-zmen-${today()}.csv`);
+    $('exL').onclick = () => download([['Datum','Čas','Operátor','Proces','Krok','Z','Na','Zapsal'], ...logList().filter(x => D.ops[x.op]).map(x => { const sp = stepById(x.s); return [dfmt(x.at), new Date(x.at).toLocaleTimeString('cs-CZ'), D.ops[x.op].name, sp?.p.n || '', sp ? sLabel(sp.s) : '(smazaný krok)', +x.p || 0, +x.l || 0, x.by]; })], `historie-zmen-${today()}.csv`);
   }
   if (tab === 'skilly'){
     const p = D.procs[skProc] || D.procs[0], save = async () => { await write({procs: D.procs}); render(); };
@@ -774,10 +778,11 @@ binds.nastaveni = r => {
     $('pI').onchange = e => { p.ico = e.target.value.trim() || p.ico; save(); };
     $('pC').onchange = e => { p.col = e.target.value; save(); };
     document.querySelectorAll('[data-ren]').forEach(i => i.onchange = () => { if (i.value.trim()){ p.steps[+i.dataset.ren].n = i.value.trim(); save(); } });
+    document.querySelectorAll('[data-grp]').forEach(i => i.onchange = () => { const st = p.steps[+i.dataset.grp], g = i.value.trim().toUpperCase(); if (g) st.g = g; else delete st.g; save(); });
     document.querySelectorAll('[data-up]').forEach(b => b.onclick = () => { const i = +b.dataset.up; [p.steps[i-1], p.steps[i]] = [p.steps[i], p.steps[i-1]]; save(); });
     document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const s = p.steps[+b.dataset.del]; if (confirm(`Smazat krok „${s.n}“ u procesu ${p.n}?`)){ p.steps.splice(+b.dataset.del, 1); save(); } });
-    $('skAdd').onsubmit = e => { e.preventDefault(); const n = $('skNew').value.trim(); if (!n) return; p.steps.push({ id: p.k + '_' + uid(), n }); save(); };
-    $('skReset').onclick = () => { if (confirm('Obnovit výchozí kroky u všech procesů? Vlastní kroky se odstraní, hodnocení výchozích kroků zůstane.')){ D.procs = defaultProcs(); save(); } };
+    $('skAdd').onsubmit = e => { e.preventDefault(); const n = $('skNew').value.trim(); if (!n) return; const g = $('skGrp').value.trim().toUpperCase(); p.steps.push({ id: p.k + '_' + uid(), n, ...(g ? {g} : {}) }); save(); };
+    $('skReset').onclick = () => { if (confirm('Obnovit výchozí kroky u všech procesů (podle zadání linky)? Vlastní úpravy kroků se ztratí.')){ D.procs = defaultProcs(); save(); } };
   }
   if (tab === 'parametry'){
     document.querySelectorAll('[data-c]').forEach(i => i.onchange = async () => { const v = Math.max(0, Math.min(365, +i.value || 0)); D.cfg = {...CFG(), [i.dataset.c]: v}; await write({cfg: D.cfg}); toast('Uloženo'); });

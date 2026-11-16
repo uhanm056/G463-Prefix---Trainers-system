@@ -10,7 +10,7 @@ Uživatel: Milan Hanus. Komunikace česky, stručně, výstupy hotové k použit
 - Modul Trenér G463 odstraněn 16. 11. 2026 (kód v historii gitu, commit bf16958); jeho data ve Firebase (`trenerG463/shifts`, `obs`, `esc`, `ops`, `cfg`, `eol`) zůstala.
 
 ## Pravidla
-- Nevymýšlet data; kroky procesů jsou návrh – upravuje je trenér v aplikaci.
+- Nevymýšlet data; kroky procesů Spacer, Glue spray, Prefix, Lamination, EDGW jsou od linky (16. 11.); Rework je zatím návrh. Krok může mít část `g` (FRT / RR).
 - L1 a L2 vždy zvlášť.
 - Jména operátorů nepatří do repozitáře (je veřejný) – nahrávají se importem do Firebase.
 - Lokální test: `python3 -m http.server` v kořeni + Playwright; gstatic (Firebase) a cdnjs (SheetJS) v testu podstrčit / zablokovat.
