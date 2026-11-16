@@ -124,16 +124,12 @@ const I = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
   shift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
   card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M6 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M15 9h3M15 13h3"/></svg>',
-  plant:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l6 4V9l6 4V5h6v16z"/></svg>'
 };
 /* Moduly: id = #hash, src = stránka modulu (běží i samostatně), col = barva. Nový modul = nová složka modules/<id>/ + řádek sem. */
 const GROUPS = [
   { n: 'Trénink na lince', m: [
     { id: 'trener', t: 'Trenér G463', s: 'Denní rutina trenéra na směně', d: 'Fokus směny podle rozhodovacího diagramu, stav procesů na lince, záznamy pozorování a korekcí, eskalace, briefing TOP vad, předávka směny a přehled pro TL.', src: 'modules/trener/index.html', ic: 'shift', col: '#0A5FB4', tags: ['každou směnu', 'L1 / L2', 'trenér · TL'] },
     { id: 'karty', t: 'Tréninkové karty', s: 'Skilly operátorů po procesech', d: 'Karta každého operátora: Spacer, Glue application, Prefix, Lamination, Edge Wrapping, Rework. Kroky po 4 úrovních, % zaškolení za proces i celkem, import a export do Excelu.', src: 'modules/karty/index.html', ic: 'card', col: '#1E9E4A', tags: ['průběžně', 'trenér · TL'] }
-  ]},
-  { n: 'Odkazy', m: [
-    { id: 'pms', t: 'Plant Management System', s: 'Řízení závodu Planá', d: 'KPI oddělení, výrobní KPI, plánování lidí, přesčasy, scrap a QLR.', href: 'https://plana-plant-management.web.app', ic: 'plant', col: '#002B5C', tags: ['vedení', 'přihlášení'] }
   ]}
 ];
 const ALL = GROUPS.flatMap(g => g.m.map(m => Object.assign({ g: g.n }, m)));
