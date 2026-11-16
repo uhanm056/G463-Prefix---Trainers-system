@@ -1,11 +1,37 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", ".firebaserc", "**/.*", "**/*.md", "**/node_modules/**"],
+    "ignore": [
+      "**/*.md",
+      "**/.*",
+      "**/node_modules/**",
+      ".firebaserc",
+      "database.rules.json",
+      "firebase.json"
+    ],
     "cleanUrls": false,
     "headers": [
-      { "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
-      { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "/",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
     ]
+  },
+  "database": {
+    "rules": "database.rules.json"
   }
 }

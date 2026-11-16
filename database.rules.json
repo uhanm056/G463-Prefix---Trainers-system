@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "trenerG463": {
+      ".read": "auth != null && auth.provider === 'password'",
+      ".write": "auth != null && auth.provider === 'password'"
+    }
+  }
+}

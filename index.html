@@ -195,6 +195,18 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .mx td.c.k{min-width:30px;height:28px;padding:0}
 .mx tfoot td{font-size:11.5px;color:var(--muted);background:var(--soft);font-weight:700}
 
+/* přihlášení */
+#gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(110deg,rgba(0,43,92,.94) 0%,rgba(0,59,122,.82) 55%,rgba(10,95,180,.55) 100%),url(assets/plant.jpg) center/cover no-repeat}
+#gate[hidden]{display:none}
+body.locked header.top,body.locked .body{visibility:hidden}
+.gbox{background:#fff;color:#1f2933;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:28px;width:100%;max-width:370px;display:flex;flex-direction:column;gap:11px}
+.gbox .lg{align-self:flex-start;display:flex;padding:6px 10px;border-radius:7px;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#fff}.gbox .lg img{height:24px}
+.gbox h1{margin:6px 0 0;font-size:22px;color:#003B7A}.gbox p{margin:0;color:#6b7684}
+.gbox label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7684}
+.gbox input{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;font-weight:400;color:#1f2933;background:#fff;border:1px solid #c3ced8;border-radius:8px;padding:10px;min-height:44px}
+.gbox button{border:0;border-radius:999px;background:#003B7A;color:#fff;font:inherit;font-weight:700;padding:11px;min-height:46px;cursor:pointer}.gbox button:disabled{opacity:.6}
+.gbox .lnk2{background:none;color:#0A5FB4;min-height:0;padding:0;font-weight:600;font-size:13px;align-self:flex-start}
+.gbox small{color:#6b7684;font-size:11.5px}.gerr{color:#E03C31;font-size:13px}.gerr:empty{display:none}.gok{color:#1E9E4A;font-size:13px}.gok:empty{display:none}
 .toast{position:fixed;right:16px;bottom:16px;background:#1F2933;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:90;max-width:90vw;font-size:13px}
 .toast.show{opacity:1;transform:none}
 .banner{border-radius:10px;padding:9px 14px;margin-bottom:12px;border-left:4px solid var(--amber);background:#fdf4e3;color:#7a4d00;font-size:13px}
@@ -220,7 +232,20 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
   .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="gate" hidden>
+  <form id="gateForm" class="gbox" autocomplete="on">
+    <span class="lg"><img src="assets/logo.png" alt="Yanfeng"></span>
+    <h1>Tréninkové karty</h1>
+    <p>Linka G463 Prefix · přístup jen pro přihlášené</p>
+    <label>E-mail<input id="gE" type="email" autocomplete="username" required></label>
+    <label>Heslo<input id="gP" type="password" autocomplete="current-password" required></label>
+    <div class="gerr" id="gErr"></div><div class="gok" id="gOk"></div>
+    <button id="gBtn" type="submit">Přihlásit</button>
+    <button type="button" class="lnk2" id="gReset">Zapomenuté heslo</button>
+    <small>Účet zakládá správce aplikace. Přihlášení si prohlížeč pamatuje, dokud se neodhlásíte.</small>
+  </form>
+</div>
 <header class="top">
   <button class="burger" id="burger" aria-label="Menu" title="Schovat / ukázat menu">☰</button>
   <a class="logo" href="#/prehled"><img src="assets/logo.png" alt="Yanfeng"></a>
@@ -291,33 +316,65 @@ let fb = null, canWrite = true, online = false;
 let ME = ''; try{ ME = localStorage.getItem(LS_ME) || ''; }catch(e){}
 const CFG = () => ({...DEFAULT_CFG, ...(D.cfg || {})});
 const fixProcs = p => Array.isArray(p) && p.length ? p.map(x => ({...x, steps: x.steps || []})) : null;
-function saveLocal(){ try{ localStorage.setItem(LS_DATA, JSON.stringify(D)); }catch(e){} }
-function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LS_DATA) || 'null'); if (d){ D.ops = d.ops || {}; D.procs = fixProcs(d.procs) || D.procs; D.log = d.log || {}; D.cfg = d.cfg || {}; } }catch(e){} }
+/* data se drží jen v paměti po přihlášení (dřívější lokální kopie se maže) */
+function saveLocal(){}
+function loadLocal(){ try{ localStorage.removeItem(LS_DATA); }catch(e){} }
 /* zápis více cest najednou (update); lokální kopie vždy */
 async function write(updates){
-  saveLocal();
-  if (!fb) return;
+  if (!fb){ toast('Nejste připojeni k databázi – změna se neuložila'); return; }
   const u = {}; for (const [k,v] of Object.entries(updates)) u[k] = v == null ? null : clean(v);
   try{ await fb.ref(ROOT).update(u); }
-  catch(e){ console.warn(e); canWrite = false; render(); toast('Uložení do databáze selhalo – změna je jen v tomto prohlížeči'); }
+  catch(e){ console.warn(e); canWrite = false; render(); toast('Uložení do databáze selhalo – zkontrolujte připojení a přihlášení'); }
 }
 const newKey = () => fb ? fb.ref(ROOT + '/log').push().key : uid();
 function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error(src)); document.head.appendChild(s); }); }
-async function fbInit(){
+/* Firebase: aplikace jen pro přihlášené (Authentication e-mail + heslo, účty zakládá správce).
+   Pravidla databáze (database.rules.json) pouští k datům jen přihlášení heslem. */
+let AUTH = null, started = false;
+async function fbLoad(){
   await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
   await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
   await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
   firebase.initializeApp(FIREBASE_CONFIG);
-  await firebase.auth().signInAnonymously();
+  AUTH = firebase.auth();
+  AUTH.onAuthStateChanged(u => {
+    if (u && !u.isAnonymous){ gate(false, u); startData(); }
+    else { if (u) AUTH.signOut(); if (started) location.reload(); else gate(true); }
+  });
+}
+async function startData(){
+  if (started) return; started = true;
   fb = firebase.database();
   fb.ref('.info/connected').on('value', s => { online = !!s.val(); setSync(); renderNav(); });
-  const procs = (await fb.ref(ROOT + '/procs').once('value')).val();
-  if (!fixProcs(procs)) await fb.ref(ROOT + '/procs').set(clean(D.procs)).catch(() => { canWrite = false; });
-  const on = (path, key, fn = v => v || {}) => fb.ref(ROOT + '/' + path).on('value', s => { D[key] = fn(s.val()); saveLocal(); scheduleRender(); }, e => { console.warn(e); canWrite = false; scheduleRender(); });
+  try{
+    const procs = (await fb.ref(ROOT + '/procs').once('value')).val();
+    if (!fixProcs(procs)) await fb.ref(ROOT + '/procs').set(clean(D.procs));
+  }catch(e){ console.warn(e); canWrite = false; }
+  const on = (path, key, fn = v => v || {}) => fb.ref(ROOT + '/' + path).on('value', s => { D[key] = fn(s.val()); scheduleRender(); }, e => { console.warn(e); canWrite = false; scheduleRender(); });
   on('ops', 'ops'); on('cfg', 'cfg'); on('procs', 'procs', v => fixProcs(v) || D.procs);
-  fb.ref(ROOT + '/log').orderByKey().limitToLast(4000).on('value', s => { D.log = s.val() || {}; saveLocal(); scheduleRender(); });
+  fb.ref(ROOT + '/log').orderByKey().limitToLast(4000).on('value', s => { D.log = s.val() || {}; scheduleRender(); });
+  setSync(); render();
 }
-function setSync(){ $('sync').classList.toggle('on', !!fb && online); $('who').title = (fb ? (online ? 'Online – sdílená data týmu' : 'Offline – změny se odešlou po připojení') : 'Offline – data jen v tomto prohlížeči') + '. Klikněte pro změnu jména, které se ukládá ke změnám.'; }
+function gate(show, u){
+  document.body.classList.toggle('locked', show); $('gate').hidden = !show;
+  if (show){ try{ $('gE').value ||= localStorage.getItem('trenerG463.karty.email') || ''; }catch(e){} setTimeout(() => ($('gE').value ? $('gP') : $('gE')).focus(), 60); return; }
+  if (!ME && u){ ME = u.displayName || u.email.split('@')[0].replace(/[._-]+/g,' ').replace(/\b\w/g, c => c.toUpperCase()); showMe(); }
+}
+const AUTH_ERR = c => ({ 'auth/invalid-credential':'Špatný e-mail nebo heslo.', 'auth/wrong-password':'Špatný e-mail nebo heslo.', 'auth/user-not-found':'Účet s tímto e-mailem neexistuje.', 'auth/invalid-email':'Neplatný e-mail.', 'auth/too-many-requests':'Příliš mnoho pokusů – zkuste to za chvíli.', 'auth/network-request-failed':'Bez připojení k internetu.', 'auth/user-disabled':'Účet je zablokovaný.', 'auth/operation-not-allowed':'Přihlášení e-mailem není ve Firebase zapnuté.' }[c] || 'Přihlášení se nepovedlo (' + c + ').');
+$('gateForm').onsubmit = async e => {
+  e.preventDefault(); $('gErr').textContent = ''; $('gOk').textContent = ''; $('gBtn').disabled = true;
+  try{ const em = $('gE').value.trim(); await AUTH.signInWithEmailAndPassword(em, $('gP').value); $('gP').value = ''; try{ localStorage.setItem('trenerG463.karty.email', em); }catch(_){} }
+  catch(err){ $('gErr').textContent = AUTH_ERR(err.code); }
+  $('gBtn').disabled = false;
+};
+$('gReset').onclick = async () => {
+  const em = $('gE').value.trim(); $('gErr').textContent = ''; $('gOk').textContent = '';
+  if (!em){ $('gErr').textContent = 'Nejdřív vyplňte e-mail.'; $('gE').focus(); return; }
+  try{ await AUTH.sendPasswordResetEmail(em); $('gOk').textContent = 'Pokud účet existuje, přišel na ' + em + ' e-mail s odkazem pro nové heslo.'; }
+  catch(err){ $('gErr').textContent = AUTH_ERR(err.code); }
+};
+function logout(){ if (!confirm('Odhlásit se z aplikace?')) return; AUTH.signOut(); }
+function setSync(){ $('sync').classList.toggle('on', !!fb && online); if (!$('who')) return; $('who').title = (fb ? (online ? 'Online – sdílená data týmu' : 'Offline – změny se odešlou po připojení') : 'Offline – data jen v tomto prohlížeči') + '. Klikněte pro změnu jména, které se ukládá ke změnám.'; }
 /* nepřekreslovat pod rukama, když uživatel píše do pole */
 let pending = false;
 function scheduleRender(){ const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && $('main').contains(a)){ pending = true; return; } render(); }
@@ -402,7 +459,7 @@ function renderNav(){
     ${a('nastaveni/import','📥','Import a export', at('nastaveni','import') || (at('nastaveni') && !r[1]))}
     ${a('nastaveni/skilly','🗂️','Procesy a kroky', at('nastaveni','skilly'))}
     ${a('nastaveni/parametry','🎯','Parametry', at('nastaveni','parametry'))}
-    <div class="foot">Linka G463 Prefix · Yanfeng Planá<br>${fb ? (online ? '● online – sdílená data' : '○ offline – změny se odešlou') : '○ data jen v tomto prohlížeči'}</div>`;
+    <div class="foot">${AUTH?.currentUser ? `Přihlášen: <b>${esc(AUTH.currentUser.email)}</b><br><a href="#" id="logout">Odhlásit</a><br><br>` : ''}Linka G463 Prefix · Yanfeng Planá<br>${fb ? (online ? '● online – sdílená data' : '○ offline – změny se odešlou') : '○ data jen v tomto prohlížeči'}</div>`;
   $('body').classList.toggle('nonav', !navOpen);
   $('shade').style.display = navOpen && narrow() ? '' : 'none';
 }
@@ -842,15 +899,14 @@ function showMe(){ $('whoName').textContent = 'Zapisuje: ' + (ME || '— nastavi
 $('who').onclick = () => { const n = prompt('Vaše jméno (trenér / TL) – ukládá se ke každé změně úrovně:', ME); if (n == null) return; ME = n.trim(); try{ localStorage.setItem(LS_ME, ME); }catch(e){} showMe(); toast(ME ? `Změny se zapisují jako ${ME}` : 'Jméno smazáno'); };
 $('burger').onclick = () => { navOpen = !navOpen; try{ if (!narrow()) localStorage.setItem(LS_NAV, navOpen ? '1' : '0'); }catch(e){} renderNav(); };
 $('shade').onclick = () => { navOpen = false; renderNav(); };
-$('nav').onclick = e => { if (narrow() && e.target.closest('a')){ navOpen = false; renderNav(); } };
+$('nav').onclick = e => { if (e.target.id === 'logout'){ e.preventDefault(); logout(); return; } if (narrow() && e.target.closest('a')){ navOpen = false; renderNav(); } };
 window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); });
 
 /* ===================== 9. Start ===================== */
 (async () => {
   try{ const th = localStorage.getItem(LS_THEME); if (th) document.documentElement.dataset.theme = th; }catch(e){}
-  loadLocal(); showMe(); setSync(); render();
-  try{ await fbInit(); }catch(e){ console.warn('Firebase', e); fb = null; }
-  setSync(); render();
+  loadLocal(); showMe(); setSync();
+  try{ await fbLoad(); }catch(e){ console.warn('Firebase', e); gate(true); $('gErr').textContent = 'Nepodařilo se připojit k serveru – zkontrolujte internet a obnovte stránku.'; $('gBtn').disabled = true; }
 })();
 </script>
 </body>

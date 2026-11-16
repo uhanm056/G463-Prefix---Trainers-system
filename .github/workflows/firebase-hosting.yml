@@ -2,6 +2,7 @@
 # https://g463-prefix---trainers-system.web.app) po každé změně ve větvi main – stejně jako PMS.
 # Potřebuje secret FIREBASE_SA_G463 = JSON klíč servisního účtu projektu (Firebase konzole →
 # Nastavení projektu → Servisní účty → Vygenerovat nový soukromý klíč). Bez něj se nasazení přeskočí.
+# Nasazuje i pravidla Realtime Database (database.rules.json).
 name: Nasazení na Firebase Hosting
 on:
   push:
@@ -18,6 +19,19 @@ jobs:
           SA: ${{ secrets.FIREBASE_SA_G463 }}
         run: |
           if [ -n "$SA" ]; then echo "ok=1" >> "$GITHUB_OUTPUT"; else echo "::notice::Chybí secret FIREBASE_SA_G463 – nasazení na Firebase Hosting přeskočeno (GitHub Pages běží dál)."; fi
+      - uses: actions/setup-node@v4
+        if: steps.k.outputs.ok == '1'
+        with:
+          node-version: 22
+      # pravidla databáze (database.rules.json): k datům jen přihlášení e-mailem a heslem
+      - name: Pravidla databáze
+        if: steps.k.outputs.ok == '1'
+        env:
+          SA: ${{ secrets.FIREBASE_SA_G463 }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx -y firebase-tools@13 deploy --only database --project g463-prefix---trainers-system --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         if: steps.k.outputs.ok == '1'
         with:
