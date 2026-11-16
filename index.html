@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>G463 Prefix – Training system · Yanfeng Planá</title>
-<meta name="description" content="Linka G463 Prefix: denní rutina trenéra a tréninkové karty operátorů v jedné aplikaci.">
+<meta name="description" content="Linka G463 Prefix: tréninkové karty operátorů – skilly po procesech.">
 <meta name="theme-color" content="#002B5C">
 <link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,6 +99,9 @@ h2.sec{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--m
   #home{padding:16px 16px calc(32px + var(--sab))}
   .hero{padding:20px} .hero h1{font-size:23px}
 }
+/* jen jeden modul: bez menu, modul přes celou šířku */
+body.single aside,body.single .menu-btn,body.single .scrim{display:none!important}
+body.single main{left:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -113,7 +116,7 @@ h2.sec{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--m
   </div>
 </header>
 <div class="scrim" id="scrim"></div>
-<aside id="rail"><nav class="nav" id="nav"></nav><div class="rail-foot">Trenér = co se děje dnes na směně. Tréninkové karty = co už operátor umí. Oba moduly sdílí Firebase projekt linky.</div></aside>
+<aside id="rail"><nav class="nav" id="nav"></nav><div class="rail-foot">Tréninkové karty = co už operátor umí na jednotlivých procesech. Data ve Firebase projektu linky.</div></aside>
 <main>
   <section id="home"></section>
   <iframe id="frame" title="Modul" hidden></iframe>
@@ -122,13 +125,11 @@ h2.sec{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--m
 <script>
 const I = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
-  shift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
   card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M6 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M15 9h3M15 13h3"/></svg>',
 };
 /* Moduly: id = #hash, src = stránka modulu (běží i samostatně), col = barva. Nový modul = nová složka modules/<id>/ + řádek sem. */
 const GROUPS = [
   { n: 'Trénink na lince', m: [
-    { id: 'trener', t: 'Trenér G463', s: 'Denní rutina trenéra na směně', d: 'Fokus směny podle rozhodovacího diagramu, stav procesů na lince, záznamy pozorování a korekcí, eskalace, briefing TOP vad, předávka směny a přehled pro TL.', src: 'modules/trener/index.html', ic: 'shift', col: '#0A5FB4', tags: ['každou směnu', 'L1 / L2', 'trenér · TL'] },
     { id: 'karty', t: 'Tréninkové karty', s: 'Skilly operátorů po procesech', d: 'Karta každého operátora: Spacer, Glue application, Prefix, Lamination, Edge Wrapping, Rework. Kroky po 4 úrovních, % zaškolení za proces i celkem, import a export do Excelu.', src: 'modules/karty/index.html', ic: 'card', col: '#1E9E4A', tags: ['průběžně', 'trenér · TL'] }
   ]}
 ];
@@ -153,17 +154,13 @@ function tileHtml(m){
     '<div class="meta">' + m.tags.map(t => '<span>' + t + '</span>').join('') + '</div></a>';
 }
 function homeHtml(){
-  let h = '<div class="hero"><div class="k">Yanfeng Planá · linka G463 Prefix</div><h1>Training system</h1><p>Jedna aplikace pro trenéry a Team Leadery linky Prefix. Na směně trenér pozoruje a opravuje, na kartě operátora se ukládá, co už umí samostatně.</p>' +
-    '<div class="flow"><span>fokus směny</span><i>→</i><span>pozorování</span><i>→</i><span>korekce</span><i>→</i><span>karta operátora</span><i>→</i><span>zaškolen</span></div></div>';
-  h += '<div class="how">' +
-    '<div><b>Trenér na směně</b><span>Začne v modulu Trenér G463: vybere sebe, směnu a linku, aplikace ho provede rutinou.</span></div>' +
-    '<div><b>Postup operátora</b><span>V Tréninkových kartách zapíše úroveň u kroku procesu. Procenta se sečtou sama.</span></div>' +
-    '<div><b>Team Leader</b><span>Přehled TL v Trenérovi a přehled týmu v kartách: kdo je na čem zaškolený.</span></div></div>';
+  let h = '<div class="hero"><div class="k">Yanfeng Planá · linka G463 Prefix</div><h1>Training system</h1><p>Tréninkové karty operátorů linky Prefix: co kdo umí na jednotlivých procesech a jak postupuje zaškolení.</p>' +
+    '<div class="flow"><span>teorie</span><i>→</i><span>pod vedením</span><i>→</i><span>samostatně pod dohledem</span><i>→</i><span>schváleno</span></div></div>';
   GROUPS.forEach(g => { h += '<h2 class="sec">' + g.n + '</h2><div class="tiles">' + g.m.map(tileHtml).join('') + '</div>'; });
   return h;
 }
 function route(){
-  const id = (location.hash || '#uvod').slice(1), m = ALL.find(x => x.id === id && !x.href);
+  const id = (location.hash || '#uvod').slice(1), m = ALL.find(x => x.id === id && !x.href) || (ALL.length === 1 ? ALL[0] : null);   // jeden modul → otevře se rovnou
   $('nav').innerHTML = navHtml(m ? id : 'uvod');
   document.body.classList.remove('menu');
   const fr = $('frame'), oa = $('openAlone');
@@ -171,7 +168,7 @@ function route(){
     $('modTitle').textContent = m.t; $('modSub').textContent = m.g + ' · ' + m.s;
     $('home').hidden = true; fr.hidden = false;
     if (fr.getAttribute('src') !== m.src) fr.setAttribute('src', m.src);
-    oa.href = m.src; oa.hidden = false;
+    oa.href = m.src; oa.hidden = ALL.length === 1;   // jediný modul = celá aplikace
     document.title = m.t + ' – G463 Prefix';
   } else {
     $('modTitle').textContent = 'G463 Prefix'; $('modSub').textContent = 'Training system';
@@ -182,6 +179,7 @@ function route(){
 try { const th = localStorage.getItem('trenerG463.theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
 $('menuBtn').addEventListener('click', () => document.body.classList.toggle('menu'));
 $('scrim').addEventListener('click', () => document.body.classList.remove('menu'));
+document.body.classList.toggle('single', ALL.length === 1);
 window.addEventListener('hashchange', route);
 route();
 </script>
