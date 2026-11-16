@@ -126,7 +126,7 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .hero .ring .rt{fill:#fff}.hero .ring .rs{fill:rgba(255,255,255,.85)}
 .mb{display:flex;align-items:center;gap:6px;min-width:90px}.mb .tr{flex:1;height:7px;border-radius:9px;background:var(--sq);overflow:hidden}.mb .tr i{display:block;height:100%;border-radius:9px}.mb span{font-size:11.5px;width:34px;text-align:right;font-variant-numeric:tabular-nums}
 .st{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
-.st.new{background:#fdecea;color:var(--red)}.st.tr{background:#fdf4e3;color:var(--amber-t)}.st.ok{background:#eaf7ee;color:var(--green)}
+.st.new{background:#eef1f4;color:#5b6876}.st.tr{background:#fdf4e3;color:var(--amber-t)}.st.ok{background:#eaf7ee;color:var(--green)}
 
 /* karty operátorů (mřížka) */
 .opgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
@@ -152,6 +152,16 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .sq{border:0;cursor:pointer;width:28px;height:28px;border-radius:7px;background:var(--sq);font-size:11px;font-weight:800;color:var(--muted);transition:transform .1s}
 .sq:hover{transform:scale(1.1);box-shadow:0 0 0 2px var(--blue)} .sq.on{color:#fff}
 .sgh{padding:6px 14px 4px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pc);background:color-mix(in srgb,var(--pc) 9%,var(--card));border-top:1px solid var(--line)}
+/* Operátoři podle rozpisu směn: směny jako sloupce, uvnitř procesy, řádek = operátor */
+.ros{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:start}
+.ros .card{margin:0}.ros h3 small{display:block;font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;opacity:.85;margin-top:2px}
+.rg{padding:7px 12px 4px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--navy);background:var(--th);border-top:1px solid var(--line);display:flex;gap:6px}
+.rg span{margin-left:auto;color:var(--muted);font-weight:700}
+.rr{display:grid;grid-template-columns:28px minmax(0,1fr) 118px 58px;gap:8px;align-items:center;padding:5px 12px;border-top:1px solid var(--line);cursor:pointer}
+.rr:hover{background:var(--hov)}.rr .av{width:28px;height:28px;font-size:10.5px}
+.rr b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rr small{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr>span{min-width:0}.rr .mb{min-width:0}
+@media (max-width:760px){.rr{grid-template-columns:28px minmax(0,1fr) 92px 54px;padding:5px 8px}.ros{grid-template-columns:1fr}}.rr .tot{text-align:center;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 0}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 12px}.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:13px;height:13px;border-radius:4px;display:inline-block}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hist td{white-space:normal}
@@ -233,7 +243,7 @@ const FIREBASE_CONFIG = {
   appId: "1:906392970022:web:cd403e27e375d83675d7e7"
 };
 const ROOT = 'trenerG463/karty';
-const LS_DATA = 'trenerG463.karty.v1', LS_ME = 'trenerG463.karty.me', LS_NAV = 'trenerG463.karty.nav', LS_THEME = 'trenerG463.theme', LS_VIEW = 'trenerG463.karty.view';
+const LS_DATA = 'trenerG463.karty.v1', LS_ME = 'trenerG463.karty.me', LS_NAV = 'trenerG463.karty.nav', LS_THEME = 'trenerG463.theme', LS_VIEW = 'trenerG463.karty.view2';
 const LEVELS = ['Nehodnoceno','Teorie / viděl','Pod vedením trenéra','Samostatně pod dohledem','Schváleno, plně zaškolen'];
 const LV_COL = ['var(--sq)','#9DB4CC','#F2B544','#3B8FE0','#1E9E4A'];
 const PHOTO = { plant:'assets/plant.jpg', interior:'assets/interior.jpg', car:'assets/car.jpg' };
@@ -311,10 +321,19 @@ const allSteps = () => D.procs.flatMap(p => p.steps.map(s => ({...s, p})));
 const lvOf = (o, sid) => +(o?.lv?.[sid]?.l || 0);
 const procPct = (o, p) => p.steps.length ? Math.round(100 * p.steps.reduce((a,s) => a + lvOf(o, s.id), 0) / (4 * p.steps.length)) : 0;
 function totalPct(o){ let s = 0, n = 0; for (const p of D.procs) for (const st of p.steps){ s += lvOf(o, st.id); n++; } return n ? Math.round(100 * s / (4 * n)) : 0; }
-function status(p){ const c = CFG(); return p < c.thNew ? {k:'new', n:'Nový', c:'var(--red)'} : p < c.thOk ? {k:'tr', n:'V tréninku', c:'var(--amber)'} : {k:'ok', n:'Zaškolen', c:'var(--green)'}; }
+function status(p){ const c = CFG(); return p < c.thNew ? {k:'new', n:'Nový', c:'var(--grey)'} : p < c.thOk ? {k:'tr', n:'V tréninku', c:'var(--amber)'} : {k:'ok', n:'Zaškolen', c:'var(--green)'}; }
 const pctCol = p => p >= CFG().thOk ? 'var(--green)' : p >= 40 ? 'var(--blue)' : p >= CFG().thNew ? 'var(--amber)' : 'var(--red)';
 const opsSorted = () => Object.values(D.ops).filter(o => o && o.name).sort((a,b) => a.name.localeCompare(b.name, 'cs'));
 const planKeys = o => [...new Set(String(o.plan || '').split(';').map(x => x.replace(/\(.*?\)/g,'').replace(/\b(12|8) ?cka\b/gi,'').trim()).filter(Boolean))];
+/* rozpis: „Prefix (12cka ranní); Kontrola EDGW (…)“ → [{proc, shift}] */
+const planEntries = o => String(o.plan || '').split(';').map(x => x.trim()).filter(Boolean).map(x => { const m = x.match(/^(.*?)\s*\((.*)\)\s*$/); return m ? {proc:m[1].trim(), shift:m[2].trim()} : {proc:x, shift:''}; });
+const SHIFT_ORDER = ['12cka ranní','12cka','8cka ranní','8cka noční','8cka odpolední'];
+const PROC_ORDER = ['TL+TR','Spacer','Spacer – Roll coater','Glue spray','Prefix','Kontrola Prefix','Laminace','EDGW','Kontrola EDGW','Balení'];
+const ordIdx = (arr, v) => { const i = arr.indexOf(v); return i < 0 ? arr.length : i; };
+/* proces z rozpisu → proces karty (pro pruh „na jeho procesu“) */
+function procOfPlan(name){ const n = norm(name);
+  const key = /^spacer/.test(n) ? 'spacer' : /^glue/.test(n) ? 'glue' : /^prefix|kontrola prefix/.test(n) ? 'prefix' : /^lamin/.test(n) ? 'lam' : /edgw|edge/.test(n) ? 'ew' : /rework/.test(n) ? 'rework' : '';
+  return D.procs.find(p => p.k === key) || D.procs.find(p => norm(p.n) === n) || null; }
 const logList = () => Object.entries(D.log || {}).map(([k,v]) => ({k, ...v})).filter(x => x.op && x.at).sort((a,b) => b.at.localeCompare(a.at));
 const lastChange = o => Object.values(o.lv || {}).reduce((m, v) => { const t = v?.at || v?.d || ''; return t > m ? t : m; }, '');
 const stepById = id => { for (const p of D.procs) for (const s of p.steps) if (s.id === id) return {s, p}; return null; };
@@ -438,7 +457,7 @@ function vPrehled(){
     ${tile('b','Ø zaškolení', avg, '%', prev != null && l30.length ? `${avg - prev >= 0 ? '▲ +' : '▼ '}${avg - prev} b. za 4 týdny` : 'průměr všech kroků')}
     ${tile('g','Zaškoleno', by('ok'), '', `≥ ${c.thOk} % všech kroků`, '#/operatori/ok')}
     ${tile('a','V tréninku', by('tr'), '', `${c.thNew}–${c.thOk} %`, '#/operatori/tr')}
-    ${tile('r','Noví', by('new'), '', `pod ${c.thNew} %`, '#/operatori/new')}
+    ${tile('','Noví', by('new'), '', `pod ${c.thNew} %`, '#/operatori/new')}
     ${tile('', 'Změn za 30 dní', l30.length, '', `${new Set(l30.map(x => x.op)).size} operátorů · ${new Set(l30.map(x => x.by).filter(Boolean)).size} trenérů`, '#/aktivita')}
   </div>`;
   const cov = D.procs.map(p => { const v = ops.map(o => procPct(o,p)); return { p, z: v.filter(x => x === 0).length, s: v.filter(x => x > 0 && x < 40).length, t: v.filter(x => x >= 40 && x < c.thOk).length, ok: v.filter(x => x >= c.thOk).length, avg: Math.round(v.reduce((a,b) => a + b, 0) / n) }; });
@@ -463,7 +482,7 @@ function vPrehled(){
   </div>
   <div class="grid g21">
     <div class="card"><h3>Vývoj zaškolení týmu <span>Ø % na konci týdne · ze záznamů změn</span></h3><div class="chart">${lineChart(tr.map(x => ({l: dshort(x.ws.toISOString()), v:x.v})))}</div></div>
-    <div class="card"><h3>Stav operátorů</h3>${donut([{v:by('ok'),c:'#1E9E4A',l:'Zaškolen'},{v:by('tr'),c:'#E89818',l:'V tréninku'},{v:by('new'),c:'#E03C31',l:'Nový'}], n, 'operátorů')}</div>
+    <div class="card"><h3>Stav operátorů</h3>${donut([{v:by('ok'),c:'#1E9E4A',l:'Zaškolen'},{v:by('tr'),c:'#E89818',l:'V tréninku'},{v:by('new'),c:'#b3bdc7',l:'Nový'}], n, 'operátorů')}</div>
   </div>
   <div class="grid g11">
     <div class="card"><h3>Největší pokrok za 30 dní <span><a href="#/aktivita">historie →</a></span></h3>${top.length ? `<div class="rank">${top.map(([id,g]) => { const o = D.ops[id], t = totalPct(o); return `<a href="#/op/${encodeURIComponent(id)}">${avatar(o.name)}<span><b>${esc(o.name)}</b><small>+${g} úrovní · ${esc(o.plan || '')}</small></span>${mbar(t, pctCol(t))}<span class="pill g">+${Math.max(1, Math.round(100 * g / (4 * nSteps)))} %</span></a>`; }).join('')}</div>` : '<div class="empty">Za posledních 30 dní žádné změny.</div>'}</div>
@@ -472,7 +491,7 @@ function vPrehled(){
 }
 
 /* ---- Operátoři ---- */
-const UI = { q:'', tl:'', pl:'', st:'', view: (() => { try{ return localStorage.getItem(LS_VIEW) || 'karty'; }catch(e){ return 'karty'; } })() };
+const UI = { q:'', tl:'', pl:'', st:'', view: (() => { try{ return localStorage.getItem(LS_VIEW) || 'rozpis'; }catch(e){ return 'rozpis'; } })() };
 function filterOps(pre){
   const c = CFG(), q = norm(UI.q);
   return opsSorted().filter(o => {
@@ -502,7 +521,7 @@ function vOperatori(r){
     <select id="fTL"><option value="">Všichni Team Leadeři</option>${tls.map(t => `<option ${t === UI.tl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.tl === '__none' ? 'selected' : ''}>— bez Team Leadera —</option></select>
     <select id="fPl"><option value="">Všechny procesy (rozpis)</option>${pls.map(t => `<option ${t === UI.pl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.pl === '__none' ? 'selected' : ''}>— bez procesu —</option></select>
     <select id="fSt"><option value="">Všechny stavy</option>${[['new','Nový'],['tr','V tréninku'],['ok','Zaškolen']].map(([k,n]) => `<option value="${k}" ${UI.st === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
-    <span class="subt" style="margin:0"><button data-view="karty" class="${UI.view === 'karty' ? 'on' : ''}">▦ Karty</button><button data-view="tabulka" class="${UI.view === 'tabulka' ? 'on' : ''}">☰ Tabulka</button></span>
+    <span class="subt" style="margin:0"><button data-view="rozpis" class="${UI.view === 'rozpis' ? 'on' : ''}">▥ Podle rozpisu</button><button data-view="karty" class="${UI.view === 'karty' ? 'on' : ''}">▦ Karty</button><button data-view="tabulka" class="${UI.view === 'tabulka' ? 'on' : ''}">☰ Tabulka</button></span>
   </div>
   <div class="az" id="az"></div>
   <div id="opList"></div>
@@ -514,6 +533,25 @@ function renderOpList(pre){
   $('az').innerHTML = az.map(l => `<button data-az="${esc(l)}" ${have.has(l) ? '' : 'disabled'}>${esc(l)}</button>`).join('');
   $('opCount').textContent = `Zobrazeno ${list.length} z ${opsSorted().length} operátorů`;
   if (!list.length){ $('opList').innerHTML = '<div class="card"><div class="empty"><b>Nikdo neodpovídá</b>Zkuste upravit hledání nebo filtry.</div></div>'; return; }
+  $('az').style.display = UI.view === 'rozpis' ? 'none' : '';
+  if (UI.view === 'rozpis'){
+    const shifts = {};
+    for (const o of list){ const es = planEntries(o), e = es.find(x => x.proc !== 'TL+TR') || es[0] || {proc:'', shift:''};
+      const sh = e.shift || 'Bez směny v rozpisu'; (shifts[sh] ??= {}); (shifts[sh][e.proc || '—'] ??= []).push(o); }
+    const mode = arr => { const c = {}; arr.filter(Boolean).forEach(v => c[v] = (c[v] || 0) + 1); return Object.entries(c).sort((a,b) => b[1] - a[1])[0]?.[0] || ''; };
+    const row = (o, pname) => { const t = totalPct(o), s = status(t), p = procOfPlan(pname), v = p ? procPct(o, p) : null;
+      return `<div class="rr" data-id="${esc(o.id)}" title="${esc(o.name)} – celkem ${t} % (${s.n})">${avatar(o.name)}<span><b>${esc(o.name)}</b>${o.note ? `<small>${esc(o.note)}</small>` : ''}</span>
+        ${p ? `<span title="${esc(p.n)}: ${v} %">${mbar(v, v ? p.col : 'var(--sq)')}</span>` : '<span class="small muted">—</span>'}
+        <span class="tot st ${s.k}" title="Zaškolení celkem (všechny procesy)">Σ ${t} %</span></div>`; };
+    $('opList').innerHTML = `<div class="ros">${Object.keys(shifts).sort((a,b) => ordIdx(SHIFT_ORDER,a) - ordIdx(SHIFT_ORDER,b) || a.localeCompare(b,'cs')).map(sh => {
+      const groups = shifts[sh], all = Object.values(groups).flat(), avg = Math.round(all.reduce((a,o) => a + totalPct(o), 0) / all.length);
+      const tl = mode(all.map(o => o.tl)), tr = mode(all.map(o => o.trainer));
+      return `<div class="card"><h3><span style="margin:0;opacity:1;text-transform:uppercase;letter-spacing:.6px;font-weight:700">${esc(sh)}<small>${[tl && 'TL ' + tl, tr && 'trenér ' + tr].filter(Boolean).map(esc).join(' · ') || '&nbsp;'}</small></span><span>${all.length} lidí · Ø ${avg} %</span></h3>
+        ${Object.keys(groups).sort((a,b) => ordIdx(PROC_ORDER,a) - ordIdx(PROC_ORDER,b) || a.localeCompare(b,'cs')).map(g => { const p = procOfPlan(g);
+          return `<div class="rg">${p ? esc(p.ico) + ' ' : ''}${esc(g)}<span>${groups[g].length}</span></div>` + groups[g].map(o => row(o, g)).join(''); }).join('')}</div>`; }).join('')}</div>
+      <div class="leg" style="padding:10px 0 0"><span>Pruh = zaškolení na procesu, kde operátor podle rozpisu pracuje</span><span>Σ vpravo = zaškolení celkem (všechny procesy)</span><span>Klik na řádek otevře kartu operátora</span></div>`;
+    return;
+  }
   if (UI.view === 'tabulka'){
     $('opList').innerHTML = `<div class="card"><div class="tw" style="max-height:68vh"><table><thead><tr><th>Operátor</th><th>TL / trenér</th>${D.procs.map(p => `<th title="${esc(p.n)}">${esc(p.ico)} ${esc(p.n)}</th>`).join('')}<th>Celkem</th><th>Stav</th></tr></thead><tbody>
       ${list.map(o => { const t = totalPct(o), s = status(t); return `<tr class="click" data-id="${esc(o.id)}" data-letter="${esc(firstLetter(o.name))}"><td><div style="display:flex;gap:9px;align-items:center">${avatar(o.name)}<div><b>${esc(o.name)}</b>${o.plan ? `<br><span class="plan">${esc(o.plan)}</span>` : ''}</div></div></td>
