@@ -1,0 +1,14 @@
+/* G463: vzhled modulů vložených v shellu (třída pms-embed z shared/embed.js).
+   Hlavička shellu už nese logo i název modulu – vlastní hlavička modulu je tenká světlá lišta se stavem. */
+html.pms-embed{--pms-navy:#003B7A;--pms-line:#e3e8ed;--pms-chip:#eef2f6;--pms-chip-t:#41525f}
+
+/* Trenér G463 i Tréninkové karty: header.top */
+html.pms-embed header.top{background:var(--surface,#fff)!important;color:var(--text,#1f2933)!important;border-bottom:1px solid var(--line,var(--pms-line))!important;box-shadow:none!important;min-height:0!important;padding:6px 18px!important;justify-content:flex-end}
+html.pms-embed header.top .brand,html.pms-embed header.top .app{display:none!important}
+html.pms-embed header.top .pill{background:var(--pms-chip)!important;color:var(--pms-chip-t)!important}
+html.pms-embed header.top .me{background:var(--pms-chip)!important;color:var(--pms-chip-t)!important}
+html.pms-embed header.top .me input{border:1px solid var(--pms-line)!important}
+@media (prefers-color-scheme:dark){
+  html.pms-embed:not([data-theme="light"]) header.top .pill,html.pms-embed:not([data-theme="light"]) header.top .me{background:#1E2A3A!important;color:#B8C6D4!important}
+}
+html.pms-embed[data-theme="dark"] header.top .pill,html.pms-embed[data-theme="dark"] header.top .me{background:#1E2A3A!important;color:#B8C6D4!important}

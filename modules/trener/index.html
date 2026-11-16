@@ -1,0 +1,1426 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<script src="../../shared/embed.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#003B7A">
+<title>Trenér G463 – Planá</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#003B7A; --navy-d:#002B5C; --blue:#0A5FB4; --navy-2:#0A5FB4; --navy-soft:#EAF1F9;
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#F7F9FB; --text:#1F2933; --muted:#6B7684; --line:#E3E8ED;
+  --good:#1E9E4A; --warn:#D08600; --crit:#E03C31; --info:#0A5FB4; --violet:#6B4FB8;
+  --good-soft:#EAF7EE; --warn-soft:#FFF6E5; --crit-soft:#FDECEA; --violet-soft:#F1EDFA;
+  --h2:#003B7A; --th:#EEF2F6; --th-text:#41525F;
+  --shadow:0 1px 3px rgba(16,32,48,.08),0 6px 18px rgba(16,32,48,.05);
+  --r:14px;
+  --f-head:"Inter","Segoe UI",Roboto,Arial,sans-serif;
+  --f-text:"Inter","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0E141C;--surface:#161E29;--surface-2:#1B2533;--text:#E6ECF2;--muted:#93A1B1;--line:#263241;--navy-soft:#122A47;
+    --good-soft:#12301F;--warn-soft:#33270C;--crit-soft:#3A1715;--violet-soft:#241B3D;--h2:#9CC3F0;--th:#1E2A3A;--th-text:#B8C6D4;--shadow:0 1px 3px rgba(0,0,0,.4)}
+}
+:root[data-theme="dark"]{--bg:#0E141C;--surface:#161E29;--surface-2:#1B2533;--text:#E6ECF2;--muted:#93A1B1;--line:#263241;--navy-soft:#122A47;
+  --good-soft:#12301F;--warn-soft:#33270C;--crit-soft:#3A1715;--violet-soft:#241B3D;--h2:#9CC3F0;--th:#1E2A3A;--th-text:#B8C6D4;--shadow:0 1px 3px rgba(0,0,0,.4)}
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font:14.5px/1.5 var(--f-text);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-head);margin:0 0 .5rem;line-height:1.25}
+h1{font-size:1.4rem;font-weight:700;letter-spacing:-.2px} h2{font-size:1.05rem} h3{font-size:.98rem;font-weight:700}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:.82rem}
+svg.i{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== hlavička (styl MEC Analyzer) ===== */
+header.top{background:linear-gradient(90deg,var(--navy-d) 0%,var(--navy) 55%,#0A5FB4 100%);color:#fff;padding:10px 22px;display:flex;align-items:center;gap:16px;border-bottom:3px solid #0A5FB4}
+.brand{display:flex;align-items:center;gap:10px;padding-right:16px;border-right:1px solid rgba(255,255,255,.25)}
+.brand .lg{background:#fff;border-radius:8px;padding:5px 9px;display:flex;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.brand img{height:24px;width:auto;display:block}
+.brand .bt{display:flex;flex-direction:column;line-height:1.05}
+.brand .bt b{font-size:12.5px;font-weight:800;letter-spacing:2px}
+.brand .bt small{font-size:10px;letter-spacing:.8px;text-transform:uppercase;opacity:.8;margin-top:3px}
+header.top .app{font-size:17px;font-weight:600;margin:0;letter-spacing:.2px}
+.pill{background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500;white-space:nowrap}
+.hspacer{flex:1}
+.sync{display:inline-flex;align-items:center;gap:7px}
+.sync i{width:8px;height:8px;border-radius:50%;background:#F2B544;display:inline-block;box-shadow:0 0 0 3px rgba(242,181,68,.25)}
+.sync.on i{background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.25)}
+
+/* ===== navigace ===== */
+nav.rail{background:var(--surface);border-bottom:1px solid var(--line);padding:8px 20px;display:flex;gap:6px;position:sticky;top:0;z-index:30;overflow-x:auto;scrollbar-width:none}
+nav.rail button{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;position:relative;min-height:38px;transition:.15s}
+nav.rail button:hover{border-color:var(--blue);color:var(--blue)}
+nav.rail button.active{background:var(--navy);border-color:var(--navy);color:#fff}
+nav.rail .l-short{display:none}
+nav.rail .badge{background:var(--crit);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;font-weight:700;line-height:18px;min-width:18px;text-align:center}
+
+main{max-width:1280px;margin:0 auto;padding:18px 20px 70px}
+section[data-view]{display:none} section[data-view].active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===== nadpis stránky ===== */
+.ph{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:4px 0 14px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue)}
+.ph h1{margin:2px 0 0}
+.ph .hint{font-size:.82rem;color:var(--muted);margin-top:4px;max-width:760px}
+.chip-info{background:var(--navy-soft);color:var(--h2);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
+
+/* ===== hero ===== */
+.hero{position:relative;border-radius:16px;overflow:hidden;color:#fff;padding:26px 28px 24px;margin-bottom:14px;box-shadow:var(--shadow);border-bottom:3px solid #1E9E4A;
+  background:linear-gradient(90deg,rgba(0,35,78,.97) 0%,rgba(0,59,122,.86) 48%,rgba(0,59,122,.30) 100%),var(--hero-img) center 60%/cover,var(--navy)}
+.hero .eyebrow{color:#fff;opacity:.85;font-size:11px}
+.hero h1{font-size:30px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px;color:#fff}
+.hero .sub{opacity:.88;font-size:14px}
+.hero .hrow{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.hero .prog{text-align:right}
+.hero-switch{all:unset;cursor:pointer;display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;margin-bottom:12px;transition:.15s}
+.hero-switch:hover{background:rgba(255,255,255,.28)}
+.hero .prog .big{font-size:34px;font-weight:800;line-height:1}
+.hero .prog .lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.hero .pbar{height:6px;background:rgba(255,255,255,.2);border-radius:99px;margin-top:16px;overflow:hidden}
+.hero .pbar i{display:block;height:100%;background:linear-gradient(90deg,#4ADE80,#1E9E4A);border-radius:99px;transition:width .4s}
+
+/* ===== kroky směny ===== */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.step{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;display:flex;gap:10px;align-items:center;border-left:4px solid var(--line);transition:.15s;min-height:56px}
+.step:hover{transform:translateY(-1px)}
+.step .n{width:26px;height:26px;border-radius:50%;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step .t{font-size:13px;font-weight:600;line-height:1.2}
+.step .s{font-size:11.5px;color:var(--muted)}
+.step.done{border-left-color:var(--good)} .step.done .n{background:var(--good);color:#fff}
+.step.now{border-left-color:var(--blue);box-shadow:0 0 0 2px rgba(10,95,180,.18),var(--shadow)} .step.now .n{background:var(--blue);color:#fff}
+
+/* ===== karty ===== */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px;border-top:3px solid var(--blue)}
+.card.plain{border-top:0}
+.card h2{font-size:12px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--h2);margin:0 0 12px}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start}
+.grid-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{margin:0}
+.card.kpi{border-top-color:var(--navy)}
+.kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi .val{font-size:26px;font-weight:700;margin:2px 0;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .sub{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;padding:.12rem .55rem;border-radius:999px;font-size:.7rem;font-weight:700;color:#fff;letter-spacing:.03em;white-space:nowrap}
+.tag.good{background:var(--good)} .tag.warn{background:var(--warn)} .tag.crit{background:var(--crit)} .tag.neutral{background:var(--muted)} .tag.info{background:var(--info)} .tag.violet{background:var(--violet)}
+
+/* ===== ovládací prvky ===== */
+.chips{display:flex;flex-wrap:wrap;gap:.45rem}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;min-height:40px;cursor:pointer;font:inherit;font-size:.9rem;font-weight:500;color:inherit;transition:.12s}
+.chip:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.chip.active,.chip.active:hover{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip:disabled{cursor:not-allowed}
+.chip.s-ok.active{background:var(--good);border-color:var(--good)}
+.chip.s-po.active{background:var(--warn);border-color:var(--warn)}
+.chip.s-kr.active{background:var(--crit);border-color:var(--crit)}
+label.f{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin:.9rem 0 .35rem;text-transform:uppercase;letter-spacing:.06em}
+label.f .req{color:var(--crit)}
+input[type=text],input[type=date],input[type=number],input[type=time],select,textarea{width:100%;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;min-height:44px;transition:border-color .15s,box-shadow .15s}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,95,180,.15)}
+.btn{background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:999px;padding:.6rem 1.25rem;min-height:44px;font:inherit;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn:hover:not(:disabled){background:var(--blue);border-color:var(--blue)}
+.btn.secondary{background:transparent;color:var(--blue);border-color:var(--blue)}
+.btn.secondary:hover:not(:disabled){background:var(--navy-soft);color:var(--blue)}
+:root[data-theme="dark"] .btn.secondary{color:#9CC3F0;border-color:#9CC3F0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.secondary{color:#9CC3F0;border-color:#9CC3F0}}
+.btn.danger{background:var(--crit);border-color:var(--crit)} .btn.good{background:var(--good);border-color:var(--good)}
+.btn.sm{min-height:36px;padding:.35rem .9rem;font-size:.85rem}
+.btn.xl{min-height:54px;font-size:1.05rem;padding:.8rem 1.6rem;width:100%;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+input[type=checkbox]{accent-color:var(--navy)}
+
+/* ===== tabulky ===== */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{padding:.55rem .75rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:var(--th);color:var(--th-text);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.num{font-variant-numeric:tabular-nums;text-align:right}
+
+/* ===== stavy ===== */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.empty .big{font-size:2.2rem;margin-bottom:.4rem}
+.toast{position:fixed;right:1rem;bottom:1rem;background:#1F2933;color:#fff;padding:.75rem 1.1rem;border-radius:12px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:60;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.9rem}
+.toast.show{opacity:1;transform:none}
+.banner{border-radius:12px;padding:.8rem 1rem;margin-bottom:14px;border-left:4px solid;font-size:.92rem}
+.banner.crit{background:var(--crit-soft);border-color:var(--crit)}
+.banner.warn{background:var(--warn-soft);border-color:var(--warn)}
+.banner.good{background:var(--good-soft);border-color:var(--good)}
+.banner.info{background:var(--navy-soft);border-color:var(--blue)}
+
+/* ===== start směny ===== */
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.pick{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:60px;transition:.15s;font-weight:600}
+.pick:hover{border-color:var(--blue);transform:translateY(-1px)}
+.pick.active{border-color:var(--navy);background:var(--navy-soft);box-shadow:0 0 0 3px rgba(0,59,122,.12)}
+.pick .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#0A5FB4);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex-shrink:0;letter-spacing:.5px}
+.pick .ic{width:38px;height:38px;border-radius:10px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;flex-shrink:0;font-size:18px}
+.pick.active .ic{background:var(--navy);color:#fff}
+.pick small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.picks.cols3{grid-template-columns:repeat(3,1fr)} .picks.cols2{grid-template-columns:repeat(2,1fr)}
+.start-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
+
+/* ===== rozhodovací diagram ===== */
+.q{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-bottom:.6rem;background:var(--surface);transition:.15s}
+.q.dim{opacity:.4}
+.q .qh{display:flex;gap:.75rem;align-items:flex-start}
+.q .qn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.q .qt{font-weight:700}
+.q .hint{font-size:.8rem;color:var(--muted)}
+.q .auto{font-size:.8rem;margin-top:.45rem;padding:.4rem .65rem;border-radius:8px;background:var(--navy-soft)}
+.q .ans{margin-top:.6rem;display:flex;gap:.45rem}
+.q .ans .chip{min-width:72px}
+.focus-card{border-radius:14px;padding:1rem 1.1rem;border:2px solid;margin-bottom:1rem}
+.focus-card.f-new{border-color:var(--warn);background:var(--warn-soft)}
+.focus-card.f-prob{border-color:var(--crit);background:var(--crit-soft)}
+.focus-card.f-stab{border-color:var(--good);background:var(--good-soft)}
+.focus-card.f-mix{border-color:var(--violet);background:var(--violet-soft)}
+.focus-card .ft{font-family:var(--f-head);font-size:1.1rem;font-weight:800;letter-spacing:-.1px}
+.checkl{list-style:none;padding:0;margin:0}
+.checkl li{display:flex;gap:.7rem;align-items:center;padding:.55rem .2rem;border-bottom:1px solid var(--line);min-height:46px}
+.checkl li:last-of-type{border-bottom:0}
+.checkl input{width:22px;height:22px;flex-shrink:0;cursor:pointer}
+.checkl label{cursor:pointer}
+.checkl input:checked + label{color:var(--muted)}
+.checkl .t{margin-left:auto;font-size:.75rem;color:var(--good);font-weight:600}
+
+/* ===== linka ===== */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:12px}
+.ptile{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);border-top:5px solid var(--line);padding:.9rem;display:flex;flex-direction:column;gap:.5rem}
+.ptile.ok{border-top-color:var(--good)} .ptile.po{border-top-color:var(--warn)} .ptile.kr{border-top-color:var(--crit)}
+.ptile .pn{font-weight:800;font-size:1.02rem}
+.ptile .pst{font-size:.76rem;color:var(--muted)}
+.ptile .stbtns{display:flex;gap:.3rem}
+.ptile .stbtns .chip{flex:1;padding:.3rem .15rem;font-size:.74rem;min-height:38px;text-align:center}
+.ptile .nums{display:flex;gap:.9rem;font-size:.78rem;color:var(--muted)}
+.ptile .nums b{color:var(--text);font-weight:700}
+.ptile>.btn{margin-top:auto;justify-content:center}
+
+/* ===== záznamy, grafy ===== */
+.rec{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;margin-bottom:.55rem;background:var(--surface)}
+.rec .rh{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.rec .rb{font-size:.88rem;margin-top:.3rem}
+.blocks .chip{font-size:.82rem}
+.bar{display:flex;align-items:center;gap:.6rem;margin:.35rem 0}
+.bar .bl{width:55%;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{flex:1;background:var(--navy-soft);border-radius:99px;height:12px;overflow:hidden}
+.bar .bf{height:100%;background:linear-gradient(90deg,var(--navy),#0A5FB4);border-radius:99px}
+.bar .bf.crit{background:linear-gradient(90deg,#B92D24,var(--crit))}
+.bar .bv{width:48px;text-align:right;font-weight:600;font-size:.85rem;font-variant-numeric:tabular-nums}
+.legend{font-size:.76rem;color:var(--muted);margin-top:.5rem}
+details summary{cursor:pointer;font-weight:600;padding:.3rem 0}
+.handover{white-space:pre-wrap;font-family:var(--f-mono);font-size:.8rem;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:.9rem;max-height:440px;overflow:auto}
+
+/* ===== mobil / tablet ===== */
+@media (max-width:1100px){ .steps{grid-template-columns:repeat(3,1fr)} .start-grid{grid-template-columns:1fr} }
+@media (max-width:760px){
+  header.top{padding:8px 12px;gap:10px}
+  .brand{border-right:0;padding-right:0} .brand .bt{display:none}
+  header.top .app{font-size:15px}
+  #railMeta{display:none}
+  nav.rail{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:40;background:linear-gradient(180deg,#0A4C94 0%,var(--navy) 35%,var(--navy-d) 100%);border:0;border-top:2px solid #0A5FB4;
+    padding:7px 6px calc(7px + env(safe-area-inset-bottom));gap:3px;box-shadow:0 -8px 24px rgba(0,30,70,.28);border-radius:18px 18px 0 0;justify-content:space-between;overflow:visible}
+  nav.rail button{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:3px;border:0;border-radius:12px;padding:7px 1px 6px;font-size:10px;font-weight:600;letter-spacing:.1px;min-height:58px;color:rgba(255,255,255,.78)}
+  nav.rail button span:not(.badge){max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  nav.rail button svg.i{width:23px;height:23px;stroke-width:2.1}
+  nav.rail button:hover{color:#fff;border-color:transparent}
+  nav.rail button.active{background:#fff;color:var(--navy);box-shadow:0 3px 10px rgba(0,0,0,.25)}
+  nav.rail button.active svg.i{stroke-width:2.4}
+  nav.rail .l-long{display:none} nav.rail .l-short{display:inline}
+  nav.rail button.nav-set{flex:0 0 44px} nav.rail button.nav-set span{display:none}
+  nav.rail .badge{position:absolute;top:3px;right:calc(50% - 20px);font-size:10px;line-height:16px;min-width:16px;border:2px solid var(--navy)}
+  main{padding:12px 12px 104px}
+  body{font-size:15.5px}
+  .hero{padding:18px 18px 16px} .hero h1{font-size:24px} .hero .prog .big{font-size:26px}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .picks.cols3{grid-template-columns:repeat(3,1fr)} .pick{padding:10px;gap:8px;font-size:.9rem}
+  .picks.cols3 .pick{flex-direction:column;text-align:center}
+  .bar .bl{width:50%}
+  .toast{bottom:6.2rem;left:.75rem;right:.75rem}
+}
+@media print{nav.rail,header.top,.btn,.toast,.steps{display:none!important} body{background:#fff} .card{break-inside:avoid;box-shadow:none}}
+
+:root{--hero-img:url(data:image/jpeg;base64,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)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="lg"><img src="data:image/png;base64,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" alt="Yanfeng"></span><div class="bt"><b>PLANÁ NAD LUŽNICÍ</b><small>G463 Prefix · Training system</small></div></div>
+  <h1 class="app">Trenér G463</h1>
+  <span class="pill" id="railMeta" style="cursor:pointer" title="Přepnout trenéra nebo směnu">Bez aktivní směny</span>
+  <div class="hspacer"></div>
+  <span class="pill"><span class="sync" id="syncState"><i></i><span>lokálně</span></span></span>
+</header>
+<nav class="rail" id="rail">
+  <button data-go="smena" class="active"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Směna</span></button>
+  <button data-go="linka"><svg class="i" viewBox="0 0 24 24"><path d="M2 20h20M4 20V9l5 3V9l5 3V5h6v15"/></svg><span>Linka</span></button>
+  <button data-go="zaznam"><svg class="i" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>Záznam</span></button>
+  <button data-go="eskalace"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Eskalace</span><span class="badge" id="escBadge" hidden></span></button>
+  <button data-go="zaver"><svg class="i" viewBox="0 0 24 24"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></svg><span>Závěr</span></button>
+  <button data-go="prehled"><svg class="i" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/></svg><span class="l-long">Přehled TL</span><span class="l-short">Přehled</span></button>
+  <button data-href="karty" title="Tréninkové karty operátorů – skilly po procesech"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M6 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M15 9h3M15 13h3"/></svg><span class="l-long">Tréninkové karty</span><span class="l-short">Karty</span></button>
+  <button data-go="nastaveni" class="nav-set" title="Nastavení"><svg class="i" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Nastavení</span></button>
+</nav>
+
+<main>
+  <!-- ===== SMĚNA ===== -->
+  <section data-view="smena" class="active"><div id="smenaBody"></div></section>
+
+  <!-- ===== LINKA ===== -->
+  <section data-view="linka">
+    <div class="ph"><div><div class="eyebrow">Průběh směny</div><h1>Stav procesů na lince</h1>
+      <div class="hint">OK = vše v pořádku · Pozornost = drobný problém, řeším sám · Kritické = závažná odchylka, potřebuji podporu (automaticky založí eskalaci)</div></div>
+      <span class="chip-info" id="linkaMeta"></span></div>
+    <div id="linkaBody"></div>
+  </section>
+
+  <!-- ===== ZÁZNAM ===== -->
+  <section data-view="zaznam">
+    <div class="ph"><div><div class="eyebrow">Trénink na lince</div><h1>Záznam pozorování a korekce</h1></div></div>
+    <div id="zaznamBody"></div>
+  </section>
+
+  <!-- ===== ESKALACE ===== -->
+  <section data-view="eskalace">
+    <div class="ph"><div><div class="eyebrow">Problém → owner → termín → ověření</div><h1>Eskalace a otevřené body</h1></div><button class="btn" id="btnNewEsc">+ Nová eskalace</button></div>
+    <div class="chips" id="escFilter" style="margin-bottom:1rem"></div>
+    <div id="escForm"></div>
+    <div id="escList"></div>
+  </section>
+
+  <!-- ===== ZÁVĚR ===== -->
+  <section data-view="zaver"><div class="ph"><div><div class="eyebrow">Konec směny</div><h1>Závěr směny a předávka</h1></div></div><div id="zaverBody"></div></section>
+
+  <!-- ===== PŘEHLED ===== -->
+  <section data-view="prehled">
+    <div class="ph"><div><div class="eyebrow">Team Leader · supervisor</div><h1>Přehled práce trenérů</h1></div></div>
+    <div class="row" style="margin-bottom:1rem;gap:1rem">
+      <div class="chips" id="pvLine"></div>
+      <div class="chips" id="pvPeriod"></div>
+    </div>
+    <div id="prehledBody"></div>
+  </section>
+
+  <!-- ===== NASTAVENÍ ===== -->
+  <section data-view="nastaveni"><div class="ph"><div><div class="eyebrow">Správa aplikace</div><h1>Nastavení</h1></div></div><div id="nastaveniBody"></div></section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== 1. Konstanty ===================== */
+const APP_KEY = 'trenerG463.data.v1';
+const LOCAL_KEY = 'trenerG463.local.v1';      // per-zařízení: aktivní směna
+/* Firebase RTDB (europe-west1) – doplň konfiguraci projektu, jinak aplikace běží lokálně v prohlížeči */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAz7_9ijMC38SL9dVbYdjwvBHHNyuV97VU",
+  authDomain: "g463-prefix---trainers-system.firebaseapp.com",
+  databaseURL: "https://g463-prefix---trainers-system-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "g463-prefix---trainers-system",
+  storageBucket: "g463-prefix---trainers-system.firebasestorage.app",
+  messagingSenderId: "906392970022",
+  appId: "1:906392970022:web:cd403e27e375d83675d7e7"
+}; /* formát: { apiKey:'…', authDomain:'…', databaseURL:'https://xxx-default-rtdb.europe-west1.firebasedatabase.app', projectId:'…', appId:'…' } */
+const FB_CFG_KEY = 'trenerG463.firebase.v1';
+function readFbCfg(){ if (FIREBASE_CONFIG) return FIREBASE_CONFIG; try{ return JSON.parse(localStorage.getItem(FB_CFG_KEY) || 'null'); }catch(e){ return null; } }
+/* Přijme celý snippet z Firebase konzole (const firebaseConfig = {...}) nebo JSON */
+function parseFbSnippet(txt){
+  const o = {}; const re = /["']?(apiKey|authDomain|databaseURL|projectId|storageBucket|messagingSenderId|appId)["']?\s*:\s*["']([^"']+)["']/g; let m;
+  while ((m = re.exec(txt))) o[m[1]] = m[2];
+  if (!o.apiKey || !o.databaseURL) throw new Error('V textu chybí apiKey nebo databaseURL (Realtime Database musí být založená).');
+  return o;
+}
+const FB_CFG = readFbCfg();
+const FB_ROOT = 'trenerG463';
+
+const LINES = ['L1','L2'];
+const SHIFTS = [{k:'R',n:'Ranní'},{k:'O',n:'Odpolední'},{k:'N',n:'Noční'}];
+const DEFAULT_TRAINERS = ['Isidora Medič','Tetiana Flora','Sebastian Gabriel Molnar','Petra Fizel'];
+
+/* Procesy a volby přesně podle MS Forms „G463 Prefix – denní rutina Trenéra“ */
+const PROC = [
+  {k:'spacer', n:'Spacer',
+   what:['Přetlačený spacer','Trhací zkouška','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Špatně nastavená teplota horkovzdušné pistole','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'glue', n:'Glue spray',
+   what:['Znečištění lepidlem','Lepidlo pod kůží','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Stroj – špatná tryska','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'prefix', n:'Prefix',
+   what:['Dlouhý nástřih','Znečištění lepidlem','Vada kůže','NOK díly – jiné','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Materiál (kůže)','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Jiné']},
+  {k:'lam', n:'Laminace',
+   what:['Vrásky','Vzduch (bubliny)','Lepidlo pod kůží','NOK díly po Prefixu','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Stroj','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Tool – znečištění','NOK díl z předešlého procesu','Jiné']},
+  {k:'ew', n:'Edge Wrapping',
+   what:['Hrana > 1 mm','Zahranění – Map Pocket','Zahranění – ostatní','Znečištění lepidlem','NOK díly po Prefixu','NOK díly po Laminaci','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Laminace','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','Znečištění','Jiné']},
+  {k:'rework', n:'Rework',
+   what:['Oprava nedokončena / vada zůstala','Nová vada po opravě','NOK díly','Working instruction / ODS','5S – pracoviště','Tempo / Výkon','Jiné'],
+   cause:['Chyba operátora','Pracovní pomůcky','Nedostatečný trénink / Nezkušený OP','NOK díly z Prefixu','NOK díl z Laminace','Jiné']},
+];
+const PROC_BY = Object.fromEntries(PROC.map(p => [p.k, p]));
+
+/* „Chyba operátora“ není root cause – trenér musí říct, proč to systém umožnil */
+const WHY_SYSTEM = ['OP standard neznal (nebyl zaškolen)','OP standard znal, ale nedodržel','Standard / WI je nejasný nebo chybí','Chybí poka-yoke / kontrola chybu nezachytí','Tlak na tempo / přetížení','Rozptýlení / pracovní podmínky'];
+
+const STATUS = {ok:{n:'OK',cls:'good'}, po:{n:'Pozornost',cls:'warn'}, kr:{n:'Kritické',cls:'crit'}};
+const ACTION = [{k:'done',n:'Ano – korekce provedena'},{k:'prog',n:'Probíhá – řeším'},{k:'help',n:'Ne – potřebuji pomoc'}];
+
+const BLOCKS = [
+  {k:1,n:'Blok 1 · Aktivní pozorování',s:['Sleduj celý pracovní cyklus bez zásahu','Sleduj, zda OP chápe, co kontroluje','Zaznamenej odchylky od standardu']},
+  {k:2,n:'Blok 2 · Okamžitá korekce',s:['Zastavit OP a vysvětlit','Ukázat správný postup (ne jen říct)','Nechat OP zopakovat správně','Ujistit se, že pochopil důvod']},
+  {k:3,n:'Blok 3 · Prevence chyb',s:['Upozornit na kritický bod','Vysvětlit následky chyby','Ověřit, že OP ví, co dělat při NOK','Identifikovat slabé místo procesu']},
+  {k:4,n:'Blok 4 · Podpora výkonu',s:['Tempo vs. kvalita (nejen rychlost)','Ergonomie / pohyby','5S na pracovišti','Pomůcky a nástroje']},
+  {k:5,n:'Blok 5 · Zpětná vazba',s:['Co dělá dobře (konkrétně)','Co má zlepšit (konkrétně)','Na co se zaměří příště','Zapsat do tréninkového záznamu']},
+];
+
+/* Rozhodovací diagram trenéra – pořadí = priorita */
+const FOCUS = {
+  new: {n:'NOVÝ OPERÁTOR', ico:'🆕', cls:'f-new', blocks:[1,2,3,4,5],
+        strat:'Bloky 1–5 komplet u tohoto jednoho OP. Ostatní OP: vizuální scan na začátku a v polovině směny.'},
+  prob:{n:'AKTIVNÍ PROBLÉM / NOK TREND', ico:'🚨', cls:'f-prob', blocks:[1,2,3],
+        strat:'Bloky 1–3 zaměřené na konkrétní krok procesu + eskalace. Ostatní OP: self-check.'},
+  stab:{n:'STABILNÍ TÝM', ico:'✅', cls:'f-stab', blocks:[1,5],
+        strat:'Rotace: Blok 1 + 5 u každého OP. Bloky 2–4 jen při odchylce v Bloku 1.'},
+  mix: {n:'SMÍŠENÝ TÝM', ico:'🔀', cls:'f-mix', blocks:[1,2,3,4,5],
+        strat:'70 % času na slabším / méně zkušeném OP, 30 % kontrolní scan ostatních (Blok 1).'},
+};
+const PRESHIFT = ['Zkontroluj docházku operátorů na pracovišti','Ověř dostupnost dokumentace (WI, control plan)','Zkontroluj stav nástrojů, přípravků a materiálu','Projdi hlášení NOK a eskalace z předchozí směny','Briefing operátorům: plán, cíle směny a aktuální TOP vady'];
+const ENDSHIFT = ['Počet NOK a hlavní příčiny zapsány','Otevřené problémy předány nástupní směně','Čistota a 5S pracoviště zkontrolovány','Tréninkové záznamy operátorů vyplněny','Eskalace nahlášena, pokud nebyly splněny cíle'];
+
+/* Vady z kontrolních reportů (EOL CZ25170, 200% sklad CZ26027) → proces + položka „Co nefunguje“.
+   Přiřazení k procesu = NÁVRH, potvrdit s Quality / Engineering. proc:null = vzniká mimo linku (šití, materiál). */
+const DEFECTS = [
+  {src:'laminacia',            n:'Laminace – vrásky',       proc:'lam',    item:'Vrásky'},
+  {src:'vzduch',               n:'Vzduch (bubliny)',        proc:'lam',    item:'Vzduch (bubliny)'},
+  {src:'znecistenie',          n:'Znečištění lepidlem',     proc:'glue',   item:'Znečištění lepidlem'},
+  {src:'lepidlo pod',          n:'Lepidlo pod kůží',        proc:'glue',   item:'Lepidlo pod kůží'},
+  {src:'hrana',                n:'Hrana > 1 mm',            proc:'ew',     item:'Hrana > 1 mm'},
+  {src:'zahranenie map',       n:'Zahranění – Map Pocket',  proc:'ew',     item:'Zahranění – Map Pocket'},
+  {src:'zahranenie',           n:'Zahranění – ostatní',     proc:'ew',     item:'Zahranění – ostatní'},
+  {src:'pretlaceny',           n:'Přetlačený spacer',       proc:'spacer', item:'Přetlačený spacer'},
+  {src:'dlhy nastrih',         n:'Dlouhý nástřih',          proc:'prefix', item:'Dlouhý nástřih'},
+  {src:'vada koze',            n:'Vada kůže',               proc:'prefix', item:'Vada kůže'},
+  {src:'sitie',                n:'Šití',                    proc:null,     item:null},
+  {src:'mechanicke',           n:'Mechanické poškození',    proc:null,     item:null},
+];
+const EOL_SRC = { eol:'EOL Prefix (CZ25170)', sklad:'200% kontrola sklad (CZ26027)' };
+const RULES = { repeatN: 3, repeatDays: 7, newOpDays: 14, tlConfirmMin: 30 };
+
+/* ===================== 2. Perzistence – odstíněná ===================== */
+let DATA = { shifts:{}, obs:{}, esc:{}, ops:{}, cfg:{} };
+let LOCAL = { activeShift:null };
+let fb = null;
+
+const store = {
+  async load(){
+    try{
+      if (FB_CFG){
+        await fbInit();
+        const snap = await fb.ref(FB_ROOT).once('value'); const remote = snap.val();
+        if (!remote){   // první připojení: nahraj do Firebase to, co je zatím v tomto prohlížeči
+          const local = normalize(JSON.parse(localStorage.getItem(APP_KEY) || '{}'));
+          if (Object.values(local).some(x => Object.keys(x).length)){ await fb.ref(FB_ROOT).set(clean(local)); toast('Lokální data nahrána do Firebase'); return local; }
+        }
+        return remote || {};
+      }
+      return JSON.parse(localStorage.getItem(APP_KEY) || '{}');
+    }catch(e){ console.warn('load', e); toast('Data se nepodařilo načíst – pracuji lokálně'); try{ return JSON.parse(localStorage.getItem(APP_KEY) || '{}'); }catch(_){ return {}; } }
+  },
+  async put(entity, id, obj){
+    DATA[entity] ??= {};
+    if (obj == null) delete DATA[entity][id]; else DATA[entity][id] = obj;
+    try{
+      if (fb){ await fb.ref(`${FB_ROOT}/${entity}/${id}`).set(obj == null ? null : clean(obj)); }
+      localStorage.setItem(APP_KEY, JSON.stringify(DATA));
+    }catch(e){ console.warn('save', e); toast('Uložení selhalo – zkontroluj připojení'); }
+  },
+  saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL)); }catch(e){} },
+  loadLocal(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); }catch(e){ return {}; } }
+};
+
+function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Nenačteno: ' + src)); document.head.appendChild(s); }); }
+async function fbInit(){
+  if (fb) return;
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
+  firebase.initializeApp(FB_CFG);
+  await firebase.auth().signInAnonymously();
+  fb = firebase.database();
+  fb.ref('.info/connected').on('value', s => setSync(!!s.val()));
+  fb.ref(FB_ROOT).on('value', s => {
+    DATA = normalize(s.val() || {});
+    // nepřekreslovat formulář, do kterého trenér právě píše – jen menu
+    const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) renderRail(); else renderAll();
+  });
+}
+function setSync(on){ const el = document.getElementById('syncState'); el.classList.toggle('on', on); el.querySelector('span').textContent = fb ? (on ? 'online – sdíleno' : 'offline – změny se odešlou') : 'lokálně'; }
+const clean = o => JSON.parse(JSON.stringify(o));   // Firebase nepřijímá undefined
+function normalize(d){ return { shifts:d.shifts||{}, obs:d.obs||{}, esc:d.esc||{}, ops:d.ops||{}, cfg:d.cfg||{}, eol:d.eol||{} }; }
+
+/* ===================== 3b. Import kontrolních reportů EOL / 200% ===================== */
+const nrm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+const defectOf = raw => { const r = nrm(raw); return DEFECTS.find(d => r.startsWith(d.src) || r.includes(d.src)) || { src:r, n: String(raw).trim(), proc:null, item:null }; };
+function isoWeek(dt){ const d = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const day = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return d.getUTCFullYear() + '-W' + String(Math.ceil(((d - y0) / 864e5 + 1) / 7)).padStart(2,'0'); }
+let XLSXp;
+const getXLSX = () => XLSXp ??= new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload = () => res(window.XLSX); sc.onerror = () => { XLSXp = null; rej(new Error('Knihovnu pro Excel se nepodařilo načíst (internet?)')); }; document.head.appendChild(sc); });
+
+async function parseControlReport(file){
+  const XLSX = await getXLSX();
+  const wb = XLSX.read(await file.arrayBuffer(), { type:'array', cellDates:true });
+  const sheetName = wb.SheetNames.find(n => nrm(n) === 'report') || wb.SheetNames[0];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header:1, raw:true, defval:null });
+  // hlavička podle názvů sloupců, nikdy pevný index
+  let hi = -1, H = [];
+  for (let i = 0; i < Math.min(rows.length, 40); i++){ const c = rows[i].map(nrm); if (c.some(x => x.startsWith('chyba')) && c.some(x => x.includes('datum'))){ hi = i; H = c; break; } }
+  if (hi < 0) throw new Error('Nenalezena hlavička (sloupce „Dátum kontroly“ a „Chyba / Defect“).');
+  const col = (...k) => H.findIndex(c => k.every(x => c.includes(x)));
+  const C = { date: col('datum'), line: col('linka'), var: col('variant'),
+    chk: col('vykonanych') >= 0 ? col('vykonanych') : col('skontrolovanych'),
+    def: H.findIndex(c => c.startsWith('chyba')), cnt: col('detekovanych') >= 0 ? col('detekovanych') : col('zachytenych') };
+  if (C.def < 0 || C.cnt < 0 || C.chk < 0) throw new Error('Chybí sloupec kontrolovaných MC nebo počtu vad.');
+  const src = C.line >= 0 ? 'eol' : 'sklad';
+  const weeks = {}; let cur = {}, skipped = 0; const todayD = new Date(); todayD.setHours(23,59,59);
+  for (const r of rows.slice(hi + 1)){
+    let d = r[C.date]; if (typeof d === 'number') d = new Date(Math.round((d - 25569) * 864e5));
+    if (d instanceof Date && !isNaN(d)) cur.date = d;
+    if (C.line >= 0 && r[C.line] != null && r[C.line] !== '') cur.line = 'L' + String(r[C.line]).trim();
+    if (!cur.date) continue;
+    if (cur.date > todayD){ skipped++; continue; }           // překlep v datu (budoucnost) – nezapočítat
+    const wk = isoWeek(cur.date);
+    const W = weeks[wk] ??= {};
+    const keys = ['ALL']; if (src === 'eol' && cur.line) keys.push(cur.line);
+    const chk = +r[C.chk]; const raw = r[C.def]; const q = +r[C.cnt] || 0;
+    for (const k of keys){
+      const B = W[k] ??= { chk:0, d:{} };
+      if (chk > 0) B.chk += chk;
+      if (raw && q){ const n = defectOf(raw).n.replace(/[.#$\[\]\/]/g,' '); B.d[n] = (B.d[n] || 0) + q; }
+    }
+  }
+  return { src, weeks, file: file.name, importedAt: nowIso(), skipped };
+}
+
+/* TOP vady: poslední týden v datech (W_n) vs. předchozí (W_n−1), na 100 kontrolovaných MC */
+function eolTop(src, line, n = 5){
+  const E = DATA.eol[src]; if (!E) return null;
+  const wks = Object.keys(E.weeks).sort(); if (!wks.length) return null;
+  const k = src === 'eol' ? (line || 'ALL') : 'ALL';
+  const wn = wks.at(-1), wp = wks.at(-2);
+  const B = { chk:0, ...(E.weeks[wn][k] || {}) }, P = wp ? { chk:0, ...(E.weeks[wp][k] || {}) } : null;
+  B.d = B.d || {}; if (P) P.d = P.d || {};
+  const total = Object.values(B.d).reduce((a,b) => a + b, 0);
+  const list = Object.entries(B.d).sort((a,b) => b[1] - a[1]).slice(0, n).map(([name, cnt]) => {
+    const def = DEFECTS.find(d => d.n === name) || { n:name, proc:null };
+    const rate = B.chk ? cnt / B.chk * 100 : null;
+    const prate = P && P.chk ? (P.d[name] || 0) / P.chk * 100 : null;
+    const prev8 = wks.slice(-9, -1).map(w => E.weeks[w][k]).filter(Boolean);
+    const c8 = prev8.reduce((s,x) => s + ((x.d || {})[name] || 0), 0), k8 = prev8.reduce((s,x) => s + (x.chk || 0), 0);
+    return { ...def, cnt, share: total ? cnt / total : 0, rate, prate, avg8: k8 ? c8 / k8 * 100 : null, R: rag(rate, prate) };
+  });
+  return { wn, wp, chk:B.chk, total, list, file:E.file, line:k };
+}
+function rag(cur, prev){
+  if (cur == null || prev == null || prev === 0) return { cls:'neutral', label:'–', pct:null };
+  const d = (cur - prev) / prev;
+  if (d >  0.05) return { cls:'crit', label:'ROSTE', pct:d };
+  if (d < -0.05) return { cls:'good', label:'KLESÁ', pct:d };
+  return { cls:'warn', label:'STABILNÍ', pct:d };
+}
+const pctTxt = p => p == null ? '' : (p > 0 ? '+' : '') + Math.round(p * 100) + ' %';
+
+/* ===================== 3. Pomocné ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+const hhmm = iso => iso ? new Date(iso).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}) : '–';
+const dfmt = s => s ? new Date(s + (s.length === 10 ? 'T00:00' : '')).toLocaleDateString('cs-CZ') : '–';
+const nowIso = () => new Date().toISOString();
+const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+const trainers = () => (DATA.cfg.trainers && DATA.cfg.trainers.length) ? DATA.cfg.trainers : DEFAULT_TRAINERS;
+const opsOf = line => Object.values(DATA.ops).filter(o => o.line === line && !o.off).sort((a,b) => a.name.localeCompare(b.name,'cs'));
+const shiftName = k => (SHIFTS.find(s => s.k === k) || {}).n || k;
+const curShift = () => LOCAL.activeShift ? DATA.shifts[LOCAL.activeShift] : null;
+const shiftObs = sh => Object.values(DATA.obs).filter(o => o.shift === sh.id).sort((a,b) => a.t < b.t ? 1 : -1);
+const openEsc = line => Object.values(DATA.esc).filter(e => e.st !== 'closed' && (!line || e.line === line));
+const isOverdue = e => e.st !== 'closed' && e.d0 && e.d0 < today();   // počítá se z PŮVODNÍHO termínu
+
+function isNewOp(o){
+  if (!o) return false;
+  if (o.absUntil && o.absUntil >= today()) return true;
+  if (!o.start) return false;
+  return (Date.now() - new Date(o.start + 'T00:00').getTime()) / 864e5 < RULES.newOpDays;
+}
+
+/* ===================== 4. Logika ===================== */
+/* Návrh odpovědí pro rozhodovací diagram z reálných dat */
+function focusSuggest(line){
+  const newOps = opsOf(line).filter(isNewOp);
+  const open = openEsc(line);
+  const prevKrit = Object.values(DATA.shifts)
+    .filter(s => s.line === line && s.id !== LOCAL.activeShift && new Date(s.date + 'T00:00') >= daysAgo(2))
+    .flatMap(s => Object.entries(s.proc || {}).filter(([,v]) => v.st === 'kr').map(([k]) => PROC_BY[k]?.n));
+  const rep = repeatOffenders(line);
+  const eolT = eolTop('eol', line, 3);
+  return { newOps, open, prevKrit:[...new Set(prevKrit)], rep, eolT };
+}
+
+/* Opakované korekce: stejný OP + proces + typ problému v posledních N dnech */
+function repeatGroups(line){
+  const since = daysAgo(RULES.repeatDays).toISOString();
+  const g = {};
+  Object.values(DATA.obs).filter(o => o.line === line && o.t >= since && o.op).forEach(o => {
+    (o.what || ['–']).forEach(w => { const k = o.op + '|' + o.proc + '|' + w; (g[k] ??= {op:o.op, proc:o.proc, what:w, list:[]}).list.push(o); });
+  });
+  return Object.values(g);
+}
+function repeatOffenders(line){ return repeatGroups(line).filter(x => x.list.length >= RULES.repeatN); }
+
+function shiftSummary(sh){
+  const obs = shiftObs(sh);
+  const nok = obs.reduce((a,o) => a + (+o.nok || 0), 0);
+  const sts = Object.values(sh.proc || {}).map(v => v.st);
+  const rating = sts.includes('kr') || obs.some(o => o.crit) ? 'kr' : (sts.includes('po') || obs.length ? 'po' : 'ok');
+  return { obs, nok, rating };
+}
+
+/* ===================== 5. Render – SMĚNA ===================== */
+let startDraft = { date: today(), shift: guessShift(), line: 'L1', trainer: '' };
+function guessShift(){ const h = new Date().getHours(); return h >= 6 && h < 14 ? 'R' : (h >= 14 && h < 22 ? 'O' : 'N'); }
+
+function renderSmena(){
+  const el = $('smenaBody');
+  const sh = curShift();
+  if (!sh){
+    const hr = new Date().getHours();
+    const greet = hr < 10 ? 'Dobré ráno' : hr < 18 ? 'Dobrý den' : 'Dobrý večer';
+    const SICON = { R:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+                    O:'<svg class="i" viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"/><path d="M12 9V3M4.2 10.2l1.4 1.4M1 18h2M21 18h2M18.4 11.6l1.4-1.4M23 22H1"/></svg>',
+                    N:'<svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>' };
+    const ini = t => t.split(/\s+/).filter(Boolean).map(w => w[0]).filter((_,i,a) => i === 0 || i === a.length - 1).join('').toUpperCase();
+    el.innerHTML = `
+      <div class="hero">
+        <div class="eyebrow">Denní rutina trenéra · G463 Prefix</div>
+        <h1>${greet}, začni směnu</h1>
+        <div class="sub">Vyber trenéra, směnu a linku. Aplikace tě pak provede checklistem, briefingem TOP vad a fokusem směny.</div>
+      </div>
+      <div class="start-grid">
+        <div class="card">
+          <h2>Kdo je dnes trenér</h2>
+          <div class="picks" id="stTrainer">${trainers().map(t => `<button class="pick ${startDraft.trainer===t?'active':''}" data-v="${esc(t)}"><span class="av">${esc(ini(t))}</span><span>${esc(t)}</span></button>`).join('')}</div>
+          <h2 style="margin-top:20px">Směna</h2>
+          <div class="picks cols3" id="stShift">${SHIFTS.map(x => `<button class="pick ${startDraft.shift===x.k?'active':''}" data-v="${x.k}"><span class="ic">${SICON[x.k]}</span><span>${x.n}</span></button>`).join('')}</div>
+          <h2 style="margin-top:20px">Linka</h2>
+          <div class="picks cols2" id="stLine">${LINES.map(l => `<button class="pick ${startDraft.line===l?'active':''}" data-v="${l}"><span class="ic" style="font-size:13px;font-weight:800">${l}</span><span>G463 Prefix ${l}<small>${l === 'L1' ? 'linka 1' : 'linka 2'}</small></span></button>`).join('')}</div>
+        </div>
+        <div class="card">
+          <h2>Datum směny</h2>
+          <input type="date" id="stDate" value="${startDraft.date}">
+          <div style="margin-top:18px"><button class="btn xl" id="btnStart" ${startDraft.trainer?'':'disabled'}>Zahájit směnu →</button></div>
+          <p class="small muted" style="margin:.7rem 0 0;text-align:center">${startDraft.trainer ? `${esc(startDraft.trainer)} · ${shiftName(startDraft.shift)} · ${startDraft.line}` : 'Nejdřív vyber trenéra.'}</p>
+        </div>
+      </div>
+      ${renderRecentShifts()}`;
+    $('stDate').onchange = e => startDraft.date = e.target.value;
+    bindChips('stShift', v => { startDraft.shift = v; renderSmena(); });
+    bindChips('stLine', v => { startDraft.line = v; renderSmena(); });
+    bindChips('stTrainer', v => { startDraft.trainer = v; renderSmena(); });
+    $('btnStart').onclick = startShift;
+    el.querySelectorAll('[data-resume]').forEach(b => b.onclick = () => { LOCAL.activeShift = b.dataset.resume; store.saveLocal(); renderAll(); });
+    return;
+  }
+
+  const sug = focusSuggest(sh.line);
+  const f = sh.focus || {};
+  const answers = f.ans || {};
+  // pořadí otázek – zastav se u první ANO
+  const qs = [
+    {k:'new', t:'Je na procesu nový OP?', h:'méně než 2 týdny na procesu nebo po delší absenci',
+     auto: sug.newOps.length ? `Podle evidence: ${sug.newOps.map(o => esc(o.name)).join(', ')}` : 'V evidenci operátorů linky není nikdo nový.'},
+    {k:'prob', t:'Je aktivní problém / NOK trend?', h:'opakující se chyba, eskalace z minulé směny, reklamace zákazníka',
+     auto: [sug.open.length ? `${sug.open.length} otevřených eskalací na ${sh.line}` : '', sug.prevKrit.length ? `Kritické v posledních směnách: ${sug.prevKrit.join(', ')}` : '', sug.rep.length ? `Opakovaná korekce: ${sug.rep.map(r => esc(r.op) + ' – ' + PROC_BY[r.proc]?.n).join(', ')}` : '', sug.eolT ? `EOL ${sug.eolT.wn}: ${sug.eolT.list.filter(x => x.R.cls === 'crit' || (x.avg8 && x.rate > x.avg8 * 1.2)).map(x => esc(x.n) + (x.R.cls === 'crit' ? ' roste ' + pctTxt(x.R.pct) : ' nad normálem 8 týdnů')).join(', ') || 'TOP vady nerostou a jsou v normálu'}` : ''].filter(Boolean).join(' · ') || 'Žádná otevřená eskalace ani opakovaná chyba v datech.'},
+    {k:'stab', t:'Je tým stabilní a bez odchylek?', h:'všichni OP zkušení, výkon v normě, žádná otevřená eskalace', auto:''},
+  ];
+  // 1) urči rozhodnutí (první ANO, nebo 3× NE = smíšený tým)
+  let decided = null;
+  for (const q of qs){ const a = answers[q.k]; if (a === 'ano'){ decided = q.k; break; } if (a == null) break; }
+  if (!decided && answers.new === 'ne' && answers.prob === 'ne' && answers.stab === 'ne') decided = 'mix';
+  const F = decided ? FOCUS[decided] : null;
+  // 2) předvyplnění z dat (jen když trenér ještě nic nezapsal)
+  const sameType = f.type === decided;
+  let dOp = sameType ? f.op : '', dProc = sameType ? f.proc : '', dWhy = sameType ? f.why : '';
+  if (!dOp && decided === 'new' && sug.newOps.length === 1) dOp = sug.newOps[0].name;
+  if (!dOp && decided === 'prob' && sug.rep.length) dOp = sug.rep[0].op;
+  if (!dOp && decided === 'stab') dOp = 'Všichni OP – rotace';
+  if (!dProc && decided === 'prob'){
+    const hot = sug.eolT ? sug.eolT.list.find(x => x.proc && (x.R.cls === 'crit' || (x.avg8 && x.rate > x.avg8 * 1.2))) : null;
+    dProc = sug.rep[0]?.proc || hot?.proc || '';
+  }
+  const focusCard = F ? `<div class="focus-card ${F.cls}" id="focusCard" style="margin:.2rem 0 .7rem">
+      <div class="ft">${F.ico} ${F.n}</div>
+      <p style="margin:.4rem 0 .6rem">${F.strat}</p>
+      <div class="small"><b>Bloky:</b> ${F.blocks.join(', ')}</div>
+      <label class="f">Hlavní OP fokus <span class="req">*</span></label>
+      ${opSelect('fOp', dOp, sh.line, decided === 'stab')}
+      <label class="f">${decided === 'prob' ? 'Krok procesu s problémem' : 'Proces / krok procesu'}${decided === 'prob' ? ' <span class="req">*</span>' : ''}</label>
+      <select id="fProc"><option value="">– celá linka –</option>${PROC.map(p => `<option value="${p.k}" ${dProc===p.k?'selected':''}>${p.n}</option>`).join('')}</select>
+      <label class="f">Důvod výběru <span class="req">*</span></label>
+      <textarea id="fWhy" placeholder="${decided === 'new' ? 'Např. 3. den na Prefixu, zatím bez samostatné kvalifikace' : decided === 'prob' ? 'Např. EOL: vrásky nad normálem, včera 4 NOK na Laminaci' : decided === 'stab' ? 'Např. všichni kvalifikovaní, žádná otevřená eskalace' : 'Např. 2 zkušení + 1 OP po návratu z absence'}">${esc(dWhy || '')}</textarea>
+      <div class="row" style="margin-top:.75rem">
+        <button class="btn" id="btnFocus">${f.setAt ? 'Změnit fokus' : 'Zapsat fokus směny'}</button>
+        ${f.setAt ? `<span class="small muted">zapsáno ${hhmm(f.setAt)}${(f.hist||[]).length ? ` · změněno ${f.hist.length}×` : ''}</span>` : ''}
+      </div>
+    </div>` : '';
+  // 3) otázky; karta fokusu hned pod tou, kde padlo rozhodnutí
+  let stop = false;
+  const qHtml = qs.map((q, i) => {
+    const dim = stop;
+    const a = answers[q.k];
+    let after = '';
+    if (!stop && a === 'ano'){ stop = true; after = focusCard; }
+    else if (!stop && a == null) stop = true;
+    else if (q.k === 'stab' && decided === 'mix') after = focusCard;
+    return `<div class="q ${dim?'dim':''}"><div class="qh"><div class="qn">${i+1}</div><div style="flex:1">
+      <div class="qt">${q.t}</div><div class="hint">${q.h}</div>
+      ${q.auto ? `<div class="auto">💡 ${q.auto}</div>` : ''}
+      <div class="ans"><button class="chip ${a==='ano'?'active':''}" data-q="${q.k}" data-a="ano" ${dim?'disabled':''}>ANO</button>
+      <button class="chip ${a==='ne'?'active':''}" data-q="${q.k}" data-a="ne" ${dim?'disabled':''}>NE</button></div>
+    </div></div></div>${after}`;
+  }).join('');
+  const ops = opsOf(sh.line);
+  const pre = sh.pre || {};
+  const tlLate = f.setAt && f.tlAt && (new Date(f.tlAt) - new Date(sh.startAt)) / 6e4 > RULES.tlConfirmMin;
+
+  el.innerHTML = `
+    ${shiftHero(sh)}
+
+    <div class="grid2">
+      <div>
+        <div class="card" id="preCard">
+          <h2>Předsměnový checklist</h2>
+          <ul class="checkl">${PRESHIFT.map((p,i) => `<li><input type="checkbox" data-pre="${i}" ${pre[i]?'checked':''} id="pre${i}"><label for="pre${i}">${p}</label><span class="t">${pre[i]?hhmm(pre[i]):''}</span></li>`).join('')}</ul>
+          ${briefingHtml(sh)}
+        </div>
+        <div class="card" id="diagCard">
+          <h2>Fokus směny – rozhodovací diagram</h2>
+          <p class="muted small" style="margin-top:0">Projdi otázky shora dolů a zastav se u první, kde platí ANO. 💡 = návrh z dat aplikace, rozhoduješ ty.</p>
+          ${qHtml}
+        </div>
+      </div>
+      <div>
+        ${f.setAt ? `<div class="focus-card ${FOCUS[f.type]?.cls || ''}" style="padding:.75rem 1rem">
+            <div class="small muted">Zapsaný fokus směny · ${hhmm(f.setAt)}</div>
+            <div class="ft" style="font-size:1rem">${FOCUS[f.type]?.ico || ''} ${FOCUS[f.type]?.n || ''}</div>
+            <div class="small" style="margin-top:.2rem"><b>${esc(f.op)}</b>${f.proc ? ' · ' + PROC_BY[f.proc].n : ''}<br>${esc(f.why)}</div>
+          </div>` : `<div class="card empty" style="padding:1.5rem 1rem"><div class="big">🧭</div>${F ? 'Doplň detail fokusu pod otázkou a zapiš ho.' : 'Odpověz na otázky rozhodovacího diagramu.'}</div>`}
+
+        ${f.setAt ? `<div class="card" id="tlCard">
+            <h2>Potvrzení TL / supervisor</h2>
+            <p class="small muted" style="margin-top:0">TL zkontroluje fokus nejpozději do ${RULES.tlConfirmMin} minut od začátku směny.</p>
+            ${f.tlAt ? `<div class="banner ${tlLate?'warn':'good'}" style="margin:0">Potvrdil(a) <b>${esc(f.tl)}</b> v ${hhmm(f.tlAt)}${tlLate?' – po limitu 30 min':''}${f.tlNote?`<br><span class="small">${esc(f.tlNote)}</span>`:''}</div>`
+              : `<input type="text" id="tlName" placeholder="Jméno TL"><input type="text" id="tlNote" placeholder="Poznámka / challenge (nepovinné)" style="margin-top:.4rem">
+                 <div style="margin-top:.5rem"><button class="btn secondary" id="btnTl">TL potvrzuje fokus</button></div>`}
+          </div>` : ''}
+
+        <div class="card">
+          <div class="row between"><h2 style="margin:0">Tato směna</h2><button class="btn secondary sm" id="btnSwitch">Přepnout / ukončit</button></div>
+          ${(() => { const s = shiftSummary(sh); return `<div class="grid-kpi" style="margin:.7rem 0 0">
+            <div class="kpi"><div class="lbl">Záznamy</div><div class="val">${s.obs.length}</div></div>
+            <div class="kpi"><div class="lbl">NOK ks</div><div class="val">${s.nok}</div></div>
+            <div class="kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${openEsc(sh.line).length}</div></div></div>`; })()}
+        </div>
+      </div>
+    </div>`;
+
+  el.querySelectorAll('[data-pre]').forEach(c => c.onchange = async () => {
+    sh.pre = sh.pre || {}; sh.pre[c.dataset.pre] = c.checked ? nowIso() : null;
+    if (c.dataset.pre === String(PRESHIFT.length - 1)){
+      if (c.checked){ const B = briefingData(sh); sh.brief = { at: nowIso(), items: B.items.map(x => x.n), src: B.srcLabel }; } else delete sh.brief;
+    }
+    await store.put('shifts', sh.id, sh); renderSmena();
+  });
+  el.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
+    const t = b.dataset.step;
+    if (t === 'linka' || t === 'zaver') return go(t);
+    const target = $(t) || $('diagCard'); if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+  el.querySelectorAll('[data-talk]').forEach(t => t.onchange = async () => {
+    DATA.cfg.talk = { ...(DATA.cfg.talk || {}), [t.dataset.talk]: t.value.trim() };
+    await store.put('cfg', 'talk', DATA.cfg.talk); toast('Sdělení uloženo – zobrazí se i dalším směnám');
+  });
+  el.querySelectorAll('[data-q]').forEach(b => b.onclick = async () => {
+    sh.focus = sh.focus || {}; sh.focus.ans = sh.focus.ans || {};
+    const order = ['new','prob','stab']; const i = order.indexOf(b.dataset.q);
+    order.slice(i+1).forEach(k => delete sh.focus.ans[k]);
+    sh.focus.ans[b.dataset.q] = b.dataset.a;
+    await store.put('shifts', sh.id, sh); renderSmena();
+    const card = $('focusCard');
+    if (card){
+      card.scrollIntoView({ behavior:'smooth', block:'start' });
+      const first = [$('fOp'), $('fWhy')].find(x => x && !x.value);
+      if (first) setTimeout(() => first.focus({ preventScroll:true }), 350);
+    }
+  });
+  if ($('btnFocus')) $('btnFocus').onclick = async () => {
+    const op = $('fOp').value, why = $('fWhy').value.trim();
+    if (!op || !why){ toast('Vyplň hlavního OP a důvod výběru'); return; }
+    if (decided === 'prob' && !$('fProc').value){ toast('U aktivního problému vyber krok procesu'); return; }
+    const prev = sh.focus.setAt ? {type:sh.focus.type, op:sh.focus.op, why:sh.focus.why, at:sh.focus.setAt} : null;
+    Object.assign(sh.focus, { type: decided, op, proc: $('fProc').value, why, setAt: nowIso() });
+    if (prev){ sh.focus.hist = [...(sh.focus.hist || []), prev]; }
+    await store.put('shifts', sh.id, sh); toast('Fokus směny zapsán'); renderAll();
+  };
+  if ($('btnTl')) $('btnTl').onclick = async () => {
+    const n = $('tlName').value.trim(); if (!n){ toast('Doplň jméno TL'); return; }
+    Object.assign(sh.focus, { tl:n, tlNote:$('tlNote').value.trim(), tlAt: nowIso() });
+    await store.put('shifts', sh.id, sh); renderSmena();
+  };
+  const leave = () => { startDraft = { date: today(), shift: guessShift(), line: sh.line, trainer: '' }; LOCAL.activeShift = null; store.saveLocal(); renderAll(); window.scrollTo(0,0); };
+  $('btnSwitch').onclick = leave;
+  $('btnHeroSwitch').onclick = leave;
+}
+
+/* Briefing operátorům: TOP vady z EOL (linka), únik do skladu (200%), nálezy trenérů z minulé směny */
+function briefingData(sh){
+  const T = eolTop('eol', sh.line, 3);
+  const S = eolTop('sklad', null, 1);
+  const prevSh = Object.values(DATA.shifts).filter(s => s.line === sh.line && s.id !== sh.id && s.startAt < sh.startAt).sort((a,b) => a.startAt < b.startAt ? 1 : -1)[0];
+  const prevObs = prevSh ? Object.values(DATA.obs).filter(o => o.shift === prevSh.id) : [];
+  const cnt = {}; prevObs.forEach(o => (o.what || []).forEach(w => { if (!/working instruction|5s|tempo|jiné/i.test(w)) cnt[w] = (cnt[w] || 0) + (+o.nok || 1); }));
+  const prevTop = Object.entries(cnt).sort((a,b) => b[1] - a[1]).slice(0, 3);
+  const items = T ? T.list.map(x => ({ n:x.n, proc:x.proc, share:x.share, R:x.R, over: x.avg8 && x.rate > x.avg8 * 1.2 })) : [];
+  return { T, S, prevSh, prevTop, items, srcLabel: T ? `EOL ${T.wn}` : (prevTop.length ? 'minulá směna' : '') };
+}
+function briefingHtml(sh){
+  const B = briefingData(sh); const talk = DATA.cfg.talk || {};
+  const done = sh.brief;
+  const esc2 = esc;
+  if (!B.items.length && !B.prevTop.length) return `<div class="banner info" style="margin:.6rem 0 0"><b>Briefing TOP vad:</b> zatím nejsou data. Nahraj kontrolní report EOL v Nastavení – aplikace pak připraví TOP 3 vady pro operátory.</div>`;
+  return `<div class="q" style="margin:.7rem 0 0;border-color:${done ? 'var(--good)' : 'var(--navy-2)'}">
+    <div class="row between"><h3 style="margin:0">Co říct operátorům – TOP vady teď</h3>${done ? `<span class="tag good">PŘEDÁNO ${hhmm(done.at)}</span>` : '<span class="tag info">K PŘEDÁNÍ</span>'}</div>
+    ${B.T ? `<div class="small muted" style="margin:.2rem 0 .5rem">EOL Prefix ${sh.line} · ${B.T.wn} · podíl na všech vadách</div>
+      ${B.items.map((x,i) => `<div style="padding:.5rem 0;border-top:1px solid var(--line)">
+        <div class="row" style="gap:.4rem"><b>${i+1}. ${esc2(x.n)}</b><span class="muted small">· ${x.proc ? PROC_BY[x.proc].n : 'mimo linku'} · ${Math.round(x.share*100)} %</span>
+          <span class="tag ${x.R.cls}">${x.R.label}</span>${x.over ? '<span class="tag crit">NAD NORMÁLEM</span>' : ''}</div>
+        <input type="text" data-talk="${esc2(x.n)}" value="${esc2(talk[x.n] || '')}" placeholder="Na co upozornit (kontrolní bod, limitní vzorek, co dělat při vadě)" style="margin-top:.35rem;min-height:40px">
+      </div>`).join('')}` : ''}
+    ${B.S && B.S.list[0] ? `<div class="small" style="padding:.5rem 0;border-top:1px solid var(--line)">📦 <b>Ve 200% kontrole skladu nejčastěji:</b> ${esc2(B.S.list[0].n)} (${Math.round(B.S.list[0].share*100)} %) – vady, které prošly až za linku.</div>` : ''}
+    ${B.prevTop.length ? `<div class="small" style="padding:.5rem 0;border-top:1px solid var(--line)">🔁 <b>Minulá směna (${shiftName(B.prevSh.shift)} ${dfmt(B.prevSh.date)}) trenér zachytil:</b> ${B.prevTop.map(([w,c]) => esc2(w) + ' (' + c + ')').join(', ')}</div>` : ''}
+    <div class="small muted" style="margin-top:.3rem">Odškrtnutím posledního bodu checklistu se uloží, které vady byly operátorům předány. Sdělení u vady se pamatuje pro další směny – stačí ho napsat jednou (ideálně s Quality).</div>
+  </div>`;
+}
+
+function shiftSteps(sh){
+  const f = sh.focus || {}, pre = sh.pre || {};
+  const preN = PRESHIFT.filter((_, i) => pre[i]).length;
+  const rated = PROC.filter(p => (sh.proc || {})[p.k]).length;
+  const st = [
+    { t:'Checklist',     s:`${preN} / ${PRESHIFT.length}`,                          done: preN === PRESHIFT.length, go:'preCard' },
+    { t:'Briefing vad',  s: sh.brief ? 'předáno ' + hhmm(sh.brief.at) : 'čeká',     done: !!sh.brief,               go:'preCard' },
+    { t:'Fokus směny',   s: f.setAt ? (FOCUS[f.type]?.n || '').toLowerCase() : 'čeká', done: !!f.setAt,           go:'diagCard' },
+    { t:'Potvrzení TL',  s: f.tlAt ? esc(f.tl) + ' ' + hhmm(f.tlAt) : 'čeká',       done: !!f.tlAt,                 go:'tlCard' },
+    { t:'Procesy',       s:`${rated} / ${PROC.length} hodnoceno`,                    done: rated === PROC.length,    go:'linka' },
+    { t:'Závěr',         s: sh.closedAt ? 'uzavřeno ' + hhmm(sh.closedAt) : 'čeká',  done: !!sh.closedAt,            go:'zaver' },
+  ];
+  const now = st.findIndex(x => !x.done); if (now >= 0) st[now].now = true;
+  return st;
+}
+function shiftHero(sh){
+  const st = shiftSteps(sh); const done = st.filter(x => x.done).length;
+  const d = new Date(sh.date + 'T00:00');
+  const day = d.toLocaleDateString('cs-CZ', { weekday:'long', day:'numeric', month:'numeric', year:'numeric' });
+  return `<div class="hero">
+      <div class="hrow">
+        <div>
+          <div class="eyebrow">Denní rutina trenéra · G463 Prefix ${sh.line}</div>
+          <h1>${shiftName(sh.shift)} směna</h1>
+          <div class="sub">${day} · ${esc(sh.trainer)} · zahájeno ${hhmm(sh.startAt)}</div>
+        </div>
+        <div class="prog"><button class="hero-switch" id="btnHeroSwitch" title="Přepnout trenéra nebo směnu">⇄ Změnit trenéra / směnu</button><div class="big">${done}<span style="font-size:.55em;opacity:.7"> / ${st.length}</span></div><div class="lbl">kroků splněno</div></div>
+      </div>
+      <div class="pbar"><i style="width:${Math.round(done / st.length * 100)}%"></i></div>
+    </div>
+    <div class="steps">${st.map((x, i) => `<button class="step ${x.done ? 'done' : ''} ${x.now ? 'now' : ''}" data-step="${x.go}">
+      <span class="n">${x.done ? '✓' : i + 1}</span><span><span class="t">${x.t}</span><br><span class="s">${x.s}</span></span></button>`).join('')}</div>`;
+}
+
+function renderRecentShifts(){
+  const list = Object.values(DATA.shifts).sort((a,b) => a.startAt < b.startAt ? 1 : -1).slice(0, 8);
+  if (!list.length) return '';
+  return `<div class="card plain"><h2>Poslední směny</h2>${list.map(s => `<div class="row between" style="padding:.4rem 0;border-bottom:1px solid var(--line)">
+    <span>${dfmt(s.date)} · ${shiftName(s.shift)} · ${s.line} · ${esc(s.trainer)} ${s.closedAt?'<span class="tag neutral">uzavřeno</span>':'<span class="tag info">otevřeno</span>'}</span>
+    <button class="btn secondary sm" data-resume="${s.id}">Otevřít</button></div>`).join('')}</div>`;
+}
+
+function opSelect(id, val, line, allowAll){
+  const ops = opsOf(line);
+  return `<input type="text" id="${id}" list="${id}List" value="${esc(val || '')}" placeholder="${ops.length ? 'Vyber nebo napiš jméno OP' : 'Jméno OP (seznam doplň v Nastavení)'}">
+    <datalist id="${id}List">${allowAll ? '<option value="Všichni OP – rotace">' : ''}${ops.map(o => `<option value="${esc(o.name)}">${isNewOp(o)?'NOVÝ':''}</option>`).join('')}</datalist>`;
+}
+
+async function startShift(){
+  const d = startDraft;
+  const id = `${d.date}_${d.shift}_${d.line}_${d.trainer.replace(/\W+/g,'')}`;
+  if (!DATA.shifts[id]) await store.put('shifts', id, { id, date:d.date, shift:d.shift, line:d.line, trainer:d.trainer, startAt: nowIso(), proc:{}, pre:{}, focus:{} });
+  LOCAL.activeShift = id; store.saveLocal(); renderAll(); window.scrollTo(0,0);
+}
+
+function bindChips(id, fn){ $(id).querySelectorAll('.chip,.pick').forEach(b => b.onclick = () => fn(b.dataset.v)); }
+
+/* ===================== 6. Render – LINKA ===================== */
+function needShift(el, what){
+  el.innerHTML = `<div class="card empty"><div class="big">🎯</div>Nejdřív zahaj směnu v sekci <b>Směna</b>${what ? ' – ' + what : ''}.<br><br><button class="btn" onclick="go('smena')">Zahájit směnu</button></div>`;
+}
+function renderLinka(){
+  const el = $('linkaBody'); const sh = curShift();
+  if (!sh){ $('linkaMeta').textContent = ''; return needShift(el); }
+  $('linkaMeta').textContent = `G463 Prefix ${sh.line} · ${shiftName(sh.shift)} ${dfmt(sh.date)}`;
+  const obs = shiftObs(sh);
+  const rep = repeatOffenders(sh.line);
+  const f = sh.focus || {};
+  const eolT = eolTop('eol', sh.line, 6);
+  el.innerHTML = `
+    ${f.setAt ? `<div class="banner info"><b>${FOCUS[f.type]?.ico || ''} Fokus:</b> ${esc(f.op)}${f.proc ? ' · ' + PROC_BY[f.proc].n : ''} — ${FOCUS[f.type]?.strat || ''}</div>`
+      : `<div class="banner warn"><b>Fokus směny není zapsán.</b> Bez fokusu trenér pracuje náhodně – vyplň ho v sekci Směna.</div>`}
+    ${rep.map(r => `<div class="banner crit"><b>${RULES.repeatN}× korekce bez zlepšení:</b> ${esc(r.op)} · ${PROC_BY[r.proc]?.n} · ${esc(r.what)} (${r.list.length}× za ${RULES.repeatDays} dní) → podle standardu eskaluj TL a zvaž přeškolení.</div>`).join('')}
+    <div class="flow">${PROC.map(p => {
+      const st = (sh.proc || {})[p.k] || {};
+      const po = obs.filter(o => o.proc === p.k);
+      const nok = po.reduce((a,o) => a + (+o.nok || 0), 0);
+      return `<div class="ptile ${st.st || ''}">
+        <div class="pn">${p.n}</div>
+        <div class="pst">${st.t ? `${STATUS[st.st].n} · ${hhmm(st.t)}` : 'Zatím nehodnoceno'}</div>
+        <div class="stbtns">${Object.entries(STATUS).map(([k,v]) => `<button class="chip s-${k} ${st.st===k?'active':''}" data-p="${p.k}" data-s="${k}">${v.n}</button>`).join('')}</div>
+        <div class="nums"><span>Záznamy <b>${po.length}</b></span><span>NOK <b>${nok}</b></span></div>
+        ${eolT ? eolT.list.filter(x => x.proc === p.k).slice(0,2).map(x => `<div class="small"><span class="tag ${x.R.cls}">${x.R.label}</span> EOL: ${esc(x.n)} <span class="mono">${Math.round(x.share*100)} %</span></div>`).join('') : ''}
+        <button class="btn secondary sm" data-rec="${p.k}">+ Záznam</button>
+      </div>`; }).join('')}</div>
+    <div class="legend">Pořadí dlaždic = tok materiálu: Spacer → Glue spray → Prefix → Laminace → Edge Wrapping → Rework.</div>`;
+  el.querySelectorAll('[data-s]').forEach(b => b.onclick = () => setProcStatus(b.dataset.p, b.dataset.s));
+  el.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => { recDraft = newRecDraft(b.dataset.rec); go('zaznam'); });
+}
+
+async function setProcStatus(pk, s){
+  const sh = curShift(); sh.proc = sh.proc || {};
+  sh.proc[pk] = { st:s, t: nowIso() };
+  await store.put('shifts', sh.id, sh);
+  if (s === 'kr'){
+    const id = uid();
+    await store.put('esc', id, { id, line:sh.line, shift:sh.id, proc:pk, src:'status', prio:'H', txt:`${PROC_BY[pk].n}: stav Kritické – závažná odchylka, trenér potřebuje podporu`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+    toast('Kritické → založena eskalace H. Doplň popis, ownera a termín.');
+    recDraft = newRecDraft(pk); go('zaznam'); return;
+  }
+  if (s !== 'ok'){ toast('Doplň záznam – co nefunguje a proč'); recDraft = newRecDraft(pk); go('zaznam'); return; }
+  renderLinka(); renderRail();
+}
+
+/* ===================== 7. Render – ZÁZNAM ===================== */
+let recDraft = null;
+function newRecDraft(pk){
+  const sh = curShift(); const f = sh?.focus || {};
+  return { proc: pk || f.proc || '', op: (f.op && f.op !== 'Všichni OP – rotace') ? f.op : '', what:[], cause:'', why:'', nok:'', act:'', crit:false, tempo:false,
+           blocks: f.type ? [...FOCUS[f.type].blocks] : [1], desc:'', und:null, more:null, train:null, okfb:'' };
+}
+function renderZaznam(){
+  const el = $('zaznamBody'); const sh = curShift();
+  if (!sh) return needShift(el);
+  recDraft ??= newRecDraft();
+  const r = recDraft; const P = PROC_BY[r.proc];
+  const obs = shiftObs(sh);
+  el.innerHTML = `
+    <div class="grid2">
+      <div class="card">
+        <label class="f">Proces <span class="req">*</span></label>
+        <div class="chips" id="rProc">${PROC.map(p => `<button class="chip ${r.proc===p.k?'active':''}" data-v="${p.k}">${p.n}</button>`).join('')}</div>
+        <label class="f">Operátor <span class="req">*</span></label>
+        ${opSelect('rOp', r.op, sh.line)}
+        ${P ? `
+        <label class="f">Co konkrétně nefunguje? <span class="req">*</span></label>
+        <div class="chips" id="rWhat">${P.what.map(w => `<button class="chip ${r.what.includes(w)?'active':''}" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+        <label class="f">Příčina problému <span class="req">*</span></label>
+        <div class="chips" id="rCause">${P.cause.map(c => `<button class="chip ${r.cause===c?'active':''}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+        ${r.cause === 'Chyba operátora' ? `
+          <div class="banner warn" style="margin:.7rem 0 0"><b>Proč systém chybu umožnil?</b> „Chyba operátora“ sama o sobě není příčina – vyber, co za ní stojí.
+          <div class="chips" id="rWhy" style="margin-top:.5rem">${WHY_SYSTEM.map(w => `<button class="chip ${r.why===w?'active':''}" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div></div>` : ''}
+        <div class="row" style="margin-top:.2rem">
+          <div style="flex:1;min-width:120px"><label class="f">Počet NOK dílů</label><input type="number" id="rNok" min="0" inputmode="numeric" value="${esc(r.nok)}"></div>
+          <div style="flex:2;min-width:200px"><label class="f">Kritická chyba?</label>
+            <div class="chips" id="rCrit"><button class="chip ${r.crit?'active':''}" data-v="1">ANO</button><button class="chip ${!r.crit?'active':''}" data-v="0">NE</button></div></div>
+        </div>
+        <label class="f">Okamžitá akce provedena? <span class="req">*</span></label>
+        <div class="chips" id="rAct">${ACTION.map(a => `<button class="chip ${r.act===a.k?'active':''}" data-v="${a.k}">${a.n}</button>`).join('')}</div>
+        <label class="f">Popis situace a akce <span class="req">*</span></label>
+        <textarea id="rDesc" placeholder="Co jsi viděl, co jsi ukázal, jak OP zopakoval">${esc(r.desc)}</textarea>
+        ` : '<p class="muted">Vyber proces – nabídnou se volby přesně pro daný proces.</p>'}
+      </div>
+
+      <div>
+        ${P ? `<div class="card blocks">
+          <h2>Tréninkové bloky</h2>
+          <p class="small muted" style="margin-top:0">Předvyplněno podle fokusu směny. Označ, co jsi s OP udělal.</p>
+          <div class="chips" id="rBlocks">${BLOCKS.map(b => `<button class="chip ${r.blocks.includes(b.k)?'active':''}" data-v="${b.k}" title="${esc(b.s.join(' · '))}">${b.n}</button>`).join('')}</div>
+          <details style="margin-top:.6rem"><summary class="small">Kroky jednotlivých bloků</summary>
+            ${BLOCKS.map(b => `<div class="small" style="margin:.35rem 0"><b>${b.n}</b><br>${b.s.map(s => '· ' + s).join('<br>')}</div>`).join('')}</details>
+          <label class="f">Tempo ohrožuje kvalitu?</label>
+          <div class="chips" id="rTempo"><button class="chip ${r.tempo?'active':''}" data-v="1">ANO</button><button class="chip ${!r.tempo?'active':''}" data-v="0">NE</button></div>
+          ${r.blocks.includes(5) ? `
+            <label class="f">Co dělá OP dobře (konkrétně)</label><input type="text" id="rOkfb" value="${esc(r.okfb)}">
+            ${yn('Operátor rozumí zpětné vazbě?','und',r.und)}
+            ${yn('Nutná další kontrola během směny?','more',r.more)}
+            ${yn('Potřeba delší trénink?','train',r.train)}` : ''}
+        </div>
+        <div class="row"><button class="btn" id="btnSaveRec">Uložit záznam</button><button class="btn secondary" id="btnClearRec">Vyčistit</button></div>` : ''}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:.9rem">
+      <h2>Záznamy této směny (${obs.length})</h2>
+      ${obs.length ? obs.map(recHtml).join('') : '<div class="empty" style="padding:1rem">Zatím žádný záznam.</div>'}
+    </div>`;
+
+  const sync = () => { if ($('rOp')) r.op = $('rOp').value; if ($('rNok')) r.nok = $('rNok').value; if ($('rDesc')) r.desc = $('rDesc').value; if ($('rOkfb')) r.okfb = $('rOkfb').value; };
+  ['rOp','rNok','rDesc','rOkfb'].forEach(i => $(i) && ($(i).oninput = sync));
+  bindChips('rProc', v => { sync(); if (r.proc !== v){ r.what = []; r.cause = ''; r.why = ''; } r.proc = v; renderZaznam(); });
+  if (P){
+    bindChips('rWhat', v => { sync(); r.what = r.what.includes(v) ? r.what.filter(x => x !== v) : [...r.what, v]; renderZaznam(); });
+    bindChips('rCause', v => { sync(); r.cause = v; if (v !== 'Chyba operátora') r.why = ''; renderZaznam(); });
+    $('rWhy') && bindChips('rWhy', v => { sync(); r.why = v; renderZaznam(); });
+    bindChips('rCrit', v => { sync(); r.crit = v === '1'; renderZaznam(); });
+    bindChips('rAct', v => { sync(); r.act = v; renderZaznam(); });
+    bindChips('rTempo', v => { sync(); r.tempo = v === '1'; renderZaznam(); });
+    bindChips('rBlocks', v => { sync(); v = +v; r.blocks = r.blocks.includes(v) ? r.blocks.filter(x => x !== v) : [...r.blocks, v].sort(); renderZaznam(); });
+    el.querySelectorAll('[data-yn]').forEach(b => b.onclick = () => { sync(); r[b.dataset.yn] = b.dataset.v === '1'; renderZaznam(); });
+    $('btnSaveRec').onclick = () => { sync(); saveRecord(); };
+    $('btnClearRec').onclick = () => { recDraft = newRecDraft(r.proc); renderZaznam(); };
+  }
+  el.querySelectorAll('[data-delrec]').forEach(b => b.onclick = async () => { if (!confirm('Smazat záznam?')) return; await store.put('obs', b.dataset.delrec, null); renderAll(); });
+}
+function yn(label, key, val){
+  return `<label class="f">${label}</label><div class="chips"><button class="chip ${val===true?'active':''}" data-yn="${key}" data-v="1">ANO</button><button class="chip ${val===false?'active':''}" data-yn="${key}" data-v="0">NE</button></div>`;
+}
+function recHtml(o){
+  const a = ACTION.find(x => x.k === o.act);
+  return `<div class="rec"><div class="rh">
+      <span class="mono small">${hhmm(o.t)}</span><b>${PROC_BY[o.proc]?.n}</b><span>· ${esc(o.op)}</span>
+      ${o.crit ? '<span class="tag crit">KRITICKÁ</span>' : ''}${o.nok ? `<span class="tag neutral">NOK ${o.nok}</span>` : ''}
+      ${o.act === 'help' ? '<span class="tag crit">POTŘEBUJE POMOC</span>' : o.act === 'prog' ? '<span class="tag warn">ŘEŠÍ SE</span>' : '<span class="tag good">KOREKCE OK</span>'}
+      ${o.train ? '<span class="tag violet">DELŠÍ TRÉNINK</span>' : ''}
+      <button class="btn secondary sm" style="margin-left:auto" data-delrec="${o.id}">Smazat</button></div>
+    <div class="rb"><b>${esc((o.what||[]).join(', '))}</b> → ${esc(o.cause)}${o.why ? ` <span class="muted">(${esc(o.why)})</span>` : ''}<br>${esc(o.desc)}</div></div>`;
+}
+
+async function saveRecord(){
+  const r = recDraft, sh = curShift();
+  const miss = [];
+  if (!r.proc) miss.push('proces'); if (!r.op.trim()) miss.push('operátor'); if (!r.what.length) miss.push('co nefunguje');
+  if (!r.cause) miss.push('příčina'); if (r.cause === 'Chyba operátora' && !r.why) miss.push('proč systém chybu umožnil');
+  if (!r.act) miss.push('okamžitá akce'); if (!r.desc.trim()) miss.push('popis');
+  if (miss.length){ toast('Chybí: ' + miss.join(', ')); return; }
+  const id = uid();
+  const rec = { id, shift: sh.id, line: sh.line, date: sh.date, sh: sh.shift, trainer: sh.trainer, t: nowIso(),
+    proc:r.proc, op:r.op.trim(), what:r.what, cause:r.cause, why:r.why, nok: r.nok === '' ? 0 : Math.max(0, +r.nok || 0),
+    act:r.act, crit:r.crit, tempo:r.tempo, blocks:r.blocks, desc:r.desc.trim(), okfb:r.okfb, und:r.und, more:r.more, train:r.train };
+  await store.put('obs', id, rec);
+  // eskalace: OP potřebuje pomoc nebo kritická chyba
+  if (r.act === 'help' || r.crit){
+    const eid = uid();
+    await store.put('esc', eid, { id:eid, line:sh.line, shift:sh.id, proc:r.proc, src:'obs', obs:id, prio: r.crit ? 'H' : 'M',
+      txt:`${PROC_BY[r.proc].n} · ${rec.op}: ${r.what.join(', ')} → ${r.cause}. ${rec.desc}`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+    toast('Záznam uložen + založena eskalace');
+  } else toast('Záznam uložen');
+  // 3× korekce bez zlepšení → TL
+  for (const g of repeatOffenders(sh.line)){
+    const key = g.op + '|' + g.proc + '|' + g.what;
+    const exists = Object.values(DATA.esc).some(e => e.repKey === key && e.st !== 'closed');
+    if (g.list.some(o => o.id === id) && !exists){
+      const eid = uid();
+      await store.put('esc', eid, { id:eid, line:sh.line, shift:sh.id, proc:g.proc, src:'repeat', repKey:key, prio:'H',
+        txt:`${g.op} · ${PROC_BY[g.proc].n} · ${g.what}: ${g.list.length}× korekce za ${RULES.repeatDays} dní bez zlepšení → eskalace TL, přeškolení / ověření standardu`, act:'', owner:'', d0:'', d:'', st:'open', created: nowIso(), by: sh.trainer });
+      toast(`${RULES.repeatN}× korekce bez zlepšení → eskalace TL založena`);
+    }
+  }
+  recDraft = newRecDraft(r.proc);
+  renderAll();
+}
+
+/* ===================== 8. Render – ESKALACE ===================== */
+let escFilter = 'open', escEdit = null;
+function renderEskalace(){
+  const sh = curShift();
+  const all = Object.values(DATA.esc);
+  const counts = { open: all.filter(e => e.st !== 'closed').length, over: all.filter(isOverdue).length, noown: all.filter(e => e.st !== 'closed' && (!e.owner || !e.d0)).length, closed: all.filter(e => e.st === 'closed').length };
+  $('escFilter').innerHTML = [['open','Otevřené',counts.open],['noown','Bez ownera / termínu',counts.noown],['over','Po termínu',counts.over],['closed','Uzavřené',counts.closed]]
+    .map(([k,n,c]) => `<button class="chip ${escFilter===k?'active':''}" data-v="${k}">${n} <span class="mono">${c}</span></button>`).join('');
+  bindChips('escFilter', v => { escFilter = v; renderEskalace(); });
+
+  $('escForm').innerHTML = escEdit ? escFormHtml(escEdit) : '';
+  if (escEdit) bindEscForm();
+
+  const list = all.filter(e => escFilter === 'open' ? e.st !== 'closed' : escFilter === 'over' ? isOverdue(e) : escFilter === 'noown' ? (e.st !== 'closed' && (!e.owner || !e.d0)) : e.st === 'closed')
+    .sort((a,b) => ('HML'.indexOf(a.prio) - 'HML'.indexOf(b.prio)) || (a.created < b.created ? 1 : -1));
+  $('escList').innerHTML = list.length ? `<div class="tbl-wrap"><table><thead><tr><th>Pri</th><th>Linka</th><th>Problém / odchylka</th><th>Akce</th><th>Owner</th><th>Termín</th><th>Stav</th><th></th></tr></thead><tbody>
+    ${list.map(e => `<tr>
+      <td><span class="tag ${e.prio==='H'?'crit':e.prio==='M'?'warn':'neutral'}">${e.prio}</span></td>
+      <td>${e.line}<div class="small muted">${PROC_BY[e.proc]?.n || ''}</div></td>
+      <td style="min-width:240px">${esc(e.txt)}<div class="small muted">${dfmt(e.created?.slice(0,10))} · ${esc(e.by || '')}${e.src==='repeat'?' · automaticky (opakování)':e.src==='status'?' · automaticky (Kritické)':''}</div></td>
+      <td style="min-width:160px">${esc(e.act) || '<span class="muted">–</span>'}</td>
+      <td>${esc(e.owner) || '<span class="tag crit">chybí</span>'}</td>
+      <td class="mono">${e.d0 ? dfmt(e.d0) : '<span class="tag crit">chybí</span>'}${e.d && e.d !== e.d0 ? `<div class="small muted">posun: ${dfmt(e.d)}</div>` : ''}${isOverdue(e) ? '<div><span class="tag crit">PO TERMÍNU</span></div>' : ''}</td>
+      <td>${e.st==='closed' ? `<span class="tag good">UZAVŘENO</span><div class="small muted">${esc(e.verify||'')}</div>` : e.st==='prog' ? '<span class="tag warn">ŘEŠÍ SE</span>' : '<span class="tag info">OTEVŘENO</span>'}</td>
+      <td><button class="btn secondary sm" data-edit="${e.id}">Upravit</button></td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="legend">Termín se počítá z původního data – posun se zobrazuje zvlášť a „po termínu“ se tím neruší. Uzavřít lze až s ověřením účinnosti.</div>`
+    : `<div class="card empty"><div class="big">✅</div>Žádné položky v tomto filtru.</div>`;
+  $('escList').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { escEdit = {...DATA.esc[b.dataset.edit]}; renderEskalace(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnNewEsc').onclick = () => {
+    if (!sh){ toast('Nejdřív zahaj směnu'); return; }
+    escEdit = { id:null, line:sh.line, shift:sh.id, proc:'', src:'manual', prio:'M', txt:'', act:'', owner:'', d0:'', d:'', st:'open', by: sh.trainer }; renderEskalace();
+  };
+}
+function escFormHtml(e){
+  return `<div class="card">
+    <h2>${e.id ? 'Upravit eskalaci' : 'Nová eskalace'}</h2>
+    <div class="row">
+      <div style="flex:1;min-width:180px"><label class="f">Priorita</label><div class="chips" id="eP">${['H','M','L'].map(p => `<button class="chip ${e.prio===p?'active':''}" data-v="${p}">${p}</button>`).join('')}</div></div>
+      <div style="flex:1;min-width:180px"><label class="f">Proces</label><select id="eProc"><option value="">–</option>${PROC.map(p => `<option value="${p.k}" ${e.proc===p.k?'selected':''}>${p.n}</option>`).join('')}</select></div>
+    </div>
+    <label class="f">Problém / odchylka <span class="req">*</span></label><textarea id="eTxt">${esc(e.txt)}</textarea>
+    <label class="f">Akce – očekávaný výsledek, ne aktivita</label><input type="text" id="eAct" value="${esc(e.act)}" placeholder="Např. OP přeškolen na hranu R5, 0 NOK ve 3 po sobě jdoucích směnách">
+    <div class="row">
+      <div style="flex:2;min-width:200px"><label class="f">Owner (jméno, ne oddělení) <span class="req">*</span></label><input type="text" id="eOwn" value="${esc(e.owner)}"></div>
+      <div style="flex:1;min-width:150px"><label class="f">Termín <span class="req">*</span></label><input type="date" id="eD" value="${e.d || e.d0 || ''}"></div>
+    </div>
+    <label class="f">Stav</label>
+    <div class="chips" id="eSt">${[['open','Otevřeno'],['prog','Řeší se'],['closed','Uzavřeno']].map(([k,n]) => `<button class="chip ${e.st===k?'active':''}" data-v="${k}">${n}</button>`).join('')}</div>
+    ${e.st === 'closed' ? `<label class="f">Ověření účinnosti <span class="req">*</span></label><input type="text" id="eVer" value="${esc(e.verify || '')}" placeholder="KPI, období, výsledek – např. 0 NOK na EW za 5 směn">` : ''}
+    <div class="row" style="margin-top:.8rem"><button class="btn" id="eSave">Uložit</button><button class="btn secondary" id="eCancel">Zrušit</button></div>
+  </div>`;
+}
+function bindEscForm(){
+  const e = escEdit;
+  const sync = () => { e.txt = $('eTxt').value; e.act = $('eAct').value; e.owner = $('eOwn').value; e._d = $('eD').value; e.proc = $('eProc').value; if ($('eVer')) e.verify = $('eVer').value; };
+  bindChips('eP', v => { sync(); e.prio = v; $('escForm').innerHTML = escFormHtml(e); bindEscForm(); $('eD').value = e._d || ''; });
+  bindChips('eSt', v => { sync(); e.st = v; $('escForm').innerHTML = escFormHtml(e); bindEscForm(); $('eD').value = e._d || ''; });
+  $('eCancel').onclick = () => { escEdit = null; renderEskalace(); };
+  $('eSave').onclick = async () => {
+    sync();
+    if (!e.txt.trim() || !e.owner.trim() || !e._d){ toast('Vyplň problém, ownera a termín'); return; }
+    if (e.st === 'closed' && !(e.verify || '').trim()){ toast('Uzavření vyžaduje ověření účinnosti'); return; }
+    if (!e.d0) e.d0 = e._d;      // původní termín se nepřepisuje
+    e.d = e._d; delete e._d;
+    if (!e.id){ e.id = uid(); e.created = nowIso(); }
+    if (e.st === 'closed' && !e.closedAt) e.closedAt = nowIso();
+    await store.put('esc', e.id, e); escEdit = null; toast('Eskalace uložena'); renderAll();
+  };
+}
+
+/* ===================== 9. Render – ZÁVĚR ===================== */
+function renderZaver(){
+  const el = $('zaverBody'); const sh = curShift();
+  if (!sh) return needShift(el);
+  const s = shiftSummary(sh);
+  const open = openEsc(sh.line);
+  const end = sh.end || {};
+  const rating = sh.rating || s.rating;
+  const causes = {}; s.obs.forEach(o => { const k = PROC_BY[o.proc].n + ' – ' + o.cause; causes[k] = (causes[k] || 0) + (+o.nok || 1); });
+  const top = Object.entries(causes).sort((a,b) => b[1]-a[1]).slice(0,3);
+  const ho = handoverText(sh, s, open, top);
+  const unrated = PROC.filter(p => !(sh.proc || {})[p.k]);
+  el.innerHTML = `
+    ${unrated.length ? `<div class="banner warn">Nehodnocené procesy: <b>${unrated.map(p => p.n).join(', ')}</b>. Podpis potvrzuje, že jsi prošel všechny procesy.</div>` : ''}
+    ${!(sh.focus||{}).setAt ? `<div class="banner warn">Fokus směny nebyl zapsán.</div>` : ''}
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>Celkové hodnocení směny</h2>
+          <div class="chips" id="zRate">${[['ok','Bez problémů','s-ok'],['po','Drobné odchylky','s-po'],['kr','Závažné problémy','s-kr']].map(([k,n,c]) => `<button class="chip ${c} ${rating===k?'active':''}" data-v="${k}">${n}</button>`).join('')}</div>
+          <div class="small muted" style="margin-top:.4rem">Návrh z dat: ${({ok:'Bez problémů',po:'Drobné odchylky',kr:'Závažné problémy'})[s.rating]}</div>
+          <div class="grid-kpi" style="margin:.8rem 0 0">
+            <div class="kpi"><div class="lbl">Záznamy</div><div class="val">${s.obs.length}</div></div>
+            <div class="kpi"><div class="lbl">NOK ks</div><div class="val">${s.nok}</div></div>
+            <div class="kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${open.length}</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Závěr směny – před předáním</h2>
+          <ul class="checkl">${ENDSHIFT.map((p,i) => `<li><input type="checkbox" data-end="${i}" id="end${i}" ${end[i]?'checked':''}><label for="end${i}">${p}</label></li>`).join('')}</ul>
+        </div>
+        <div class="card">
+          <h2>Podpis trenéra</h2>
+          ${sh.closedAt ? `<div class="banner good" style="margin:0">Směnu uzavřel(a) <b>${esc(sh.trainer)}</b> v ${hhmm(sh.closedAt)}.</div>`
+            : `<p class="small muted" style="margin-top:0">Podpisem potvrzuješ, že jsi prošel všechny procesy a zaznamenal aktuální stav linky.</p>
+               <button class="btn good" id="btnClose">Podepsat a uzavřít směnu (${esc(sh.trainer)})</button>`}
+        </div>
+      </div>
+      <div class="card">
+        <div class="row between"><h2 style="margin:0">Předávka nástupní směně</h2><button class="btn secondary sm" id="btnCopy">Kopírovat</button></div>
+        <p class="small muted">Text pro Teams / e-mail TL. Otevřené eskalace se nástupní směně automaticky zobrazí v otázce 2 rozhodovacího diagramu.</p>
+        <div class="handover" id="hoText">${esc(ho)}</div>
+        <div class="row" style="margin-top:.6rem"><button class="btn secondary sm" id="btnCsv">Export záznamů (CSV pro Power BI)</button></div>
+      </div>
+    </div>`;
+  bindChips('zRate', async v => { sh.rating = v; await store.put('shifts', sh.id, sh); renderZaver(); });
+  el.querySelectorAll('[data-end]').forEach(c => c.onchange = async () => { sh.end = sh.end || {}; sh.end[c.dataset.end] = c.checked ? nowIso() : null; await store.put('shifts', sh.id, sh); });
+  $('btnCopy').onclick = () => copyText(ho);
+  $('btnCsv').onclick = exportCsv;
+  if ($('btnClose')) $('btnClose').onclick = async () => {
+    if (!sh.rating) sh.rating = s.rating;
+    sh.closedAt = nowIso(); await store.put('shifts', sh.id, sh); toast('Směna uzavřena'); renderAll();
+  };
+}
+function handoverText(sh, s, open, top){
+  const f = sh.focus || {};
+  const L = [];
+  L.push(`PŘEDÁVKA – G463 Prefix ${sh.line} – ${shiftName(sh.shift)} ${dfmt(sh.date)}`);
+  L.push(`Trenér: ${sh.trainer}`);
+  L.push(`Hodnocení: ${({ok:'Bez problémů',po:'Drobné odchylky',kr:'Závažné problémy'})[sh.rating || s.rating]}`);
+  L.push(`Fokus: ${f.setAt ? `${FOCUS[f.type]?.n} – ${f.op}${f.why ? ' (' + f.why + ')' : ''}` : 'nezapsán'}`);
+  L.push(`Briefing TOP vad operátorům: ${sh.brief ? hhmm(sh.brief.at) + ' – ' + sh.brief.items.join(', ') + ' (' + sh.brief.src + ')' : 'NEPROVEDEN'}`);
+  L.push('');
+  L.push('STAV PROCESŮ');
+  PROC.forEach(p => { const st = (sh.proc || {})[p.k]; L.push(`  ${p.n.padEnd(14)} ${st ? STATUS[st.st].n : 'nehodnoceno'}`); });
+  L.push('');
+  L.push(`NOK celkem: ${s.nok} ks · záznamů: ${s.obs.length}`);
+  if (top.length){ L.push('TOP příčiny:'); top.forEach(([k,v]) => L.push(`  - ${k} (${v})`)); }
+  const tr = [...new Set(s.obs.filter(o => o.train || o.more).map(o => o.op + (o.train ? ' – delší trénink' : ' – další kontrola')))];
+  if (tr.length){ L.push(''); L.push('SLEDOVAT V NÁSLEDUJÍCÍ SMĚNĚ'); tr.forEach(t => L.push('  - ' + t)); }
+  L.push('');
+  L.push(`OTEVŘENÉ ESKALACE (${open.length})`);
+  open.forEach(e => L.push(`  [${e.prio}] ${e.txt.slice(0,140)} | owner: ${e.owner || 'CHYBÍ'} | termín: ${e.d0 ? dfmt(e.d0) : 'CHYBÍ'}`));
+  return L.join('\n');
+}
+function copyText(t){
+  try{ navigator.clipboard.writeText(t).then(() => toast('Zkopírováno'), () => fallbackCopy(t)); }catch(e){ fallbackCopy(t); }
+}
+function fallbackCopy(t){ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); toast('Zkopírováno'); }catch(e){ toast('Kopírování selhalo'); } a.remove(); }
+function exportCsv(){
+  const cols = ['date','sh','line','trainer','t','proc','op','what','cause','why','nok','act','crit','tempo','blocks','und','more','train','desc'];
+  const head = ['Datum','Směna','Linka','Trenér','Čas','Proces','Operátor','Co nefunguje','Příčina','Proč systém','NOK','Akce','Kritická','Tempo ohrožuje kvalitu','Bloky','Rozumí ZV','Další kontrola','Delší trénink','Popis'];
+  const val = (o,c) => c === 'proc' ? PROC_BY[o.proc]?.n : c === 'what' ? (o.what||[]).join(' / ') : c === 'blocks' ? (o.blocks||[]).join(',') : c === 't' ? hhmm(o.t) : c === 'act' ? (ACTION.find(a => a.k === o.act)||{}).n : typeof o[c] === 'boolean' ? (o[c] ? 'ANO' : 'NE') : o[c];
+  const rows = Object.values(DATA.obs).sort((a,b) => a.t < b.t ? -1 : 1).map(o => cols.map(c => '"' + String(val(o,c) ?? '').replace(/"/g,'""') + '"').join(';'));
+  const blob = new Blob(['﻿' + head.join(';') + '\n' + rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `trener_g463_zaznamy_${today()}.csv`; a.click();
+}
+
+/* ===================== 10. Render – PŘEHLED TL ===================== */
+let pv = { line:'L1', days:7 };
+function renderPrehled(){
+  $('pvLine').innerHTML = LINES.map(l => `<button class="chip ${pv.line===l?'active':''}" data-v="${l}">${l}</button>`).join('');
+  $('pvPeriod').innerHTML = [[1,'Dnes'],[7,'7 dní'],[30,'30 dní']].map(([d,n]) => `<button class="chip ${pv.days===d?'active':''}" data-v="${d}">${n}</button>`).join('');
+  bindChips('pvLine', v => { pv.line = v; renderPrehled(); });
+  bindChips('pvPeriod', v => { pv.days = +v; renderPrehled(); });
+  const el = $('prehledBody');
+  const since = pv.days === 1 ? today() : daysAgo(pv.days).toISOString().slice(0,10);
+  const shifts = Object.values(DATA.shifts).filter(s => s.line === pv.line && s.date >= since);
+  const obs = Object.values(DATA.obs).filter(o => o.line === pv.line && o.date >= since);
+  if (!shifts.length && !obs.length){ el.innerHTML = `<div class="card empty"><div class="big">📊</div>Za zvolené období nejsou na ${pv.line} žádné záznamy trenérů.</div>`; return; }
+  const withFocus = shifts.filter(s => s.focus?.setAt).length;
+  const tlOk = shifts.filter(s => s.focus?.tlAt && (new Date(s.focus.tlAt) - new Date(s.startAt)) / 6e4 <= RULES.tlConfirmMin).length;
+  const nok = obs.reduce((a,o) => a + (+o.nok || 0), 0);
+  const opErr = obs.filter(o => o.cause === 'Chyba operátora');
+  const open = openEsc(pv.line); const over = open.filter(isOverdue);
+  const pct = (a,b) => b ? Math.round(a / b * 100) + ' %' : '–';
+
+  const by = (arr, keyFn, valFn = () => 1) => { const m = {}; arr.forEach(o => [].concat(keyFn(o)).forEach(k => { m[k] = (m[k] || 0) + valFn(o); })); return Object.entries(m).sort((a,b) => b[1]-a[1]); };
+  const bars = (list, crit) => { const mx = Math.max(...list.map(x => x[1]), 1); return list.map(([k,v]) => `<div class="bar"><div class="bl" title="${esc(k)}">${esc(k)}</div><div class="bt"><div class="bf ${crit?'crit':''}" style="width:${v/mx*100}%"></div></div><div class="bv">${v}</div></div>`).join('') || '<div class="muted small">Bez dat</div>'; };
+
+  const procStatus = PROC.map(p => {
+    const sts = shifts.map(s => (s.proc || {})[p.k]?.st).filter(Boolean);
+    return [p.n, sts.filter(x => x === 'kr').length, sts.filter(x => x === 'po').length, sts.length];
+  });
+  const opsAgg = by(obs, o => o.op).slice(0, 10).map(([op, n]) => {
+    const l = obs.filter(o => o.op === op);
+    return { op, n, nok: l.reduce((a,o) => a + (+o.nok || 0), 0), train: l.some(o => o.train), procs: [...new Set(l.map(o => PROC_BY[o.proc]?.n))].join(', '), nw: isNewOp(Object.values(DATA.ops).find(x => x.name === op)) };
+  });
+  const rep = repeatOffenders(pv.line);
+
+  el.innerHTML = `
+    <div class="grid-kpi">
+      <div class="card kpi"><div class="lbl">Směny s trenérem</div><div class="val">${shifts.length}</div><div class="sub">${pv.line} · od ${dfmt(since)}</div></div>
+      <div class="card kpi"><div class="lbl">Fokus zapsán</div><div class="val">${pct(withFocus, shifts.length)}</div><div class="sub">${withFocus} z ${shifts.length} směn · cíl 100 %</div></div>
+      <div class="card kpi"><div class="lbl">TL potvrdil do 30 min</div><div class="val">${pct(tlOk, shifts.length)}</div><div class="sub">${tlOk} z ${shifts.length} směn</div></div>
+      <div class="card kpi"><div class="lbl">Záznamy / NOK ks</div><div class="val">${obs.length} / ${nok}</div><div class="sub">z pozorování trenérů</div></div>
+      <div class="card kpi"><div class="lbl">Otevřené eskalace</div><div class="val">${open.length}</div><div class="sub">${over.length ? `<span class="tag crit">${over.length} PO TERMÍNU</span>` : 'nic po termínu'}</div></div>
+    </div>
+    ${rep.length ? `<div class="banner crit"><b>Opakované korekce (${RULES.repeatN}+ za ${RULES.repeatDays} dní):</b> ${rep.map(r => `${esc(r.op)} – ${PROC_BY[r.proc]?.n} – ${esc(r.what)} (${r.list.length}×)`).join(' · ')}</div>` : ''}
+    <div class="grid2">
+      <div class="card"><h2>Pareto příčin (NOK ks, jinak počet)</h2>${bars(by(obs, o => PROC_BY[o.proc]?.n + ' – ' + o.cause, o => +o.nok || 1).slice(0,8))}</div>
+      <div class="card"><h2>Co nefunguje</h2>${bars(by(obs, o => o.what || []).slice(0,8))}</div>
+      <div class="card"><h2>Stav procesů po směnách</h2>
+        <div class="tbl-wrap" style="border:0"><table style="min-width:0"><thead><tr><th>Proces</th><th>Krit.</th><th>Pozor.</th><th>Hodnoc.</th></tr></thead><tbody>
+        ${procStatus.map(([n,k,p,t]) => `<tr><td>${n}</td><td class="num">${k ? `<span class="tag crit">${k}</span>` : 0}</td><td class="num">${p}</td><td class="num">${t} / ${shifts.length}</td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="legend">„Hodnoceno“ = v kolika směnách trenér proces skutečně prošel.</div></div>
+      <div class="card"><h2>„Chyba operátora“ – co za ní stojí</h2>
+        <p class="small muted" style="margin-top:0">${opErr.length} z ${obs.length} záznamů (${pct(opErr.length, obs.length)}). Systémová příčina:</p>
+        ${bars(by(opErr, o => o.why || 'neuvedeno'), true)}</div>
+    </div>
+    ${eolCompareHtml(obs)}
+    <div class="card"><h2>Operátoři s nejvíce záznamy – vstup pro skill matrix a tréninkový plán</h2>
+      ${opsAgg.length ? `<div class="tbl-wrap"><table><thead><tr><th>Operátor</th><th>Záznamy</th><th>NOK ks</th><th>Procesy</th><th>Delší trénink</th></tr></thead><tbody>
+      ${opsAgg.map(o => `<tr><td>${esc(o.op)} ${o.nw ? '<span class="tag warn">NOVÝ</span>' : ''}</td><td class="num">${o.n}</td><td class="num">${o.nok}</td><td>${esc(o.procs)}</td><td>${o.train ? '<span class="tag violet">ANO</span>' : '–'}</td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="muted">Bez dat</div>'}
+      <div class="legend">Slouží k plánování tréninku, ne k hodnocení lidí. Disciplinární poznámky sem nepatří.</div></div>
+    <div class="card"><h2>Fokus trenérů po směnách</h2>
+      <div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Směna</th><th>Trenér</th><th>Fokus</th><th>Hlavní OP</th><th>Zapsáno</th><th>TL</th><th>Briefing vad</th><th>Hodnocení</th></tr></thead><tbody>
+      ${shifts.sort((a,b) => a.startAt < b.startAt ? 1 : -1).map(s => { const f = s.focus || {}; const late = f.tlAt && (new Date(f.tlAt) - new Date(s.startAt)) / 6e4 > RULES.tlConfirmMin; const r = s.rating || shiftSummary(s).rating; return `<tr>
+        <td>${dfmt(s.date)}</td><td>${shiftName(s.shift)}</td><td>${esc(s.trainer)}</td>
+        <td>${f.setAt ? FOCUS[f.type]?.ico + ' ' + FOCUS[f.type]?.n : '<span class="tag crit">NEZAPSÁN</span>'}</td>
+        <td>${esc(f.op || '')}</td><td class="mono">${hhmm(f.setAt)}</td>
+        <td>${f.tlAt ? `<span class="tag ${late?'warn':'good'}">${hhmm(f.tlAt)}</span>` : '<span class="muted">–</span>'}</td>
+        <td>${s.brief ? `<span class="tag good">${hhmm(s.brief.at)}</span>` : '<span class="tag crit">NE</span>'}</td>
+        <td><span class="tag ${STATUS[r].cls}">${({ok:'BEZ PROBLÉMŮ',po:'DROBNÉ',kr:'ZÁVAŽNÉ'})[r]}</span></td></tr>`; }).join('')}
+      </tbody></table></div></div>`;
+}
+
+function eolCompareHtml(obs){
+  const blocks = Object.keys(EOL_SRC).map(src => {
+    const T = eolTop(src, pv.line, 8); if (!T) return '';
+    return `<div class="card"><h2>TOP vady – ${EOL_SRC[src]}${src === 'eol' ? ' · ' + pv.line : ' · obě linky'}</h2>
+      <p class="small muted" style="margin-top:0">${T.wn} vs. ${T.wp || '–'} · ${Math.round(T.chk).toLocaleString('cs-CZ')} kontrolovaných MC · ${T.total.toLocaleString('cs-CZ')} vad · zdroj ${esc(T.file)}</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Vada</th><th>Proces (návrh)</th><th>Podíl</th><th>Vad / 100 MC</th><th>Trend W/W</th><th>Ø 8 týdnů před</th><th>Záznamy trenérů</th></tr></thead><tbody>
+      ${T.list.map(x => { const tr = x.item ? obs.filter(o => (o.what || []).includes(x.item)).length : null; return `<tr>
+        <td>${esc(x.n)}</td><td>${x.proc ? PROC_BY[x.proc].n : '<span class="muted">mimo linku</span>'}</td>
+        <td class="num">${Math.round(x.share*100)} %</td><td class="num">${x.rate == null ? '–' : x.rate.toFixed(1)}</td>
+        <td><span class="tag ${x.R.cls}">${x.R.label}</span> <span class="mono small">${pctTxt(x.R.pct)}</span></td>
+        <td class="num">${x.avg8 == null ? '–' : x.avg8.toFixed(1)}${x.avg8 && x.rate > x.avg8 * 1.2 ? ' <span class="tag crit">NAD</span>' : ''}</td>
+        <td class="num">${tr == null ? '–' : tr === 0 && x.share > .1 ? '<span class="tag crit">0</span>' : tr}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      <div class="legend">Trend = vad na 100 MC v ${T.wn} vs. ${T.wp || '–'}: ROSTE > +5 %, KLESÁ < −5 %, jinak STABILNÍ. „Ø 8 týdnů“ = kontext (je aktuální úroveň nad dlouhodobým normálem?), NAD = o více než 20 % výš. Červená 0 u záznamů = vada s podílem nad 10 %, kterou trenéři ve zvoleném období vůbec nezaznamenali.</div></div>`;
+  }).join('');
+  return blocks || `<div class="card"><h2>TOP vady z EOL / 200% kontroly</h2><div class="muted small">Nahraj kontrolní report v Nastavení → Kontrolní reporty – aplikace pak porovná TOP vady se záznamy trenérů.</div></div>`;
+}
+
+/* ===================== 11. Render – NASTAVENÍ ===================== */
+let setLine = 'L1';
+function renderNastaveni(){
+  const el = $('nastaveniBody');
+  const ops = Object.values(DATA.ops).filter(o => o.line === setLine).sort((a,b) => a.name.localeCompare(b.name,'cs'));
+  el.innerHTML = `
+    <div class="grid2">
+      <div class="card">
+        <h2>Operátoři linky</h2>
+        <div class="chips" id="sLine" style="margin-bottom:.6rem">${LINES.map(l => `<button class="chip ${setLine===l?'active':''}" data-v="${l}">${l}</button>`).join('')}</div>
+        <p class="small muted" style="margin-top:0">Datum nástupu na proces a návrat z absence řídí otázku 1 diagramu („nový OP“ = méně než ${RULES.newOpDays} dní).</p>
+        <div class="row"><input type="text" id="sOpName" placeholder="Příjmení Jméno" style="flex:2;min-width:160px"><input type="date" id="sOpStart" style="flex:1;min-width:140px" title="Nástup na proces"><button class="btn" id="sOpAdd">Přidat</button></div>
+        <div class="small muted" style="margin:.4rem 0">Nebo vlož více jmen najednou (jedno na řádek):</div>
+        <textarea id="sOpBulk" placeholder="Příjmení Jméno&#10;Příjmení Jméno"></textarea>
+        <button class="btn secondary sm" id="sOpBulkAdd" style="margin-top:.4rem">Přidat seznam</button>
+        <div style="margin-top:.8rem">${ops.length ? `<div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Operátor</th><th>Nástup</th><th>Absence do</th><th></th></tr></thead><tbody>
+          ${ops.map(o => `<tr><td>${esc(o.name)} ${isNewOp(o)?'<span class="tag warn">NOVÝ</span>':''}${o.off?'<span class="tag neutral">neaktivní</span>':''}</td>
+            <td><input type="date" data-opstart="${o.id}" value="${o.start||''}" style="min-height:36px;padding:.2rem .4rem"></td>
+            <td><input type="date" data-opabs="${o.id}" value="${o.absUntil||''}" style="min-height:36px;padding:.2rem .4rem" title="Po návratu z delší absence nastav datum, do kdy platí režim nového OP"></td>
+            <td><button class="btn secondary sm" data-opoff="${o.id}">${o.off?'Aktivovat':'Vyřadit'}</button></td></tr>`).join('')}
+          </tbody></table></div>` : '<div class="muted small">Zatím žádní operátoři pro ' + setLine + '.</div>'}</div>
+      </div>
+      <div>
+        <div class="card">
+          <h2>Trenéři</h2>
+          <p class="small muted" style="margin-top:0">Jeden na řádek. Výchozí seznam je převzatý z MS Forms.</p>
+          <textarea id="sTrainers">${esc(trainers().join('\n'))}</textarea>
+          <button class="btn secondary sm" id="sTrSave" style="margin-top:.4rem">Uložit trenéry</button>
+        </div>
+        <div class="card">
+          <h2>Kontrolní reporty (EOL / 200% sklad)</h2>
+          <p class="small muted" style="margin-top:0">Nahraj aktuální „Kontrolný report“ (.xlsm). Aplikace pozná EOL (má sloupec Linka) i 200% kontrolu ve skladu a vyhodnotí TOP vady po týdnech.</p>
+          <label class="btn secondary sm" style="display:inline-flex;align-items:center">Nahrát report<input type="file" id="sEol" accept=".xlsm,.xlsx,.xls" multiple hidden></label>
+          <div style="margin-top:.6rem">${Object.entries(DATA.eol).map(([k,v]) => { const w = Object.keys(v.weeks).sort(); return `<div class="small" style="padding:.3rem 0;border-bottom:1px solid var(--line)"><b>${EOL_SRC[k]}</b><br>${esc(v.file)} · ${w[0]} – ${w.at(-1)} · nahráno ${dfmt(v.importedAt.slice(0,10))}${v.skipped ? ` · <span style="color:var(--crit)">${v.skipped} řádků s datem v budoucnu nezapočteno</span>` : ''}</div>`; }).join('') || '<span class="small muted">Zatím nic nenahráno.</span>'}</div>
+        </div>
+        <div class="card">
+          <h2>Data a sdílení</h2>
+          <p class="small">Režim: <b>${fb ? 'Firebase RTDB – sdíleno mezi zařízeními' : 'lokálně v tomto prohlížeči'}</b></p>
+          ${FB_CFG ? `<p class="small">Projekt: <span class="mono">${esc(FB_CFG.projectId || '')}</span>${FIREBASE_CONFIG ? ' (nastaveno v souboru)' : ''}</p>
+              ${FIREBASE_CONFIG ? '' : '<button class="btn secondary sm" id="sFbOff">Odpojit Firebase v tomto prohlížeči</button>'}`
+            : `<p class="small muted" style="margin-bottom:.3rem">Připojení Firebase: vlož sem celý blok <span class="mono">const firebaseConfig = {…}</span> z Firebase konzole (Project settings → Your apps → Web app).</p>
+              <textarea id="sFbCfg" placeholder="const firebaseConfig = {&#10;  apiKey: &quot;…&quot;,&#10;  databaseURL: &quot;https://…europe-west1.firebasedatabase.app&quot;,&#10;  …&#10;};"></textarea>
+              <button class="btn sm" id="sFbOn" style="margin-top:.4rem">Uložit a připojit</button>
+              <p class="small muted">Konfigurace se uloží v tomto prohlížeči. Na dalším zařízení ji vlož znovu, nebo mi ji pošli a zapíšu ji natvrdo do souboru.</p>`}
+          <div class="row"><button class="btn secondary sm" id="sExp">Záloha JSON</button>
+          <label class="btn secondary sm" style="display:inline-flex;align-items:center">Obnovit ze zálohy<input type="file" id="sImp" accept=".json" hidden></label>
+          <button class="btn secondary sm" id="sCsv">Export CSV</button></div>
+          <div class="row" style="margin-top:.6rem"><button class="btn secondary sm" id="sTheme">Přepnout světlý / tmavý režim</button></div>
+        </div>
+        <div class="card">
+          <h2>Pravidla aplikace</h2>
+          <div class="small">
+            <p><b>Rozhodovací diagram</b> – pořadí = priorita: nový OP → aktivní problém → stabilní tým → smíšený tým. Zastav se u první odpovědi ANO.</p>
+            <p><b>Nový OP</b> – nástup na proces před méně než ${RULES.newOpDays} dny nebo nastavená „absence do“.</p>
+            <p><b>Opakovaná korekce</b> – stejný OP + proces + typ problému ${RULES.repeatN}× za ${RULES.repeatDays} dní → automatická eskalace H na TL.</p>
+            <p><b>Kritické</b> na procesu, „Ne – potřebuji pomoc“ nebo kritická chyba → automatická eskalace.</p>
+            <p><b>„Chyba operátora“</b> – povinně doplnit, proč systém chybu umožnil.</p>
+            <p><b>Eskalace</b> – owner jménem, konkrétní termín; „po termínu“ se počítá z původního data; uzavření jen s ověřením účinnosti.</p>
+            <p><b>L1 a L2</b> se vedou vždy zvlášť.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  bindChips('sLine', v => { setLine = v; renderNastaveni(); });
+  const addOp = async (name, start) => { name = name.trim(); if (!name) return; if (Object.values(DATA.ops).some(o => o.line === setLine && o.name === name)) return; const id = uid(); await store.put('ops', id, { id, line:setLine, name, start: start || '' }); };
+  $('sOpAdd').onclick = async () => { await addOp($('sOpName').value, $('sOpStart').value); renderAll(); };
+  $('sOpBulkAdd').onclick = async () => { for (const n of $('sOpBulk').value.split(/\r?\n/)) await addOp(n, ''); renderAll(); };
+  el.querySelectorAll('[data-opstart]').forEach(i => i.onchange = async () => { const o = DATA.ops[i.dataset.opstart]; o.start = i.value; await store.put('ops', o.id, o); renderNastaveni(); });
+  el.querySelectorAll('[data-opabs]').forEach(i => i.onchange = async () => { const o = DATA.ops[i.dataset.opabs]; o.absUntil = i.value; await store.put('ops', o.id, o); renderNastaveni(); });
+  el.querySelectorAll('[data-opoff]').forEach(b => b.onclick = async () => { const o = DATA.ops[b.dataset.opoff]; o.off = !o.off; await store.put('ops', o.id, o); renderNastaveni(); });
+  $('sTrSave').onclick = async () => { DATA.cfg.trainers = $('sTrainers').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean); await store.put('cfg', 'trainers', DATA.cfg.trainers); toast('Trenéři uloženi'); renderAll(); };
+  $('sExp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DATA, null, 1)], {type:'application/json'})); a.download = `trener_g463_zaloha_${today()}.json`; a.click(); };
+  $('sImp').onchange = async e => { const f = e.target.files[0]; if (!f) return; try{ const d = normalize(JSON.parse(await f.text())); if (!confirm('Nahradit aktuální data zálohou?')) return; for (const ent of ['shifts','obs','esc','ops','cfg','eol']) for (const [k,v] of Object.entries(d[ent])) await store.put(ent, k, v); toast('Záloha obnovena'); renderAll(); }catch(err){ toast('Neplatný soubor zálohy'); } };
+  $('sCsv').onclick = exportCsv;
+  if ($('sFbOn')) $('sFbOn').onclick = () => { try{ const c = parseFbSnippet($('sFbCfg').value); localStorage.setItem(FB_CFG_KEY, JSON.stringify(c)); toast('Připojuji…'); setTimeout(() => location.reload(), 600); }catch(err){ toast(err.message); } };
+  if ($('sFbOff')) $('sFbOff').onclick = () => { if (!confirm('Odpojit Firebase? Aplikace bude dál pracovat jen lokálně.')) return; try{ localStorage.removeItem(FB_CFG_KEY); }catch(e){} location.reload(); };
+  $('sEol').onchange = async e => {
+    for (const f of e.target.files){
+      try{ toast('Načítám ' + f.name + ' …'); const R = await parseControlReport(f); await store.put('eol', R.src, R);
+        toast(`${EOL_SRC[R.src]}: ${Object.keys(R.weeks).length} týdnů načteno${R.skipped ? ', ' + R.skipped + ' řádků s chybným datem vynecháno' : ''}`); }
+      catch(err){ console.warn(err); toast(f.name + ': ' + err.message); }
+    }
+    renderAll();
+  };
+  $('sTheme').onclick = () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; try{ localStorage.setItem('trenerG463.theme', r.dataset.theme); }catch(e){} };
+}
+
+/* ===================== 12. Navigace, rail, init ===================== */
+function go(view){
+  document.querySelectorAll('.rail button').forEach(x => x.classList.toggle('active', x.dataset.go === view));
+  document.querySelectorAll('section[data-view]').forEach(s => s.classList.toggle('active', s.dataset.view === view));
+  renderView(view); window.scrollTo(0,0);
+}
+function renderView(v){ ({smena:renderSmena, linka:renderLinka, zaznam:renderZaznam, eskalace:renderEskalace, zaver:renderZaver, prehled:renderPrehled, nastaveni:renderNastaveni})[v]?.(); }
+function renderRail(){
+  const sh = curShift();
+  $('railMeta').textContent = sh ? `${sh.line} · ${shiftName(sh.shift)} · ${sh.trainer.split(' ')[0]}` : 'Bez aktivní směny';
+  const n = Object.values(DATA.esc).filter(e => e.st !== 'closed' && (e.prio === 'H' || isOverdue(e) || !e.owner)).length;
+  const b = $('escBadge'); b.hidden = !n; b.textContent = n;
+}
+function renderAll(){
+  renderRail();
+  const active = document.querySelector('section[data-view].active')?.dataset.view || 'smena';
+  renderView(active);
+}
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200); }
+
+$('railMeta').addEventListener('click', () => { if (curShift()){ LOCAL.activeShift = null; startDraft.trainer = ''; store.saveLocal(); renderRail(); } go('smena'); });
+$('rail').addEventListener('click', e => { const l = e.target.closest('button[data-href]'); if (l){ /* PMS-shell: v rámu přepni modul v aplikaci, samostatně otevři jeho stránku */ if (window.self !== window.top) window.top.location.hash = l.dataset.href; else location.href = '../' + l.dataset.href + '/index.html'; return; } const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); });
+
+(async () => {
+  try{ const th = localStorage.getItem('trenerG463.theme'); if (th) document.documentElement.dataset.theme = th; }catch(e){}
+  DATA = normalize(await store.load());
+  LOCAL = Object.assign({ activeShift:null }, store.loadLocal());
+  if (LOCAL.activeShift && !DATA.shifts[LOCAL.activeShift]) LOCAL.activeShift = null;
+  if (!fb) setSync(false);
+  renderAll();
+})();
+</script>
+</body>
+</html>
