@@ -4,7 +4,7 @@ Samostatná aplikace pro trenéry a Team Leadery linky G463 Prefix (Yanfeng Plan
 
 ## Stránky
 - **Přehled zaškolení** – KPI, pokrytí procesů, Co řešit, vývoj zaškolení týmu, stav operátorů, největší pokrok, aktivita trenérů.
-- **Operátoři** – karty nebo tabulka, hledání, rejstřík A–Ž, filtry (TL, proces z rozpisu, stav).
+- **Operátoři** – vlevo posuvný seznam (hledání, A–Ž, filtry TL / proces / stav), vpravo karta vybraného operátora; šipky ↑ ↓ přepínají.
 - **Karta operátora** – údaje, profil po procesech (radar), kroky se 4 úrovněmi, historie změn, listování ‹ ›, tisk.
 - **Skill matrix** – operátoři × procesy (%), nebo × kroky jednoho procesu s rychlým zadáváním.
 - **Procesy** – detail každého procesu: kdo umí, úrovně po krocích.

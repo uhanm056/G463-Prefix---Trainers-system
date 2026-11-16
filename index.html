@@ -152,16 +152,23 @@ label.f input,label.f select,label.f textarea{text-transform:none;letter-spacing
 .sq{border:0;cursor:pointer;width:28px;height:28px;border-radius:7px;background:var(--sq);font-size:11px;font-weight:800;color:var(--muted);transition:transform .1s}
 .sq:hover{transform:scale(1.1);box-shadow:0 0 0 2px var(--blue)} .sq.on{color:#fff}
 .sgh{padding:6px 14px 4px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pc);background:color-mix(in srgb,var(--pc) 9%,var(--card));border-top:1px solid var(--line)}
-/* Operátoři podle rozpisu směn: směny jako sloupce, uvnitř procesy, řádek = operátor */
-.ros{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:start}
-.ros .card{margin:0}.ros h3 small{display:block;font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;opacity:.85;margin-top:2px}
-.rg{padding:7px 12px 4px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--navy);background:var(--th);border-top:1px solid var(--line);display:flex;gap:6px}
-.rg span{margin-left:auto;color:var(--muted);font-weight:700}
-.rr{display:grid;grid-template-columns:28px minmax(0,1fr) 118px 58px;gap:8px;align-items:center;padding:5px 12px;border-top:1px solid var(--line);cursor:pointer}
-.rr:hover{background:var(--hov)}.rr .av{width:28px;height:28px;font-size:10.5px}
-.rr b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rr small{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rr>span{min-width:0}.rr .mb{min-width:0}
-@media (max-width:760px){.rr{grid-template-columns:28px minmax(0,1fr) 92px 54px;padding:5px 8px}.ros{grid-template-columns:1fr}}.rr .tot{text-align:center;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 0}
+/* Operátoři: seznam vlevo (vlastní posuv) + karta vpravo */
+.md{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}
+.mdl{position:sticky;top:73px;margin:0;display:flex;flex-direction:column;height:calc(100vh - 87px)}
+.mdh{padding:10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.mdh input[type=search]{width:100%}
+.mdf{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}.mdf select{min-height:30px;padding:3px 4px;font-size:11.5px;min-width:0;width:100%}
+.mdl .az{padding:6px 8px 4px;margin:0;gap:2px;border-bottom:1px solid var(--line)}.mdl .az button{min-width:19px;height:22px;font-size:11px;padding:0 3px}
+.mdlist{flex:1;overflow:auto;padding:2px 0}
+.mi{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 10px 6px 8px;cursor:pointer;text-decoration:none;color:inherit;border-left:3px solid transparent}
+.mi:hover{background:var(--hov)}.mi.on{background:var(--th);border-left-color:var(--blue)}
+.mi .av{width:30px;height:30px;font-size:11px}
+.mi b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mi small{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi .st{font-size:11px;padding:2px 8px}
+.mdfoot{border-top:1px solid var(--line);padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:11.5px;color:var(--muted)}
+.mdfoot form{display:flex;gap:4px}.mdfoot input{flex:1;min-width:0;min-height:30px}
+.mback{display:none}
+@media (max-width:900px){.md{grid-template-columns:1fr}.md.has-sel .mdl{display:none}.md:not(.has-sel) .mdr{display:none}.mdl{position:static;height:auto}.mback{display:inline-flex}}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 12px}.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:13px;height:13px;border-radius:4px;display:inline-block}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hist td{white-space:normal}
@@ -243,7 +250,7 @@ const FIREBASE_CONFIG = {
   appId: "1:906392970022:web:cd403e27e375d83675d7e7"
 };
 const ROOT = 'trenerG463/karty';
-const LS_DATA = 'trenerG463.karty.v1', LS_ME = 'trenerG463.karty.me', LS_NAV = 'trenerG463.karty.nav', LS_THEME = 'trenerG463.theme', LS_VIEW = 'trenerG463.karty.view2';
+const LS_DATA = 'trenerG463.karty.v1', LS_ME = 'trenerG463.karty.me', LS_NAV = 'trenerG463.karty.nav', LS_THEME = 'trenerG463.theme';
 const LEVELS = ['Nehodnoceno','Teorie / viděl','Pod vedením trenéra','Samostatně pod dohledem','Schváleno, plně zaškolen'];
 const LV_COL = ['var(--sq)','#9DB4CC','#F2B544','#3B8FE0','#1E9E4A'];
 const PHOTO = { plant:'assets/plant.jpg', interior:'assets/interior.jpg', car:'assets/car.jpg' };
@@ -325,15 +332,6 @@ function status(p){ const c = CFG(); return p < c.thNew ? {k:'new', n:'Nový', c
 const pctCol = p => p >= CFG().thOk ? 'var(--green)' : p >= 40 ? 'var(--blue)' : p >= CFG().thNew ? 'var(--amber)' : 'var(--red)';
 const opsSorted = () => Object.values(D.ops).filter(o => o && o.name).sort((a,b) => a.name.localeCompare(b.name, 'cs'));
 const planKeys = o => [...new Set(String(o.plan || '').split(';').map(x => x.replace(/\(.*?\)/g,'').replace(/\b(12|8) ?cka\b/gi,'').trim()).filter(Boolean))];
-/* rozpis: „Prefix (12cka ranní); Kontrola EDGW (…)“ → [{proc, shift}] */
-const planEntries = o => String(o.plan || '').split(';').map(x => x.trim()).filter(Boolean).map(x => { const m = x.match(/^(.*?)\s*\((.*)\)\s*$/); return m ? {proc:m[1].trim(), shift:m[2].trim()} : {proc:x, shift:''}; });
-const SHIFT_ORDER = ['12cka ranní','12cka','8cka ranní','8cka noční','8cka odpolední'];
-const PROC_ORDER = ['TL+TR','Spacer','Spacer – Roll coater','Glue spray','Prefix','Kontrola Prefix','Laminace','EDGW','Kontrola EDGW','Balení'];
-const ordIdx = (arr, v) => { const i = arr.indexOf(v); return i < 0 ? arr.length : i; };
-/* proces z rozpisu → proces karty (pro pruh „na jeho procesu“) */
-function procOfPlan(name){ const n = norm(name);
-  const key = /^spacer/.test(n) ? 'spacer' : /^glue/.test(n) ? 'glue' : /^prefix|kontrola prefix/.test(n) ? 'prefix' : /^lamin/.test(n) ? 'lam' : /edgw|edge/.test(n) ? 'ew' : /rework/.test(n) ? 'rework' : '';
-  return D.procs.find(p => p.k === key) || D.procs.find(p => norm(p.n) === n) || null; }
 const logList = () => Object.entries(D.log || {}).map(([k,v]) => ({k, ...v})).filter(x => x.op && x.at).sort((a,b) => b.at.localeCompare(a.at));
 const lastChange = o => Object.values(o.lv || {}).reduce((m, v) => { const t = v?.at || v?.d || ''; return t > m ? t : m; }, '');
 const stepById = id => { for (const p of D.procs) for (const s of p.steps) if (s.id === id) return {s, p}; return null; };
@@ -431,7 +429,7 @@ const binds = {};
 function render(){
   renderNav(); renderCrumb();
   const r = route();
-  const views = { prehled:vPrehled, operatori:vOperatori, op:vOp, matice:vMatice, proces:vProces, aktivita:vAktivita, nastaveni:vNastaveni };
+  const views = { prehled:vPrehled, operatori:vPeople, op:vPeople, matice:vMatice, proces:vProces, aktivita:vAktivita, nastaveni:vNastaveni };
   const k = views[r[0]] ? r[0] : 'prehled';
   $('main').innerHTML = banner() + views[k](r);
   (binds[k] || (() => {}))(r);
@@ -490,8 +488,9 @@ function vPrehled(){
   </div>`;
 }
 
-/* ---- Operátoři ---- */
-const UI = { q:'', tl:'', pl:'', st:'', view: (() => { try{ return localStorage.getItem(LS_VIEW) || 'rozpis'; }catch(e){ return 'rozpis'; } })() };
+/* ---- Operátoři: seznam vlevo + karta vpravo ---- */
+const UI = { q:'', tl:'', pl:'', st:'', pre:'' };
+const PRE = () => ({ ok:'Zaškolení', tr:'V tréninku', new:'Noví', stale:`Bez pokroku ${CFG().stale}+ dní`, 'bez-trenera':'Bez trenéra' });
 function filterOps(pre){
   const c = CFG(), q = norm(UI.q);
   return opsSorted().filter(o => {
@@ -506,76 +505,69 @@ function filterOps(pre){
     return true;
   });
 }
-function vOperatori(r){
-  const ops = opsSorted();
-  const pre = { ok:'Zaškolení', tr:'V tréninku', new:'Noví', stale:`Bez pokroku ${CFG().stale}+ dní`, 'bez-trenera':'Bez trenéra' }[r[1]];
+function vPeople(r){
+  const isOp = r[0] === 'op'; if (!isOp) UI.pre = r[1] || '';
+  const sel = isOp ? r[1] : '', ops = opsSorted();
+  if (!ops.length) return hero({ photo:PHOTO.interior, pos:'30% 45%', title:'👥 Operátoři' }) + emptyOps() + `<div class="card"><div class="in"><form id="addF" style="display:flex;gap:6px"><input type="text" id="addN" placeholder="Příjmení Jméno nového operátora" style="flex:1"><button class="btn f" type="submit">+ Přidat</button></form></div></div>`;
   const tls = [...new Set(ops.map(o => o.tl).filter(Boolean))].sort((a,b) => a.localeCompare(b,'cs'));
   const pls = [...new Set(ops.flatMap(planKeys))].sort((a,b) => a.localeCompare(b,'cs'));
-  const head = hero({ photo:PHOTO.interior, pos:'30% 45%', title:'👥 Operátoři', sub:`${ops.length} operátorů linky Prefix · seřazeno podle abecedy`,
-    right:`<form id="addF" class="noprint" style="display:flex;gap:6px;flex-wrap:wrap"><input type="text" id="addN" placeholder="Příjmení Jméno nového operátora" style="min-width:230px"><button class="btn w" type="submit">+ Přidat</button></form>` });
-  if (!ops.length) return head + emptyOps();
-  return head + `
-  ${pre ? `<div class="subt"><span class="pill b">Filtr z přehledu: ${esc(pre)}</span><a href="#/operatori">✕ zrušit</a></div>` : ''}
-  <div class="tools">
-    <input type="search" id="fQ" placeholder="🔍 Hledat podle jména…" value="${esc(UI.q)}">
-    <select id="fTL"><option value="">Všichni Team Leadeři</option>${tls.map(t => `<option ${t === UI.tl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.tl === '__none' ? 'selected' : ''}>— bez Team Leadera —</option></select>
-    <select id="fPl"><option value="">Všechny procesy (rozpis)</option>${pls.map(t => `<option ${t === UI.pl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.pl === '__none' ? 'selected' : ''}>— bez procesu —</option></select>
-    <select id="fSt"><option value="">Všechny stavy</option>${[['new','Nový'],['tr','V tréninku'],['ok','Zaškolen']].map(([k,n]) => `<option value="${k}" ${UI.st === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
-    <span class="subt" style="margin:0"><button data-view="rozpis" class="${UI.view === 'rozpis' ? 'on' : ''}">▥ Podle rozpisu</button><button data-view="karty" class="${UI.view === 'karty' ? 'on' : ''}">▦ Karty</button><button data-view="tabulka" class="${UI.view === 'tabulka' ? 'on' : ''}">☰ Tabulka</button></span>
-  </div>
-  <div class="az" id="az"></div>
-  <div id="opList"></div>
-  <div class="small muted" id="opCount" style="margin-top:8px"></div>`;
+  const pre = PRE()[UI.pre];
+  const by = k => ops.filter(o => status(totalPct(o)).k === k).length;
+  const right = sel ? (D.ops[sel] ? opDetail(D.ops[sel]) : '<div class="card"><div class="empty"><b>Karta neexistuje</b>Operátor byl smazán nebo přejmenován. Vyberte jiného vlevo.</div></div>')
+    : hero({ photo:PHOTO.interior, pos:'30% 45%', title:'👥 Operátoři', sub:`${ops.length} operátorů linky Prefix · vyberte jméno v seznamu vlevo` }) +
+      `<div class="tks" style="grid-template-columns:repeat(3,1fr)"><a class="tk g" href="#/operatori/ok"><span class="l">Zaškoleno</span><span class="vv"><b>${by('ok')}</b></span><span class="s">≥ ${CFG().thOk} %</span></a><a class="tk a" href="#/operatori/tr"><span class="l">V tréninku</span><span class="vv"><b>${by('tr')}</b></span><span class="s">${CFG().thNew}–${CFG().thOk} %</span></a><a class="tk" href="#/operatori/new"><span class="l">Noví</span><span class="vv"><b>${by('new')}</b></span><span class="s">pod ${CFG().thNew} %</span></a></div>
+      <div class="card"><div class="empty"><b>👈 Vyberte operátora</b>Klik na jméno otevře jeho tréninkovou kartu tady vpravo. Šipkami ↑ ↓ na klávesnici přepnete na dalšího v seznamu.</div></div>
+      <div class="card"><h3>Nový operátor</h3><div class="in"><form id="addF" style="display:flex;gap:6px;flex-wrap:wrap"><input type="text" id="addN" placeholder="Příjmení Jméno" style="flex:1;min-width:200px"><button class="btn f" type="submit">+ Přidat</button></form><p class="small muted" style="margin:8px 0 0">Více lidí najednou nahrajete v <a href="#/nastaveni/import">Import a export</a>.</p></div></div>`;
+  return `<div class="md ${sel ? 'has-sel' : ''}">
+    <aside class="card mdl">
+      <div class="mdh">
+        <input type="search" id="fQ" placeholder="🔍 Hledat operátora…" value="${esc(UI.q)}" autocomplete="off">
+        <div class="mdf">
+          <select id="fTL" title="Team Leader"><option value="">TL: všichni</option>${tls.map(t => `<option value="${esc(t)}" ${t === UI.tl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.tl === '__none' ? 'selected' : ''}>bez TL</option></select>
+          <select id="fPl" title="Proces podle rozpisu"><option value="">Proces: vše</option>${pls.map(t => `<option ${t === UI.pl ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__none" ${UI.pl === '__none' ? 'selected' : ''}>bez procesu</option></select>
+          <select id="fSt" title="Stav"><option value="">Stav: vše</option>${[['new','Nový'],['tr','V tréninku'],['ok','Zaškolen']].map(([k,n]) => `<option value="${k}" ${UI.st === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        </div>
+        ${pre ? `<div><span class="pill b">${esc(pre)}</span> <a href="#/operatori" class="small">✕ zrušit</a></div>` : ''}
+        <span class="small muted" id="opCount"></span>
+      </div>
+      <div class="az" id="az"></div>
+      <div class="mdlist" id="mdList"></div>
+    </aside>
+    <section class="mdr">${right}</section>
+  </div>`;
 }
-function renderOpList(pre){
-  const list = filterOps(pre), have = new Set(list.map(o => firstLetter(o.name))), az = [...AZ];
+let mdScroll = 0;
+function renderMdList(sel){
+  const list = filterOps(UI.pre), have = new Set(list.map(o => firstLetter(o.name))), az = [...AZ];
   have.forEach(l => { if (!az.includes(l)) az.push(l); });
   $('az').innerHTML = az.map(l => `<button data-az="${esc(l)}" ${have.has(l) ? '' : 'disabled'}>${esc(l)}</button>`).join('');
-  $('opCount').textContent = `Zobrazeno ${list.length} z ${opsSorted().length} operátorů`;
-  if (!list.length){ $('opList').innerHTML = '<div class="card"><div class="empty"><b>Nikdo neodpovídá</b>Zkuste upravit hledání nebo filtry.</div></div>'; return; }
-  $('az').style.display = UI.view === 'rozpis' ? 'none' : '';
-  if (UI.view === 'rozpis'){
-    const shifts = {};
-    for (const o of list){ const es = planEntries(o), e = es.find(x => x.proc !== 'TL+TR') || es[0] || {proc:'', shift:''};
-      const sh = e.shift || 'Bez směny v rozpisu'; (shifts[sh] ??= {}); (shifts[sh][e.proc || '—'] ??= []).push(o); }
-    const mode = arr => { const c = {}; arr.filter(Boolean).forEach(v => c[v] = (c[v] || 0) + 1); return Object.entries(c).sort((a,b) => b[1] - a[1])[0]?.[0] || ''; };
-    const row = (o, pname) => { const t = totalPct(o), s = status(t), p = procOfPlan(pname), v = p ? procPct(o, p) : null;
-      return `<div class="rr" data-id="${esc(o.id)}" title="${esc(o.name)} – celkem ${t} % (${s.n})">${avatar(o.name)}<span><b>${esc(o.name)}</b>${o.note ? `<small>${esc(o.note)}</small>` : ''}</span>
-        ${p ? `<span title="${esc(p.n)}: ${v} %">${mbar(v, v ? p.col : 'var(--sq)')}</span>` : '<span class="small muted">—</span>'}
-        <span class="tot st ${s.k}" title="Zaškolení celkem (všechny procesy)">Σ ${t} %</span></div>`; };
-    $('opList').innerHTML = `<div class="ros">${Object.keys(shifts).sort((a,b) => ordIdx(SHIFT_ORDER,a) - ordIdx(SHIFT_ORDER,b) || a.localeCompare(b,'cs')).map(sh => {
-      const groups = shifts[sh], all = Object.values(groups).flat(), avg = Math.round(all.reduce((a,o) => a + totalPct(o), 0) / all.length);
-      const tl = mode(all.map(o => o.tl)), tr = mode(all.map(o => o.trainer));
-      return `<div class="card"><h3><span style="margin:0;opacity:1;text-transform:uppercase;letter-spacing:.6px;font-weight:700">${esc(sh)}<small>${[tl && 'TL ' + tl, tr && 'trenér ' + tr].filter(Boolean).map(esc).join(' · ') || '&nbsp;'}</small></span><span>${all.length} lidí · Ø ${avg} %</span></h3>
-        ${Object.keys(groups).sort((a,b) => ordIdx(PROC_ORDER,a) - ordIdx(PROC_ORDER,b) || a.localeCompare(b,'cs')).map(g => { const p = procOfPlan(g);
-          return `<div class="rg">${p ? esc(p.ico) + ' ' : ''}${esc(g)}<span>${groups[g].length}</span></div>` + groups[g].map(o => row(o, g)).join(''); }).join('')}</div>`; }).join('')}</div>
-      <div class="leg" style="padding:10px 0 0"><span>Pruh = zaškolení na procesu, kde operátor podle rozpisu pracuje</span><span>Σ vpravo = zaškolení celkem (všechny procesy)</span><span>Klik na řádek otevře kartu operátora</span></div>`;
-    return;
-  }
-  if (UI.view === 'tabulka'){
-    $('opList').innerHTML = `<div class="card"><div class="tw" style="max-height:68vh"><table><thead><tr><th>Operátor</th><th>TL / trenér</th>${D.procs.map(p => `<th title="${esc(p.n)}">${esc(p.ico)} ${esc(p.n)}</th>`).join('')}<th>Celkem</th><th>Stav</th></tr></thead><tbody>
-      ${list.map(o => { const t = totalPct(o), s = status(t); return `<tr class="click" data-id="${esc(o.id)}" data-letter="${esc(firstLetter(o.name))}"><td><div style="display:flex;gap:9px;align-items:center">${avatar(o.name)}<div><b>${esc(o.name)}</b>${o.plan ? `<br><span class="plan">${esc(o.plan)}</span>` : ''}</div></div></td>
-        <td class="small">${esc(o.tl || '–')}<br><span class="muted">${esc(o.trainer || '–')}</span></td>${D.procs.map(p => `<td>${mbar(procPct(o,p), p.col)}</td>`).join('')}<td>${mbar(t, pctCol(t))}</td><td><span class="st ${s.k}">${s.n}</span></td></tr>`; }).join('')}
-      </tbody></table></div></div>`;
-  } else {
-    $('opList').innerHTML = `<div class="opgrid">${list.map(o => { const t = totalPct(o), s = status(t), lc = lastChange(o);
-      return `<div class="opc" data-id="${esc(o.id)}" data-letter="${esc(firstLetter(o.name))}" style="--sc:${s.c}"><div class="h">${avatar(o.name)}<div class="n"><b>${esc(o.name)}</b><small>${o.plan ? esc(o.plan) : '<span class="muted">proces neuveden</span>'}</small><small>${[o.tl && 'TL ' + o.tl, o.trainer && 'trenér ' + o.trainer, lc && 'změna ' + dshort(lc)].filter(Boolean).map(esc).join(' · ') || '&nbsp;'}</small></div>${ring(t, 58, 6, s.n)}</div>
-        <div class="ps">${D.procs.map(p => { const v = procPct(o,p); return `<div title="${esc(p.n)}: ${v} %"><i><u style="width:${v}%;background:${p.col}"></u></i>${esc(p.ico)} ${v}</div>`; }).join('')}</div></div>`; }).join('')}</div>`;
-  }
+  $('opCount').textContent = `${list.length} z ${opsSorted().length} operátorů · podle abecedy`;
+  $('mdList').innerHTML = list.map(o => { const t = totalPct(o), s = status(t);
+    return `<a class="mi ${o.id === sel ? 'on' : ''}" href="#/op/${encodeURIComponent(o.id)}" data-id="${esc(o.id)}" data-letter="${esc(firstLetter(o.name))}">${avatar(o.name)}<span><b>${esc(o.name)}</b><small>${esc(o.plan || o.note || '')}</small></span><span class="st ${s.k}">${t} %</span></a>`; }).join('')
+    || '<div class="empty" style="padding:18px 10px">Nikdo neodpovídá hledání nebo filtrům.</div>';
 }
-binds.operatori = r => {
-  bindAdd(); if (!$('opList')) return;
-  const pre = r[1] || ''; renderOpList(pre);
-  $('fQ').oninput = e => { UI.q = e.target.value; renderOpList(pre); };
-  $('fTL').onchange = e => { UI.tl = e.target.value; renderOpList(pre); };
-  $('fPl').onchange = e => { UI.pl = e.target.value; renderOpList(pre); };
-  $('fSt').onchange = e => { UI.st = e.target.value; renderOpList(pre); };
-  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { UI.view = b.dataset.view; try{ localStorage.setItem(LS_VIEW, UI.view); }catch(e){} render(); });
-  $('opList').onclick = e => { const el = e.target.closest('[data-id]'); if (el) go('op', el.dataset.id); };
-  $('az').onclick = e => { const b = e.target.closest('button[data-az]'); if (!b) return; const el = $('opList').querySelector(`[data-letter="${CSS.escape(b.dataset.az)}"]`); if (!el) return;
-    const tw = el.closest('.tw'); if (tw) tw.scrollTo({top: el.offsetTop - tw.querySelector('thead').offsetHeight, behavior:'smooth'}); else el.scrollIntoView({behavior:'smooth', block:'center'});
-    el.animate([{boxShadow:'0 0 0 3px #0A5FB4'},{boxShadow:'0 0 0 0 transparent'}], {duration:1400}); };
-};
+function bindPeople(r){
+  bindAdd(); if (!$('mdList')) return;
+  const sel = r[0] === 'op' ? r[1] : '', L = $('mdList');
+  renderMdList(sel);
+  L.scrollTop = mdScroll; L.onscroll = () => { mdScroll = L.scrollTop; };
+  const on = L.querySelector('.mi.on'); if (on && (on.offsetTop < L.scrollTop || on.offsetTop + on.offsetHeight > L.scrollTop + L.clientHeight)) on.scrollIntoView({block:'center'});
+  const re = () => { renderMdList(sel); };
+  $('fQ').oninput = e => { UI.q = e.target.value; re(); };
+  $('fTL').onchange = e => { UI.tl = e.target.value; re(); };
+  $('fPl').onchange = e => { UI.pl = e.target.value; re(); };
+  $('fSt').onchange = e => { UI.st = e.target.value; re(); };
+  $('fQ').onkeydown = e => { if (e.key === 'Enter'){ const a = L.querySelector('.mi'); if (a) go('op', a.dataset.id); } };
+  $('az').onclick = e => { const b = e.target.closest('button[data-az]'); if (!b) return; const el = L.querySelector(`[data-letter="${CSS.escape(b.dataset.az)}"]`); if (el) L.scrollTo({top: el.offsetTop - L.offsetTop, behavior:'smooth'}); };
+  if (sel && D.ops[sel]) bindDetail(D.ops[sel]);
+}
+/* ↑ ↓ = předchozí / další operátor v seznamu */
+document.addEventListener('keydown', e => {
+  const r = route(); if (!['op','operatori'].includes(r[0]) || !['ArrowDown','ArrowUp'].includes(e.key) || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
+  const list = filterOps(UI.pre); if (!list.length) return; e.preventDefault();
+  const i = r[0] === 'op' ? list.findIndex(o => o.id === r[1]) : -1, j = e.key === 'ArrowDown' ? Math.min(list.length - 1, i + 1) : Math.max(0, i - 1);
+  if (j !== i) go('op', list[j].id);
+});
 function bindAdd(){
   const f = $('addF'); if (!f) return;
   f.onsubmit = async e => { e.preventDefault(); const name = $('addN').value.trim().replace(/\s+/g,' '); if (!name) return;
@@ -584,16 +576,21 @@ function bindAdd(){
 }
 
 /* ---- Detail operátora ---- */
-function vOp(r){
-  const o = D.ops[r[1]];
-  if (!o) return hero({title:'Operátor nenalezen'}) + '<div class="card"><div class="empty"><b>Karta neexistuje</b><a href="#/operatori">Zpět na seznam operátorů</a></div></div>';
-  const all = opsSorted(), i = all.findIndex(x => x.id === o.id), t = totalPct(o), s = status(t);
+function opDetail(o){
+  let all = filterOps(UI.pre); if (!all.some(x => x.id === o.id)) all = opsSorted();
+  const i = all.findIndex(x => x.id === o.id), t = totalPct(o), s = status(t);
   const nb = (j, ch, tt) => j >= 0 && j < all.length ? `<a class="btn w" href="#/op/${encodeURIComponent(all[j].id)}" title="${tt}: ${esc(all[j].name)}">${ch}</a>` : `<span class="btn w" style="opacity:.4">${ch}</span>`;
   const head = `<div class="hero" style="--ph:url(${PHOTO.interior});--pp:70% 40%;--hc:${s.c}"><div style="display:flex;gap:16px;align-items:center">${avatar(o.name,'lg')}<div><div class="k">Tréninková karta operátora</div><h1>${esc(o.name)}</h1><p>${[o.plan, o.tl && 'TL ' + o.tl, o.trainer && 'trenér ' + o.trainer, o.start && 'nástup ' + dfmt(o.start)].filter(Boolean).map(esc).join(' · ') || 'Doplňte údaje níže'}</p></div></div>
-    <div class="hr">${ring(t, 96, 9, s.n, '#fff')}<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end" class="noprint"><div style="display:flex;gap:6px;align-items:center">${nb(i-1,'‹','Předchozí')}<span class="small">${i+1} / ${all.length}</span>${nb(i+1,'›','Další')}</div><button class="btn w" id="cPrint">🖨 Tisk karty</button></div></div></div>`;
+    <div class="hr"><a class="btn w mback" href="#/operatori">← Seznam</a>${ring(t, 96, 9, s.n, '#fff')}<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end" class="noprint"><div style="display:flex;gap:6px;align-items:center">${nb(i-1,'‹','Předchozí')}<span class="small">${i+1} / ${all.length}</span>${nb(i+1,'›','Další')}</div><button class="btn w" id="cPrint">🖨 Tisk karty</button></div></div></div>`;
   const hist = logList().filter(x => x.op === o.id).slice(0, 40);
   return head + `
-  <div class="grid g12">
+  <div class="grid g21">
+    <div>
+      <div class="legend">${LEVELS.slice(1).map((l,i) => `<span><i style="background:${LV_COL[i+1]}"></i>${i+1} = ${l}</span>`).join('')}<span>· klik na stejný čtvereček úroveň sníží</span></div>
+      <div class="procs">${D.procs.map(p => { const v = procPct(o,p); return `<div class="proc" style="--pc:${p.col}"><div class="pt"><span class="ic">${esc(p.ico)}</span><b>${esc(p.n)}</b><span class="pc">${v}%</span></div><div class="pbar"><i style="width:${v}%"></i></div>
+        ${p.steps.map((st, si) => { const e = o.lv?.[st.id], l = +(e?.l || 0); return (st.g && st.g !== p.steps[si-1]?.g ? `<div class="sgh">${esc(st.g)}</div>` : '') + `<div class="step"><div class="sn"><div>${esc(st.n)}</div><small>${l ? `${LEVELS[l]}${e.d ? ' · ' + dfmt(e.d) : ''}${e.by ? ' · ' + esc(e.by) : ''}` : 'Nehodnoceno'}</small></div>
+          <div class="sqs">${[1,2,3,4].map(nn => `<button class="sq ${nn <= l ? 'on' : ''}" style="${nn <= l ? 'background:' + LV_COL[l] : ''}" data-step="${esc(st.id)}" data-l="${nn}" title="${nn} – ${LEVELS[nn]}">${nn}</button>`).join('')}</div></div>`; }).join('') || '<div class="step muted small">Žádné kroky – doplňte v Nastavení › Procesy a kroky.</div>'}</div>`; }).join('')}</div>
+    </div>
     <div>
       <div class="card"><h3>Údaje</h3><div class="in">
         <div class="fields">
@@ -610,12 +607,6 @@ function vOp(r){
       <div class="card"><h3>Profil po procesech</h3><div class="chart">${radar(D.procs.map(p => ({l:p.n, ico:p.ico, v:procPct(o,p), c:p.col})))}</div></div>
       <div class="card noprint"><h3>Historie změn <span>${hist.length ? 'posledních ' + hist.length : ''}</span></h3>${hist.length ? `<div class="tw" style="max-height:340px"><table class="hist"><thead><tr><th>Kdy</th><th>Krok</th><th>Úroveň</th><th>Kdo</th></tr></thead><tbody>${hist.map(x => { const sp = stepById(x.s); return `<tr><td>${dshort(x.at)}</td><td>${sp ? esc(sp.p.ico + ' ' + sLabel(sp.s)) : '<span class="muted">smazaný krok</span>'}</td><td><b>${+x.p || 0} → ${+x.l || 0}</b></td><td>${esc(x.by || '—')}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Zatím žádné změny.</div>'}</div>
     </div>
-    <div>
-      <div class="legend">${LEVELS.slice(1).map((l,i) => `<span><i style="background:${LV_COL[i+1]}"></i>${i+1} = ${l}</span>`).join('')}<span>· klik na stejný čtvereček úroveň sníží</span></div>
-      <div class="procs">${D.procs.map(p => { const v = procPct(o,p); return `<div class="proc" style="--pc:${p.col}"><div class="pt"><span class="ic">${esc(p.ico)}</span><b>${esc(p.n)}</b><span class="pc">${v}%</span></div><div class="pbar"><i style="width:${v}%"></i></div>
-        ${p.steps.map((st, si) => { const e = o.lv?.[st.id], l = +(e?.l || 0); return (st.g && st.g !== p.steps[si-1]?.g ? `<div class="sgh">${esc(st.g)}</div>` : '') + `<div class="step"><div class="sn"><div>${esc(st.n)}</div><small>${l ? `${LEVELS[l]}${e.d ? ' · ' + dfmt(e.d) : ''}${e.by ? ' · ' + esc(e.by) : ''}` : 'Nehodnoceno'}</small></div>
-          <div class="sqs">${[1,2,3,4].map(nn => `<button class="sq ${nn <= l ? 'on' : ''}" style="${nn <= l ? 'background:' + LV_COL[l] : ''}" data-step="${esc(st.id)}" data-l="${nn}" title="${nn} – ${LEVELS[nn]}">${nn}</button>`).join('')}</div></div>`; }).join('') || '<div class="step muted small">Žádné kroky – doplňte v Nastavení › Procesy a kroky.</div>'}</div>`; }).join('')}</div>
-    </div>
   </div>`;
 }
 /* změna úrovně kroku + záznam do historie (jeden zápis) */
@@ -627,8 +618,7 @@ async function setLevel(o, sid, l){
   D.log[k] = entry;
   await write({ [`ops/${o.id}/lv/${sid}`]: val, [`log/${k}`]: entry });
 }
-binds.op = r => {
-  const o = D.ops[r[1]]; if (!o) return;
+function bindDetail(o){
   $('cPrint').onclick = () => print();
   $('cRename').onclick = async () => { const n = prompt('Nové jméno operátora:', o.name); if (!n || !n.trim()) return; o.name = n.trim().replace(/\s+/g,' '); await write({[`ops/${o.id}/name`]: o.name}); render(); };
   $('cReset').onclick = async () => { if (!confirm(`Vynulovat všechna hodnocení u ${o.name}?`)) return; o.lv = {}; await write({[`ops/${o.id}/lv`]: null}); render(); };
@@ -638,7 +628,8 @@ binds.op = r => {
     const sid = b.dataset.step, n = +b.dataset.l, cur = lvOf(o, sid), y = scrollY;
     const p = setLevel(o, sid, n === cur ? n - 1 : n); render(); scrollTo(0, y); await p;
   });
-};
+}
+binds.operatori = binds.op = bindPeople;
 
 /* ---- Skill matrix ---- */
 const MX = { mode:'procesy', proc:'' };
